@@ -45,5 +45,36 @@ class TestJsonmodels(unittest.TestCase):
         alan.name = 'Chuck'
         alan.validate()
 
+    def test_type_validation(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            age = fields.IntField()
+
+        alan = Person()
+        alan.age = '42'
+        self.assertRaises(error.ValidationError, alan.validate)
+
+        alan.age = 42
+        alan.validate()
+
+    def test_base_validation(self):
+        """BaseField should not be usable."""
+
+        class Person(models.Base):
+
+            name = fields.BaseField()
+
+        alan = Person()
+        self.assertRaises(error.ValidationError, alan.validate)
+
+        alan.name = 'some name'
+        self.assertRaises(error.ValidationError, alan.validate)
+
+        alan.name = 2345
+        self.assertRaises(error.ValidationError, alan.validate)
+
+
 if __name__ == '__main__':
     unittest.main()

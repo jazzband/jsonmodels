@@ -84,3 +84,25 @@ class ListField(BaseField):
     def get_value_replacement():
         """Get replacement for field."""
         return list()
+
+
+class EmbeddedField(BaseField):
+
+    """Field for embedded models."""
+
+    def __init__(self, model_types, *args, **kwargs):
+        try:
+            iter(model_types)
+            self._types = tuple(model_types)
+        except TypeError:
+            self._types = (model_types,)
+
+        super(EmbeddedField, self).__init__(*args, **kwargs)
+
+    def validate(self, name, value):
+        """Validation."""
+        super(EmbeddedField, self).validate(name, value)
+        try:
+            value.validate()
+        except AttributeError:
+            pass

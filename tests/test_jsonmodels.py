@@ -178,5 +178,119 @@ class TestJsonmodels(unittest.TestCase):
         garage.cars = 'some string'
         self.assertRaises(error.ValidationError, garage.validate)
 
+    def test_embedded_model(self):
+
+        class Secondary(models.Base):
+
+            data = fields.IntField()
+
+        class Primary(models.Base):
+
+            name = fields.StringField()
+            secondary = fields.EmbeddedField(Secondary)
+
+        entity = Primary()
+        entity.validate()
+        self.assertIsNone(entity.secondary)
+
+        entity.name = 'chuck'
+        entity.validate()
+
+        entity.secondary = Secondary()
+        entity.validate()
+
+        entity.secondary.data = 42
+        entity.validate()
+
+        entity.secondary.data = '42'
+        self.assertRaises(error.ValidationError, entity.validate)
+
+        entity.secondary.data = 42
+        entity.validate()
+
+        entity.secondary = 'something different'
+        self.assertRaises(error.ValidationError, entity.validate)
+
+        entity.secondary = None
+        entity.validate()
+
+    def test_embedded_required_validation(self):
+
+        class Secondary(models.Base):
+
+            data = fields.IntField(required=True)
+
+        class Primary(models.Base):
+
+            name = fields.StringField()
+            secondary = fields.EmbeddedField(Secondary)
+
+        entity = Primary()
+        sec = Secondary()
+        sec.data = 33
+        entity.secondary = sec
+        entity.validate()
+        entity.secondary.data = None
+        self.assertRaises(error.ValidationError, entity.validate)
+
+        entity.secondary = None
+        entity.validate()
+
+        class Primary(models.Base):
+
+            name = fields.StringField()
+            secondary = fields.EmbeddedField(Secondary, required=True)
+
+        entity = Primary()
+        sec = Secondary()
+        sec.data = 33
+        entity.secondary = sec
+        entity.validate()
+        entity.secondary.data = None
+        self.assertRaises(error.ValidationError, entity.validate)
+
+    def test_embedded_inheritance(self):
+
+        class Car(models.Base):
+            pass
+
+        class Viper(Car):
+            pass
+
+        class Lamborghini(Car):
+            pass
+
+        class ParkingPlace(models.Base):
+
+            location = fields.StringField()
+            car = fields.EmbeddedField([Viper, Lamborghini])
+
+        place = ParkingPlace()
+
+        place.car = Viper()
+        place.validate()
+
+        place.car = Lamborghini()
+        place.validate()
+
+        place.car = Car()
+        self.assertRaises(error.ValidationError, place.validate)
+
+        class ParkingPlace(models.Base):
+
+            location = fields.StringField()
+            car = fields.EmbeddedField(Car)
+
+        place = ParkingPlace()
+
+        place.car = Viper()
+        place.validate()
+
+        place.car = Lamborghini()
+        place.validate()
+
+        place.car = Car()
+        place.validate()
+
 if __name__ == '__main__':
     unittest.main()

@@ -27,6 +27,11 @@ class BaseField(object):
         if value is None and self.required:
             raise ValidationError('Field "{}" is required!'.format(name))
 
+    @staticmethod
+    def get_value_replacement():
+        """Get replacement for field."""
+        return None
+
 
 class StringField(BaseField):
 
@@ -47,3 +52,19 @@ class FloatField(BaseField):
     """Float field."""
 
     _types = (float, int)
+
+
+class ListField(BaseField):
+
+    """List field."""
+
+    _types = (list,)
+
+    def __init__(self, items_types=None, *args, **kwargs):
+        self._items_types=items_types
+        super(ListField, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def get_value_replacement():
+        """Get replacement for field."""
+        return list()

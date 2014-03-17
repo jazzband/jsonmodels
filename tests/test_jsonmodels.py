@@ -75,6 +75,35 @@ class TestJsonmodels(unittest.TestCase):
         alan.name = 2345
         self.assertRaises(error.ValidationError, alan.validate)
 
+    def test_value_replacements(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            age = fields.IntField()
+            cash = fields.FloatField()
+            children = fields.ListField()
+
+        alan = Person()
+        self.assertIsNone(alan.name)
+        self.assertIsNone(alan.age)
+        self.assertIsNone(alan.cash)
+        self.assertIsInstance(alan.children, list)
+
+    def test_list_field(self):
+
+        class Car(models.Base):
+
+            wheels = fields.ListField()
+
+        viper = Car()
+        viper.validate()
+
+        viper.wheels.append('some')
+        viper.wheels.append('not necessarily')
+        viper.wheels.append('proper')
+        viper.wheels.append('wheels')
+        viper.validate()
 
 if __name__ == '__main__':
     unittest.main()

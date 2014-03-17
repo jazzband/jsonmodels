@@ -13,7 +13,7 @@ class BaseMetaclass(type):
         fields = {}
         for name, field in attr.items():
             if isinstance(field, BaseField):
-                attr[name] = None
+                attr[name] = field.get_value_replacement()
                 fields[name] = field
         attr['_fields'] = fields
 

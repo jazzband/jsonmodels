@@ -10,19 +10,40 @@ Tests for `jsonmodels` module.
 
 import unittest
 
-from jsonmodels import jsonmodels
+from jsonmodels import models, fields, error
 
 
 class TestJsonmodels(unittest.TestCase):
 
-    def setUp(self):
-        pass
+    def test_model1(self):
 
-    def test_something(self):
-        pass
+        class Person(models.Base):
 
-    def tearDown(self):
-        pass
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+
+        alan = Person()
+        alan.validate()
+
+        alan.name = 'Alan'
+        alan.surname = 'Wake'
+        alan.age = 34
+        alan.validate()
+
+    def test_required(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(required=True)
+            surname = fields.StringField()
+            age = fields.IntField()
+
+        alan = Person()
+        self.assertRaises(error.ValidationError, alan.validate)
+
+        alan.name = 'Chuck'
+        alan.validate()
 
 if __name__ == '__main__':
     unittest.main()

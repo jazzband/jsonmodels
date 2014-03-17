@@ -292,5 +292,60 @@ class TestJsonmodels(unittest.TestCase):
         place.car = Car()
         place.validate()
 
+    def test_to_struct_basic(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(required=True)
+            surname = fields.StringField(required=True)
+            age = fields.IntField()
+            cash = fields.FloatField()
+
+        alan = Person()
+        self.assertRaises(error.ValidationError, alan.to_struct)
+
+        alan.name = 'Alan'
+        alan.surname = 'Wake'
+        self.assertEqual({'name': 'Alan', 'surname': 'Wake'}, alan.to_struct())
+
+        alan.age = 24
+        alan.cash = 2445.45
+
+        pattern = {
+            'name': 'Alan',
+            'surname': 'Wake',
+            'age': 24,
+            'cash': 2445.45,
+        }
+
+        self.assertEqual(pattern, alan.to_struct())
+
+    def test_to_struct_nested_1(self):
+
+        class Car(models.Base):
+
+            brand = fields.StringField()
+
+        class ParkingPlace(models.Base):
+
+            location = fields.StringField()
+            car = fields.EmbeddedField(Car)
+
+        place = ParkingPlace()
+        place.location = 'never never land'
+
+        pattern = {
+            'location': 'never never land',
+        }
+        self.assertEqual(pattern, place.to_struct())
+
+        place.car = Car()
+        pattern['car'] = {}
+        self.assertEqual(pattern, place.to_struct())
+
+        place.car.brand = 'Fiat'
+        pattern['car']['brand'] = 'Fiat'
+        self.assertEqual(pattern, place.to_struct())
+
 if __name__ == '__main__':
     unittest.main()

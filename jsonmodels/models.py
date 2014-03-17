@@ -29,3 +29,17 @@ class Base(object):
         for name, field in self._fields.items():
             value = getattr(self, name)
             field.validate(name, value)
+
+    def to_struct(self):
+        self.validate()
+        result = {}
+
+        for name, field in self._fields.items():
+            value = getattr(self, name)
+            if value is not None:
+                if isinstance(value, Base):
+                    result[name] = value.to_struct()
+                else:
+                    result[name] = value
+
+        return result

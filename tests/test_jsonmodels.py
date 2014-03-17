@@ -105,5 +105,78 @@ class TestJsonmodels(unittest.TestCase):
         viper.wheels.append('wheels')
         viper.validate()
 
+    def test_list_field_types(self):
+
+        class Wheel(models.Base):
+            pass
+
+        class Wheel2(models.Base):
+            pass
+
+        class Car(models.Base):
+
+            wheels = fields.ListField(items_types=[Wheel])
+
+        viper = Car()
+        viper.validate()
+
+        viper.wheels.append(Wheel())
+        viper.wheels.append(Wheel())
+        viper.validate()
+
+        viper.wheels.append(Wheel2)
+        self.assertRaises(error.ValidationError, viper.validate)
+
+    def test_list_field_for_subtypes(self):
+
+        class Car(models.Base):
+            pass
+
+        class Viper(Car):
+            pass
+
+        class Lamborghini(Car):
+            pass
+
+        class Garage1(models.Base):
+
+            cars = fields.ListField(items_types=[Car])
+
+        garage = Garage1()
+        garage.validate()
+
+        garage.cars.append(Car())
+        garage.validate()
+
+        garage.cars.append(Viper())
+        garage.cars.append(Lamborghini())
+        garage.validate()
+
+        class Garage2(models.Base):
+
+            cars = fields.ListField(items_types=[Viper, Lamborghini])
+
+        garage = Garage2()
+        garage.validate()
+
+        garage.cars.append(Viper())
+        garage.cars.append(Lamborghini())
+        garage.validate()
+
+        garage.cars.append(Car())
+        self.assertRaises(error.ValidationError, garage.validate)
+
+    def test_list_validation(self):
+
+        class Garage(models.Base):
+
+            cars = fields.ListField()
+
+        garage = Garage()
+        garage.validate()
+
+        garage.cars = 'some string'
+        self.assertRaises(error.ValidationError, garage.validate)
+
 if __name__ == '__main__':
     unittest.main()

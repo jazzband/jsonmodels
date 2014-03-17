@@ -1,3 +1,4 @@
+"""Definitions of fields."""
 
 from .error import ValidationError
 
@@ -61,8 +62,23 @@ class ListField(BaseField):
     _types = (list,)
 
     def __init__(self, items_types=None, *args, **kwargs):
-        self._items_types=items_types
+        self._items_types = tuple(items_types) if items_types else tuple()
         super(ListField, self).__init__(*args, **kwargs)
+
+    def validate(self, name, value):
+        """Validation."""
+        super(ListField, self).validate(name, value)
+
+        if len(self._items_types) == 0:
+            return
+
+        for item in value:
+            if not isinstance(item, self._items_types):
+                raise ValidationError(
+                    'All items of "{}" must be instances of {}'.format(
+                        name,
+                        ', '.join([t.__name__ for t in self._items_types])
+                    ))
 
     @staticmethod
     def get_value_replacement():

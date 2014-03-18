@@ -39,7 +39,7 @@ class Base(object):
             if value is not None:
                 if isinstance(value, Base):
                     result[name] = value.to_struct()
-                else:
-                    result[name] = value
+                elif isinstance(field, BaseField):
+                    result[name] = field.to_struct(value)
 
         return result

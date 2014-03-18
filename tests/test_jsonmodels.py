@@ -1,12 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-"""
-test_jsonmodels
-----------------------------------
-
-Tests for `jsonmodels` module.
-"""
+"""Tests for `jsonmodels` module."""
 
 import unittest
 
@@ -347,5 +339,41 @@ class TestJsonmodels(unittest.TestCase):
         pattern['car']['brand'] = 'Fiat'
         self.assertEqual(pattern, place.to_struct())
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_to_struct_nested_2(self):
+
+        class Viper(models.Base):
+
+            serial = fields.StringField()
+
+        class Lamborghini(models.Base):
+
+            serial = fields.StringField()
+
+        class Parking(models.Base):
+
+            location = fields.StringField()
+            cars = fields.ListField([Viper, Lamborghini])
+
+        parking = Parking()
+        pattern = {'cars': []}
+        self.assertEqual(pattern, parking.to_struct())
+
+        parking.location = 'somewhere'
+        pattern['location'] = 'somewhere'
+        self.assertEqual(pattern, parking.to_struct())
+
+        v = Viper()
+        v.serial = '12345'
+        parking.cars.append(v)
+        pattern['cars'].append({'serial': '12345'})
+        self.assertEqual(pattern, parking.to_struct())
+
+        parking.cars.append(Viper())
+        pattern['cars'].append({})
+        self.assertEqual(pattern, parking.to_struct())
+
+        l = Lamborghini()
+        l.serial = '54321'
+        parking.cars.append(l)
+        pattern['cars'].append({'serial': '54321'})
+        self.assertEqual(pattern, parking.to_struct())

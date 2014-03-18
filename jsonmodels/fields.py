@@ -28,6 +28,9 @@ class BaseField(object):
         if value is None and self.required:
             raise ValidationError('Field "{}" is required!'.format(name))
 
+    def to_struct(self, value):
+        return value
+
     @staticmethod
     def get_value_replacement():
         """Get replacement for field."""
@@ -79,6 +82,12 @@ class ListField(BaseField):
                         name,
                         ', '.join([t.__name__ for t in self._items_types])
                     ))
+
+    def to_struct(self, value):
+        result = []
+        for item in value:
+            result.append(item.to_struct())
+        return result
 
     @staticmethod
     def get_value_replacement():

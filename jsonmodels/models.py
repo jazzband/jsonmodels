@@ -1,5 +1,6 @@
 """Base models."""
 
+from . import parsers
 from .fields import BaseField
 
 
@@ -39,18 +40,7 @@ class Base(object):
             field.validate(name, value)
 
     def to_struct(self):
-        self.validate()
-        result = {}
-
-        for name, field in self._fields.items():
-            value = getattr(self, name)
-            if value is not None:
-                if isinstance(value, Base):
-                    result[name] = value.to_struct()
-                elif isinstance(field, BaseField):
-                    result[name] = field.to_struct(value)
-
-        return result
+        return parsers.to_struct(self)
 
     def __iter__(self):
         for name, field in self._fields.items():

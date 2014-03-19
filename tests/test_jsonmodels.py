@@ -377,3 +377,74 @@ class TestJsonmodels(unittest.TestCase):
         parking.cars.append(l)
         pattern['cars'].append({'serial': '54321'})
         self.assertEqual(pattern, parking.to_struct())
+
+    def test_iterable(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+            cash = fields.FloatField()
+
+        alan = Person()
+
+        alan.name = 'Alan'
+        alan.surname = 'Wake'
+        alan.age = 24
+        alan.cash = 2445.45
+
+        pattern = {
+            'name': 'Alan',
+            'surname': 'Wake',
+            'age': 24,
+            'cash': 2445.45,
+        }
+
+        result = {}
+        for name, value in alan:
+            result[name] = value
+
+        self.assertEqual(pattern, result)
+
+    def test_initialization(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+            cash = fields.FloatField()
+
+        alan = Person(
+            name='Alan',
+            surname='Wake',
+            age=24,
+            cash=2445.45,
+            trash='123qwe',
+        )
+
+        self.assertEqual(alan.name, 'Alan')
+        self.assertEqual(alan.surname, 'Wake')
+        self.assertEqual(alan.age, 24)
+        self.assertEqual(alan.cash, 2445.45)
+
+        self.assertTrue(not hasattr(alan, 'trash'))
+
+    def test_get_field(self):
+
+        name_field = fields.StringField()
+        surname_field = fields.StringField()
+        age_field = fields.IntField()
+
+        class Person(models.Base):
+
+            name = name_field
+            surname = surname_field
+            age = age_field
+
+        alan = Person()
+
+        self.assertIs(alan.get_field('name'), name_field)
+        self.assertIs(alan.get_field('surname'), surname_field)
+        self.assertIs(alan.get_field('age'), age_field)

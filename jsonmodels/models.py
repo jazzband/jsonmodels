@@ -39,10 +39,13 @@ class Base(object):
             value = getattr(self, name)
             field.validate(name, value)
 
-    def to_struct(self):
-        return parsers.to_struct(self)
-
     def __iter__(self):
         for name, field in self._fields.items():
             value = getattr(self, name)
             yield name, value
+
+    def to_struct(self):
+        return parsers.to_struct(self)
+
+    def to_json_schema(self):
+        return parsers.to_json_schema(self)

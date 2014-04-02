@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='jsonmodels',
-    version='0.1.0',
+    version='1.0',
     description='Models to make easier to deal with structures that are to be casted to JSON.',
     long_description=readme + '\n\n' + history,
     author='Szczepan Cieślik',
@@ -36,7 +36,6 @@ setup(
     zip_safe=False,
     keywords='jsonmodels',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',

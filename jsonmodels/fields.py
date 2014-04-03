@@ -29,6 +29,11 @@ class BaseField(object):
             raise ValidationError('Field "{}" is required!'.format(name))
 
     def to_struct(self, value):
+        """Cast value to Python structure."""
+        return value
+
+    def parse_value(self, value):
+        """Parse value from primitive to desired format."""
         return value
 
     @staticmethod
@@ -65,7 +70,13 @@ class ListField(BaseField):
     _types = (list,)
 
     def __init__(self, items_types=None, *args, **kwargs):
-        self._items_types = tuple(items_types) if items_types else tuple()
+        if items_types:
+            try:
+                self._items_types = tuple(items_types)
+            except TypeError:
+                self._items_types = items_types,
+        else:
+            self._items_types = tuple()
         super(ListField, self).__init__(*args, **kwargs)
 
     def validate(self, name, value):
@@ -84,6 +95,7 @@ class ListField(BaseField):
                     ))
 
     def to_struct(self, value):
+        """Cast value to structure."""
         result = []
         for item in value:
             result.append(item.to_struct())
@@ -93,6 +105,24 @@ class ListField(BaseField):
     def get_value_replacement():
         """Get replacement for field."""
         return list()
+
+    def parse_value(self, values):
+        if len(self._items_types) != 1:
+            raise ValidationError(
+                'Cannot decide which type to choose from "{}".'.format(
+                    ', '.join([t.__name__ for t in self._items_types])
+            ))
+
+        embed_type = self._items_types[0]
+        result = self.get_value_replacement()
+
+        try:
+            for value in values:
+                result.append(embed_type(**value))
+        except TypeError:
+            raise ValidationError('Given value for field is not iterable.')
+
+        return result
 
 
 class EmbeddedField(BaseField):
@@ -115,3 +145,12 @@ class EmbeddedField(BaseField):
             value.validate()
         except AttributeError:
             pass
+
+    def parse_value(self, value):
+        if len(self._types) != 1:
+            raise ValidationError(
+                'Cannot decide which type to choose from "{}".'.format(
+                    ', '.join([t.__name__ for t in self._types])
+            ))
+        embed_type = self._types[0]
+        return embed_type(**value)

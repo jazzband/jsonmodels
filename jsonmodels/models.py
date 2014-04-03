@@ -30,14 +30,25 @@ class Base(object):
         self.populate(**kwargs)
 
     def populate(self, **kw):
-        to_assign = {k: v for k, v in kw.items() if k in self._fields.keys()}
-        for name, value in to_assign.items():
-            setattr(self, name, value)
+        """Populate values to fields."""
+        for name, value in kw.items():
+            # Check for field, if absent, skip this values.
+            try:
+                field = self._fields[name]
+            except KeyError:
+                continue
+
+            # Let field decide in what format this value should be in.
+            parsed_value = field.parse_value(value)
+
+            setattr(self, name, parsed_value)
 
     def get_field(self, name):
+        """Get field associated with given name/attribute."""
         return self._fields[name]
 
     def validate(self):
+        """Validate."""
         for name, field in self._fields.items():
             value = getattr(self, name)
             field.validate(name, value)
@@ -48,7 +59,9 @@ class Base(object):
             yield name, value
 
     def to_struct(self):
+        """Cast model to structure. Shortcut method."""
         return parsers.to_struct(self)
 
     def to_json_schema(self):
+        """Cast model to JSON schema. Shortcut method."""
         return parsers.to_json_schema(self)

@@ -27,6 +27,15 @@ def to_struct(model):
     return resp
 
 
+def _speficy_field_type(field):
+    if isinstance(field, fields.StringField):
+        return {'type': 'string'}
+    elif isinstance(field, fields.IntField):
+        return {'type': 'integer'}
+    elif isinstance(field, fields.FloatField):
+        return {'type': 'float'}
+
+
 def to_json_schema(model):
     """Generate JSON schema for given instance of model.
 
@@ -43,12 +52,8 @@ def to_json_schema(model):
     prop = {}
     for name, _ in model:
         field = model.get_field(name)
-        if isinstance(field, fields.StringField):
-            prop[name] = {'type': 'string'}
-        elif isinstance(field, fields.IntField):
-            prop[name] = {'type': 'integer'}
-        elif isinstance(field, fields.FloatField):
-            prop[name] = {'type': 'float'}
+        prop[name] = _speficy_field_type(field)
+
     resp['properties'] = prop
 
     return resp

@@ -2,7 +2,8 @@
 
 import unittest
 
-from jsonmodels import models, fields, error
+from jsonmodels import models, fields
+from .utils import get_fixture
 
 
 class TestJsonmodels(unittest.TestCase):
@@ -11,21 +12,12 @@ class TestJsonmodels(unittest.TestCase):
 
         class Person(models.Base):
 
-            name = fields.StringField()
-            surname = fields.StringField()
+            name = fields.StringField(required=True)
+            surname = fields.StringField(required=True)
             age = fields.IntField()
 
         alan = Person()
         schema = alan.to_json_schema()
-
-        pattern = {
-            'type': 'object',
-            'properties': {
-                'name': {'type': 'string'},
-                'surname': {'type': 'string'},
-                'age': {'type': 'integer'},
-            },
-            'additionalProperties': False,
-        }
+        pattern = get_fixture('schema1.json')
 
         self.assertEqual(pattern, schema)

@@ -3,22 +3,22 @@
 History
 -------
 
-0.1.0 (2014-03-17)
+1.0.2 (2014-04-03)
 ++++++++++++++++++
 
-* First release on PyPI.
-
-1.0 (2014-04-02)
-++++++++++++++++
-
-* First stable release on PyPI.
+* Added deep data initialization.
 
 1.0.1 (2014-04-03)
 ++++++++++++++++++
 
 * Added `populate` method.
 
-1.0.2 (2014-04-03)
+1.0 (2014-04-02)
+++++++++++++++++
+
+* First stable release on PyPI.
+
+0.1.0 (2014-03-17)
 ++++++++++++++++++
 
-* Added deep data initialization.
+* First release on PyPI.

@@ -1,5 +1,7 @@
 """Definitions of fields."""
 
+import six
+
 from .error import ValidationError
 
 
@@ -46,7 +48,7 @@ class StringField(BaseField):
 
     """String field."""
 
-    _types = (str, basestring, unicode)
+    _types = six.string_types
 
 
 class IntField(BaseField):

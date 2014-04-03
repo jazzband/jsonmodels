@@ -20,11 +20,14 @@ class BaseMetaclass(type):
         return super(BaseMetaclass, cls).__new__(cls, name, bases, attr)
 
 
-class Base(object):
+class PreBase(object):
 
-    """Base class for all models."""
+    """Base class for all models.
 
-    __metaclass__ = BaseMetaclass
+    For compatibility reasons (Python 2 and 3) it is called `PreBase`
+    and you MUST in fact use class called `Base` defined after this class.
+
+    """
 
     def __init__(self, **kwargs):
         self.populate(**kwargs)
@@ -65,3 +68,6 @@ class Base(object):
     def to_json_schema(self):
         """Cast model to JSON schema. Shortcut method."""
         return parsers.to_json_schema(self)
+
+# Actual base for models.
+Base = BaseMetaclass('Base', (PreBase,), {})

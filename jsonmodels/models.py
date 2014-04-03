@@ -26,7 +26,10 @@ class Base(object):
 
     __metaclass__ = BaseMetaclass
 
-    def __init__(self, **kw):
+    def __init__(self, **kwargs):
+        self.populate(**kwargs)
+
+    def populate(self, **kw):
         to_assign = {k: v for k, v in kw.items() if k in self._fields.keys()}
         for name, value in to_assign.items():
             setattr(self, name, value)

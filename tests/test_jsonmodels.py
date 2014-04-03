@@ -448,3 +448,33 @@ class TestJsonmodels(unittest.TestCase):
         self.assertIs(alan.get_field('name'), name_field)
         self.assertIs(alan.get_field('surname'), surname_field)
         self.assertIs(alan.get_field('age'), age_field)
+
+    def test_populate(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+            cash = fields.FloatField()
+
+        data = dict(
+            name='Alan',
+            surname='Wake',
+            age=24,
+            cash=2445.45,
+            trash='123qwe',
+        )
+
+        alan = Person()
+
+        self.assertIs(alan.name, None)
+
+        alan.populate(**data)
+
+        self.assertEqual(alan.name, 'Alan')
+        self.assertEqual(alan.surname, 'Wake')
+        self.assertEqual(alan.age, 24)
+        self.assertEqual(alan.cash, 2445.45)
+
+        self.assertTrue(not hasattr(alan, 'trash'))

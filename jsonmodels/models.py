@@ -1,5 +1,7 @@
 """Base models."""
 
+import six
+
 from . import parsers
 from .fields import BaseField
 
@@ -8,7 +10,7 @@ class BaseMetaclass(type):
 
     """Metaclass for models."""
 
-    def __new__(cls, name, bases, attr):
+    def __new__(cls, class_name, bases, attr):
 
         fields = {}
         for name, field in attr.items():
@@ -17,7 +19,7 @@ class BaseMetaclass(type):
                 fields[name] = field
         attr['_fields'] = fields
 
-        return super(BaseMetaclass, cls).__new__(cls, name, bases, attr)
+        return super(BaseMetaclass, cls).__new__(cls, class_name, bases, attr)
 
 
 class PreBase(object):
@@ -68,6 +70,16 @@ class PreBase(object):
     def to_json_schema(self):
         """Cast model to JSON schema. Shortcut method."""
         return parsers.to_json_schema(self)
+
+    def __repr__(self):
+        try:
+            txt = six.text_type(self)
+        except TypeError:
+            txt = ''
+        return '<{}: {}>'.format(self.__class__.__name__, txt)
+
+    def __str__(self):
+        return '{} object'.format(self.__class__.__name__)
 
 # Actual base for models.
 Base = BaseMetaclass('Base', (PreBase,), {})

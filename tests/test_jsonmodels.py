@@ -424,3 +424,38 @@ class TestJsonmodels(unittest.TestCase):
         self.assertIs(alan.get_field('name'), name_field)
         self.assertIs(alan.get_field('surname'), surname_field)
         self.assertIs(alan.get_field('age'), age_field)
+
+    def test_repr(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+
+        chuck = Person()
+
+        self.assertEqual(chuck.__repr__(), '<Person: Person object>')
+        self.assertEqual(chuck.__str__(), 'Person object')
+
+        class Person2(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField()
+
+            def __str__(self):
+                return self.name
+
+        chuck = Person2()
+
+        self.assertEqual(chuck.__repr__(), '<Person2: >')
+
+        chuck.name = 'Chuck'
+        self.assertEqual(chuck.__repr__(), '<Person2: Chuck>')
+        self.assertEqual(chuck.__str__(), 'Chuck')
+
+        chuck.name = 'Testa'
+        self.assertEqual(chuck.__repr__(), '<Person2: Testa>')
+        self.assertEqual(chuck.__str__(), 'Testa')
+

@@ -50,10 +50,15 @@ def to_json_schema(model):
     }
 
     prop = {}
+    required = []
     for name, _ in model:
         field = model.get_field(name)
         prop[name] = _speficy_field_type(field)
+        if field.required:
+            required.append(name)
 
     resp['properties'] = prop
+    if required:
+        resp['required'] = required
 
     return resp

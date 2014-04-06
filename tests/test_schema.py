@@ -3,7 +3,7 @@
 import unittest
 
 from jsonmodels import models, fields
-from .utils import get_fixture
+from .utils import get_fixture, compare_schemes
 
 
 class TestJsonmodels(unittest.TestCase):
@@ -18,6 +18,7 @@ class TestJsonmodels(unittest.TestCase):
 
         alan = Person()
         schema = alan.to_json_schema()
+
         pattern = get_fixture('schema1.json')
 
-        self.assertEqual(pattern, schema)
+        self.assertTrue(compare_schemes(pattern, schema))

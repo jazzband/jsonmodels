@@ -11,6 +11,10 @@ class BaseField(object):
 
     _types = None
 
+    @property
+    def types(self):
+        return self._types
+
     def __init__(self, required=False):
         self.required = required
 
@@ -70,6 +74,10 @@ class ListField(BaseField):
     """List field."""
 
     _types = (list,)
+
+    @property
+    def items_types(self):
+        return self._items_types
 
     def __init__(self, items_types=None, *args, **kwargs):
         if items_types:

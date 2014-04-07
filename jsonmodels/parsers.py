@@ -53,9 +53,20 @@ def to_json_schema(model):
     required = []
     for name, _ in model:
         field = model.get_field(name)
-        prop[name] = _speficy_field_type(field)
         if field.required:
             required.append(name)
+
+        if isinstance(field, fields.EmbeddedField):
+            instance = field.types[0]()
+            prop[name] = instance.to_json_schema()
+        elif isinstance(field, fields.ListField):
+            instance = field.items_types[0]()
+            prop[name] = {
+                'type': 'list',
+                'items': instance.to_json_schema(),
+            }
+        else:
+            prop[name] = _speficy_field_type(field)
 
     resp['properties'] = prop
     if required:

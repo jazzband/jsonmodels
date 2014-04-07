@@ -23,6 +23,7 @@ def get_fixture(filepath):
     with open(os.path.join(FIXTURES_DIR, filepath)) as fixture:
         return json.loads(fixture.read())
 
+
 def _normalize_string_type(value):
     if isinstance(value, six.string_types):
         return six.text_type(value)
@@ -32,7 +33,7 @@ def _normalize_string_type(value):
 
 def _compare_dicts(one, two):
     for key, value in one.items():
-        if not compare_schemes(one[key], two[key]):
+        if not compare_schemas(one[key], two[key]):
             return False
     return True
 
@@ -43,24 +44,24 @@ def _compare_lists(one, two):
         for second_item in two:
             # Skipping loop if previously found match.
             if not result:
-                result = compare_schemes(first_item, second_item)
+                result = compare_schemas(first_item, second_item)
         if not result:
             return False
     return True
 
 
-def compare_schemes(one, two):
-    """Compare two structures that represents JSON schemes.
+def compare_schemas(one, two):
+    """Compare two structures that represents JSON schemas.
 
-    For comprison you can't use normal comparison, because in JSON scheme lists
-    DO NOT keep order (and Python lists do), so this must be taken into account
-    during compaison.
+    For comparison you can't use normal comparison, because in JSON schema
+    lists DO NOT keep order (and Python lists do), so this must be taken into
+    account during comparison.
 
     Note this wont check all configurations, only first one that seems to
     match, which can lead to wrong results.
 
-    :param one: First sheme to compare.
-    :param two: Second scheme to compare.
+    :param one: First schema to compare.
+    :param two: Second schema to compare.
     :rtype: `bool`
 
     """

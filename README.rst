@@ -4,7 +4,7 @@ JSON models
 
 .. image:: https://badge.fury.io/py/jsonmodels.png
     :target: http://badge.fury.io/py/jsonmodels
-    
+
 .. image:: https://travis-ci.org/beregond/jsonmodels.png?branch=master
         :target: https://travis-ci.org/beregond/jsonmodels
 
@@ -20,4 +20,4 @@ Models to make easier to deal with structures that are to be casted to JSON.
 Features
 --------
 
-* TODO
+* Works with Python 2.x and 3.x.

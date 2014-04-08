@@ -32,6 +32,9 @@ def _normalize_string_type(value):
 
 
 def _compare_dicts(one, two):
+    if len(one) != len(two):
+        return False
+
     for key, value in one.items():
         if not compare_schemas(one[key], two[key]):
             return False
@@ -39,15 +42,24 @@ def _compare_dicts(one, two):
 
 
 def _compare_lists(one, two):
+    if len(one) != len(two):
+        return False
+
     for first_item in one:
         result = False
         for second_item in two:
-            # Skipping loop if previously found match.
-            if not result:
-                result = compare_schemas(first_item, second_item)
+            if result:
+                continue
+            result = compare_schemas(first_item, second_item)
         if not result:
             return False
     return True
+
+
+def _assert_same_types(one, two):
+    if not isinstance(one, type(two)) or not isinstance(two, type(one)):
+        raise RuntimeError('Types mismatch! "{}" and "{}".'.format(
+            type(one).__name__, type(two).__name__))
 
 
 def compare_schemas(one, two):
@@ -65,15 +77,11 @@ def compare_schemas(one, two):
     :rtype: `bool`
 
     """
-    # Casting string and unicode types to one type.
     one = _normalize_string_type(one)
     two = _normalize_string_type(two)
 
-    if not isinstance(one, type(two)) or not isinstance(two, type(one)):
-        raise RuntimeError('Types mismatch! "{}" and "{}".'.format(
-            type(one).__name__, type(two).__name__))
+    _assert_same_types(one, two)
 
-    # From now on we can assume both argument have the same type.
     if isinstance(one, list):
         return _compare_lists(one, two)
     elif isinstance(one, dict):

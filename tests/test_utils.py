@@ -31,3 +31,13 @@ class TestCompareSchemas(unittest.TestCase):
         self.assertTrue(compare_schemas({'one': 'value'}, {'one': 'value'}))
         self.assertTrue(compare_schemas(['one', 'two'], ['one', 'two']))
         self.assertTrue(compare_schemas(['one', 'two'], ['two', 'one']))
+
+    def test_comparison_with_different_amount_of_items(self):
+        self.assertFalse(compare_schemas(
+            {'one': 1, 'two': 2},
+            {'one': 1, 'two': 2, 'three': 3}
+        ))
+        self.assertFalse(compare_schemas(
+            ['one', 'two'],
+            ['one', 'two', 'three']
+        ))

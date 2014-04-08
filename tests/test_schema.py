@@ -51,3 +51,6 @@ class TestJsonmodels(unittest.TestCase):
 
         chuck = Person()
         schema = chuck.to_json_schema()
+
+        pattern = get_fixture('schema2.json')
+        self.assertTrue(compare_schemas(pattern, schema))

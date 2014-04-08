@@ -20,4 +20,4 @@ Models to make easier to deal with structures that are to be casted to JSON.
 Features
 --------
 
-* Works with Python 2.x and 3.x.
+* Tested with Python 2.7, 3.3 and PyPy.

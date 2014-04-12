@@ -31,6 +31,7 @@ setup(
     package_dir={'jsonmodels': 'jsonmodels'},
     include_package_data=True,
     install_requires=[
+        'six',
     ],
     license="BSD",
     zip_safe=False,

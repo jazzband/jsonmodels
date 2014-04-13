@@ -186,3 +186,50 @@ class TestJsonmodelsInitialization(unittest.TestCase):
 
         parking = Parking()
         self.assertRaises(error.ValidationError, parking.populate, **data)
+
+    def test_initialization_with_non_models_types(self):
+
+        class Person(models.Base):
+
+            names = fields.ListField(str)
+            surname = fields.StringField()
+
+        data = {
+            'names': ['Chuck', 'Testa'],
+            'surname': 'Norris'
+        }
+
+        person1 = Person(**data)
+        person2 = Person()
+        person2.populate(**data)
+
+        for person in [person1, person2]:
+            person.validate()
+            self.assertEqual(person.surname, 'Norris')
+            self.assertEqual(len(person.names), 2)
+            self.assertIn('Chuck', person.names)
+            self.assertIn('Testa', person.names)
+
+    def test_initialization_with_multi_non_models_types(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            mix = fields.ListField((str, float))
+
+        data = {
+            'name': 'Chuck',
+            'mix': ['something', 42.0, 'weird']
+        }
+
+        person1 = Person(**data)
+        person2 = Person()
+        person2.populate(**data)
+
+        for person in [person1, person2]:
+            person.validate()
+            self.assertEqual(person.name, 'Chuck')
+            self.assertEqual(len(person.mix), 3)
+            self.assertIn('something', person.mix)
+            self.assertIn(42.0, person.mix)
+            self.assertIn('weird', person.mix)

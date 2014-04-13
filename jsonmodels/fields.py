@@ -91,9 +91,11 @@ class ListField(BaseField):
         for item in value:
             if not isinstance(item, self._items_types):
                 raise ValidationError(
-                    'All items of "{}" must be instances of {}'.format(
+                    'All items of "{}" must be instances '
+                    'of "{}", and not "{}".'.format(
                         name,
-                        ', '.join([t.__name__ for t in self._items_types])
+                        ', '.join([t.__name__ for t in self._items_types]),
+                        type(item).__name__
                     ))
 
     def to_struct(self, value):
@@ -109,13 +111,17 @@ class ListField(BaseField):
         return list()
 
     def parse_value(self, values):
+        embed_type = self._items_types[0]
+
+        if not hasattr(getattr(embed_type, 'populate', None), '__call__'):
+            return values
+
         if len(self._items_types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
                     ', '.join([t.__name__ for t in self._items_types])
             ))
 
-        embed_type = self._items_types[0]
         result = self.get_value_replacement()
 
         try:

@@ -284,100 +284,6 @@ class TestJsonmodels(unittest.TestCase):
         place.car = Car()
         place.validate()
 
-    def test_to_struct_basic(self):
-
-        class Person(models.Base):
-
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            cash = fields.FloatField()
-
-        alan = Person()
-        self.assertRaises(error.ValidationError, alan.to_struct)
-
-        alan.name = 'Alan'
-        alan.surname = 'Wake'
-        self.assertEqual({'name': 'Alan', 'surname': 'Wake'}, alan.to_struct())
-
-        alan.age = 24
-        alan.cash = 2445.45
-
-        pattern = {
-            'name': 'Alan',
-            'surname': 'Wake',
-            'age': 24,
-            'cash': 2445.45,
-        }
-
-        self.assertEqual(pattern, alan.to_struct())
-
-    def test_to_struct_nested_1(self):
-
-        class Car(models.Base):
-
-            brand = fields.StringField()
-
-        class ParkingPlace(models.Base):
-
-            location = fields.StringField()
-            car = fields.EmbeddedField(Car)
-
-        place = ParkingPlace()
-        place.location = 'never never land'
-
-        pattern = {
-            'location': 'never never land',
-        }
-        self.assertEqual(pattern, place.to_struct())
-
-        place.car = Car()
-        pattern['car'] = {}
-        self.assertEqual(pattern, place.to_struct())
-
-        place.car.brand = 'Fiat'
-        pattern['car']['brand'] = 'Fiat'
-        self.assertEqual(pattern, place.to_struct())
-
-    def test_to_struct_nested_2(self):
-
-        class Viper(models.Base):
-
-            serial = fields.StringField()
-
-        class Lamborghini(models.Base):
-
-            serial = fields.StringField()
-
-        class Parking(models.Base):
-
-            location = fields.StringField()
-            cars = fields.ListField([Viper, Lamborghini])
-
-        parking = Parking()
-        pattern = {'cars': []}
-        self.assertEqual(pattern, parking.to_struct())
-
-        parking.location = 'somewhere'
-        pattern['location'] = 'somewhere'
-        self.assertEqual(pattern, parking.to_struct())
-
-        v = Viper()
-        v.serial = '12345'
-        parking.cars.append(v)
-        pattern['cars'].append({'serial': '12345'})
-        self.assertEqual(pattern, parking.to_struct())
-
-        parking.cars.append(Viper())
-        pattern['cars'].append({})
-        self.assertEqual(pattern, parking.to_struct())
-
-        l = Lamborghini()
-        l.serial = '54321'
-        parking.cars.append(l)
-        pattern['cars'].append({'serial': '54321'})
-        self.assertEqual(pattern, parking.to_struct())
-
     def test_iterable(self):
 
         class Person(models.Base):
@@ -459,3 +365,15 @@ class TestJsonmodels(unittest.TestCase):
         self.assertEqual(chuck.__repr__(), '<Person2: Testa>')
         self.assertEqual(chuck.__str__(), 'Testa')
 
+    def test_list_field_with_non_model_types(self):
+
+        class Person(models.Base):
+
+            names = fields.ListField(str)
+            surname = fields.StringField()
+
+        person = Person(surname='Norris')
+        person.names.append('Chuck')
+        person.names.append('Testa')
+
+        person.validate()

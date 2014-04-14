@@ -1,6 +1,20 @@
+"""Tests for casting to structure."""
+
 import unittest
+from datetime import datetime
 
 from jsonmodels import models, fields, error
+
+
+class _DateField(fields.BaseField):
+
+    _types = (datetime,)
+
+
+class _DateTransformer(object):
+
+    def reverse_transform(self, value):
+        return value.strftime('%Y-%m-%d')
 
 
 class TestToStructMethod(unittest.TestCase):
@@ -152,4 +166,24 @@ class TestToStructMethod(unittest.TestCase):
         person.mix.append('different')
         pattern['mix'].append('different')
         person.validate()
+        self.assertEqual(pattern, person.to_struct())
+
+    def test_transformers(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            birth_date = _DateField(data_transformer=_DateTransformer())
+
+        person = Person()
+        person.name = 'Chuck'
+        person.surname = 'Testa'
+        person.birth_date = datetime(year=1990, month=1, day=1)
+
+        pattern = {
+            'name': 'Chuck',
+            'surname': 'Testa',
+            'birth_date': '1990-01-01',
+        }
         self.assertEqual(pattern, person.to_struct())

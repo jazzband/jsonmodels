@@ -11,8 +11,9 @@ class BaseField(object):
 
     _types = None
 
-    def __init__(self, required=False):
+    def __init__(self, required=False, data_transformer=None):
         self.required = required
+        self.data_transformer = data_transformer
 
     def validate(self, name, value):
         if self._types is None:
@@ -36,7 +37,10 @@ class BaseField(object):
 
     def parse_value(self, value):
         """Parse value from primitive to desired format."""
-        return value
+        if self.data_transformer:
+            return self.data_transformer.transform(value)
+        else:
+            return value
 
     @staticmethod
     def get_value_replacement():

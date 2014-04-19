@@ -377,3 +377,14 @@ class TestJsonmodels(unittest.TestCase):
         person.names.append('Testa')
 
         person.validate()
+
+    def test_help_text(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(help_text='Name of person.')
+            age = fields.IntField(help_text='Age of person.')
+
+        person = Person()
+        self.assertEqual(person.get_field('name').help_text, 'Name of person.')
+        self.assertEqual(person.get_field('age').help_text, 'Age of person.')

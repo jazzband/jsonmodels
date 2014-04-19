@@ -11,9 +11,10 @@ class BaseField(object):
 
     _types = None
 
-    def __init__(self, required=False, data_transformer=None):
+    def __init__(self, required=False, data_transformer=None, help_text=None):
         self.required = required
         self.data_transformer = data_transformer
+        self.help_text = help_text
 
     def validate(self, name, value):
         if self._types is None:
@@ -124,7 +125,8 @@ class ListField(BaseField):
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
                     ', '.join([t.__name__ for t in self._items_types])
-            ))
+                )
+            )
 
         result = self.get_value_replacement()
 
@@ -163,6 +165,7 @@ class EmbeddedField(BaseField):
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
                     ', '.join([t.__name__ for t in self._types])
-            ))
+                )
+            )
         embed_type = self._types[0]
         return embed_type(**value)

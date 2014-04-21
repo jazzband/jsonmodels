@@ -4,6 +4,8 @@
 import os
 import sys
 
+import tests
+
 
 try:
     from setuptools import setup
@@ -13,6 +15,11 @@ except ImportError:
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     sys.exit()
+
+# Hacking unittest.
+if 'test' in sys.argv and '--quick' in sys.argv:
+    tests.QUICK_TESTS = True
+    del sys.argv[sys.argv.index('--quick')]
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')

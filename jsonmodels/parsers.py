@@ -48,7 +48,6 @@ def to_json_schema(model):
     :rtype: ``dict``
 
     """
-
     resp = {
         'type': 'object',
         'additionalProperties': False,

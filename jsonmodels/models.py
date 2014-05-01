@@ -11,7 +11,7 @@ class BaseMetaclass(type):
     """Metaclass for models."""
 
     def __new__(cls, class_name, bases, attr):
-
+        """Rewriting defined fields."""
         fields = {}
         for name, field in attr.items():
             if isinstance(field, BaseField):
@@ -32,6 +32,7 @@ class PreBase(object):
     """
 
     def __init__(self, **kwargs):
+        """Init."""
         self.populate(**kwargs)
 
     def populate(self, **kw):
@@ -59,6 +60,7 @@ class PreBase(object):
             field.validate(name, value)
 
     def __iter__(self):
+        """Iterate through fields and values."""
         for name, field in self._fields.items():
             value = getattr(self, name)
             yield name, value
@@ -72,6 +74,7 @@ class PreBase(object):
         return parsers.to_json_schema(self)
 
     def __repr__(self):
+        """Get representation of model."""
         try:
             txt = six.text_type(self)
         except TypeError:
@@ -79,6 +82,7 @@ class PreBase(object):
         return '<{}: {}>'.format(self.__class__.__name__, txt)
 
     def __str__(self):
+        """Get informal representation."""
         return '{} object'.format(self.__class__.__name__)
 
 # Actual base for models.

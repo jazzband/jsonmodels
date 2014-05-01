@@ -12,11 +12,13 @@ class BaseField(object):
     _types = None
 
     def __init__(self, required=False, data_transformer=None, help_text=None):
+        """Init."""
         self.required = required
         self.data_transformer = data_transformer
         self.help_text = help_text
 
     def validate(self, name, value):
+        """Validate value."""
         if self._types is None:
             raise ValidationError(
                 'Field "{}" is of type "{}" that is not usable, try '
@@ -77,6 +79,7 @@ class ListField(BaseField):
     _types = (list,)
 
     def __init__(self, items_types=None, *args, **kwargs):
+        """Init."""
         if items_types:
             try:
                 self._items_types = tuple(items_types)
@@ -116,6 +119,7 @@ class ListField(BaseField):
         return list()
 
     def parse_value(self, values):
+        """Parse value to proper type."""
         embed_type = self._items_types[0]
 
         if not hasattr(getattr(embed_type, 'populate', None), '__call__'):
@@ -144,6 +148,7 @@ class EmbeddedField(BaseField):
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
+        """Init."""
         try:
             iter(model_types)
             self._types = tuple(model_types)
@@ -161,6 +166,7 @@ class EmbeddedField(BaseField):
             pass
 
     def parse_value(self, value):
+        """Parse value to proper type."""
         if len(self._types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(

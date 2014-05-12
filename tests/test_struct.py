@@ -140,7 +140,6 @@ class TestToStructMethod(unittest.TestCase):
         person.validate()
         self.assertEqual(pattern, person.to_struct())
 
-
     def test_to_struct_with_multi_non_models_types(self):
 
         class Person(models.Base):

@@ -1,0 +1,43 @@
+{
+    "type": "object",
+    "properties": {
+        "age": {"type": "integer"},
+        "name": {"type": "string"},
+        "surname": {"type": "string"},
+        "car": {
+            "type": "object",
+            "properties": {
+                "brand": {"type": "string"},
+                "registration": {"type": "string"}
+            },
+            "required": ["brand", "registration"],
+            "additionalProperties": false
+        },
+        "kids": {
+            "items": {
+                "type": "object",
+                "properties": {
+                    "age": {"type": "integer"},
+                    "name": {"type": "string"},
+                    "surname": {"type": "string"},
+                    "toys": {
+                        "type": "list",
+                        "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {"type": "string"}
+                            },
+                            "required": ["name"],
+                            "type": "object"
+                        }
+                    }
+                },
+                "required": ["surname", "name"],
+                "additionalProperties": false
+            },
+            "type": "list"
+        }
+    },
+    "required": ["surname", "name"],
+    "additionalProperties": false
+}

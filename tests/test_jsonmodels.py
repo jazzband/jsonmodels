@@ -388,3 +388,42 @@ class TestJsonmodels(unittest.TestCase):
         person = Person()
         self.assertEqual(person.get_field('name').help_text, 'Name of person.')
         self.assertEqual(person.get_field('age').help_text, 'Age of person.')
+
+    def test_types(self):
+
+        class Person(object):
+            pass
+
+        class Person2(object):
+            pass
+
+        allowed_types = (Person,)
+
+        field = fields.EmbeddedField(allowed_types)
+        self.assertEqual(allowed_types, field.types)
+
+        allowed_types = (Person, Person2)
+
+        field = fields.EmbeddedField(allowed_types)
+        self.assertEqual(allowed_types, field.types)
+
+    def test_items_types(self):
+
+        class Person(object):
+            pass
+
+        class Person2(object):
+            pass
+
+        allowed_types = (Person,)
+
+        field = fields.ListField(allowed_types)
+        self.assertEqual(allowed_types, field.items_types)
+
+        allowed_types = (Person, Person2)
+
+        field = fields.ListField(allowed_types)
+        self.assertEqual(allowed_types, field.items_types)
+
+        field = fields.ListField()
+        self.assertEqual(tuple(), field.items_types)

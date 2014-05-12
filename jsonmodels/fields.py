@@ -17,6 +17,11 @@ class BaseField(object):
         self.data_transformer = data_transformer
         self.help_text = help_text
 
+    @property
+    def types(self):
+        """Get types."""
+        return self._types
+
     def validate(self, name, value):
         """Validate value."""
         if self._types is None:
@@ -77,6 +82,11 @@ class ListField(BaseField):
     """List field."""
 
     _types = (list,)
+
+    @property
+    def items_types(self):
+        """Get items types."""
+        return self._items_types
 
     def __init__(self, items_types=None, *args, **kwargs):
         """Init."""

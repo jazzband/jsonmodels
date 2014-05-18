@@ -1,0 +1,90 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "age": {
+            "type": "integer"
+        },
+        "car": {
+            "oneOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "brand": {
+                            "type": "string"
+                        },
+                        "capacity": {
+                            "type": "float"
+                        }
+                    },
+                    "type": "object"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "brand": {
+                            "type": "string"
+                        },
+                        "velocity": {
+                            "type": "float"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "computer": {
+            "items": {
+                "oneOf": [
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "ports": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "battery_voltage": {
+                                "type": "float"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "os": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "type": "list"
+        },
+        "name": {
+            "type": "string"
+        },
+        "surname": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "surname",
+        "name"
+    ],
+    "type": "object"
+}

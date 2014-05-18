@@ -32,13 +32,42 @@ def to_struct(model):
     return resp
 
 
-def _speficy_field_type(field):
+def _specify_field_type(field):
     if isinstance(field, fields.StringField):
         return {'type': 'string'}
     elif isinstance(field, fields.IntField):
         return {'type': 'integer'}
     elif isinstance(field, fields.FloatField):
         return {'type': 'float'}
+
+
+def _parse_embedded(field):
+    types = field.types
+    if len(types) == 1:
+        instance = types[0]()
+        return instance.to_json_schema()
+    else:
+        return {'oneOf': [ins().to_json_schema() for ins in types]}
+
+
+def _parse_list(field):
+    types = field.items_types
+    types_len = len(types)
+
+    if types_len == 0:
+        items = None
+    if types_len == 1:
+        instance = types[0]()
+        items = instance.to_json_schema()
+    elif types_len > 1:
+        items = {
+            'oneOf': [ins().to_json_schema() for ins in types]}
+
+    result = {'type': 'list'}
+    if items:
+        result['items'] = items
+
+    return result
 
 
 def to_json_schema(model):
@@ -57,20 +86,16 @@ def to_json_schema(model):
     required = []
     for name, _ in model:
         field = model.get_field(name)
+
         if field.required:
             required.append(name)
 
         if isinstance(field, fields.EmbeddedField):
-            instance = field.types[0]()
-            prop[name] = instance.to_json_schema()
+            prop[name] = _parse_embedded(field)
         elif isinstance(field, fields.ListField):
-            instance = field.items_types[0]()
-            prop[name] = {
-                'type': 'list',
-                'items': instance.to_json_schema(),
-            }
+            prop[name] = _parse_list(field)
         else:
-            prop[name] = _speficy_field_type(field)
+            prop[name] = _specify_field_type(field)
 
     resp['properties'] = prop
     if required:

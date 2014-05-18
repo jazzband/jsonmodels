@@ -36,6 +36,9 @@ def _compare_dicts(one, two):
         return False
 
     for key, value in one.items():
+        if key not in one or key not in two:
+            return False
+
         if not compare_schemas(one[key], two[key]):
             return False
     return True

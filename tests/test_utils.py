@@ -41,3 +41,9 @@ class TestCompareSchemas(unittest.TestCase):
             ['one', 'two'],
             ['one', 'two', 'three']
         ))
+
+    def test_comparison_of_list_with_items_with_different_keys(self):
+        self.assertTrue(compare_schemas(
+            [{'one': 1}, {'two': 2}],
+            [{'two': 2}, {'one': 1}]
+        ))

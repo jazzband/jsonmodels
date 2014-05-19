@@ -6,6 +6,7 @@ import os
 import sys
 
 import tests
+from jsonmodels import __version__ as version
 
 
 try:
@@ -27,7 +28,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='jsonmodels',
-    version='1.0.5',
+    version=version,
     description='Models to make easier to deal with structures'
     ' that are to be casted to JSON.',
     long_description=readme + '\n\n' + history,

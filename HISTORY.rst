@@ -3,6 +3,16 @@
 History
 -------
 
+1.1 (2014-05-19)
+++++++++++++++++
+
+* Added docs.
+* Added json schema generation.
+* Added tests for PEP8 and complexity.
+* Moved to Python 3.4.
+* Added PEP257 compatibility.
+* Added help text to fields.
+
 1.0.5 (2014-04-14)
 ++++++++++++++++++
 

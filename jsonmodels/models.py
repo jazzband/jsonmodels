@@ -26,8 +26,8 @@ class PreBase(object):
 
     """Base class for all models.
 
-    For compatibility reasons (Python 2 and 3) it is called `PreBase`
-    and you MUST in fact use class called `Base` defined after this class.
+    For compatibility reasons (Python 2 and 3) it is called `PreBase` and
+    models MUST in fact inherit from class `Base`, otherwise it won't work.
 
     """
 
@@ -36,21 +36,19 @@ class PreBase(object):
         self.populate(**kwargs)
 
     def populate(self, **kw):
-        """Populate values to fields."""
+        """Populate values to fields. Skip non-existing."""
         for name, value in kw.items():
-            # Check for field, if absent, skip this values.
             try:
                 field = self._fields[name]
             except KeyError:
                 continue
 
-            # Let field decide in what format this value should be in.
             parsed_value = field.parse_value(value)
 
             setattr(self, name, parsed_value)
 
     def get_field(self, name):
-        """Get field associated with given name/attribute."""
+        """Get field associated with given attribute."""
         return self._fields[name]
 
     def validate(self):
@@ -66,11 +64,11 @@ class PreBase(object):
             yield name, value
 
     def to_struct(self):
-        """Cast model to structure. Shortcut method."""
+        """Cast model to structure."""
         return parsers.to_struct(self)
 
     def to_json_schema(self):
-        """Cast model to JSON schema. Shortcut method."""
+        """Cast model to JSON schema."""
         return parsers.to_json_schema(self)
 
     def __repr__(self):

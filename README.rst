@@ -155,3 +155,9 @@ Features
             }
         }
     }
+
+More
+----
+
+For more examples and better description see full documentation:
+http://jsonmodels.rtfd.org.

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to JSON models's documentation!
+Welcome to JSON models' documentation!
 ======================================
 
 Contents:
@@ -14,6 +14,7 @@ Contents:
    readme
    installation
    usage
+   api
    contributing
    authors
    history

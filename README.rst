@@ -165,7 +165,7 @@ Features
     >>> schema2 = {'type': 'list'}
     >>> compare_schemas(schema1, schema1)
     True
-    >>> compare_schemas(schema2, schema2)
+    >>> compare_schemas(schema1, schema2)
     False
 
 More

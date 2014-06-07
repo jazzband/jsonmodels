@@ -177,6 +177,9 @@ class EmbeddedField(BaseField):
 
     def parse_value(self, value):
         """Parse value to proper type."""
+        if not isinstance(value, dict):
+            return value
+
         if len(self._types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
@@ -184,4 +187,5 @@ class EmbeddedField(BaseField):
                 )
             )
         embed_type = self._types[0]
+
         return embed_type(**value)

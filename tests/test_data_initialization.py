@@ -233,3 +233,37 @@ class TestJsonmodelsInitialization(unittest.TestCase):
             self.assertIn('something', person.mix)
             self.assertIn(42.0, person.mix)
             self.assertIn('weird', person.mix)
+
+    def test_deep_initialization_for_embed_field(self):
+
+        class Car(models.Base):
+
+            brand = fields.StringField()
+
+        class ParkingPlace(models.Base):
+
+            location = fields.StringField()
+            car = fields.EmbeddedField(Car)
+
+        data = {
+            'location': 'somewhere',
+            'car': Car(brand='awesome brand'),
+        }
+
+        parking1 = ParkingPlace(**data)
+        parking2 = ParkingPlace()
+        parking2.populate(**data)
+        for parking in [parking1, parking2]:
+            parking.validate()
+
+            self.assertEqual(parking.location, 'somewhere')
+            car = parking.car
+            self.assertTrue(isinstance(car, Car))
+            self.assertEqual(car.brand, 'awesome brand')
+
+            parking.validate()
+
+            self.assertEqual(parking.location, 'somewhere')
+            car = parking.car
+            self.assertTrue(isinstance(car, Car))
+            self.assertEqual(car.brand, 'awesome brand')

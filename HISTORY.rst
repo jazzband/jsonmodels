@@ -3,6 +3,11 @@
 History
 -------
 
+Current
++++++++
+
+* Added possibility to populate already initialized data to EmbeddedField.
+
 1.1 (2014-05-19)
 ++++++++++++++++
 

@@ -3,8 +3,8 @@
 History
 -------
 
-Current
-+++++++
+1.1.1 (2014-06-07)
+++++++++++++++++++
 
 * Added possibility to populate already initialized data to EmbeddedField.
 * Added `compare_schemas` utility.

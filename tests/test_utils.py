@@ -2,7 +2,7 @@
 
 import unittest
 
-from .utils import compare_schemas
+from jsonmodels.utils import compare_schemas
 
 
 class TestCompareSchemas(unittest.TestCase):

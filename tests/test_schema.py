@@ -3,7 +3,9 @@
 import unittest
 
 from jsonmodels import models, fields
-from .utils import get_fixture, compare_schemas
+from jsonmodels.utils import compare_schemas
+
+from .utils import get_fixture
 
 
 class TestJsonmodels(unittest.TestCase):

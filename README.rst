@@ -156,6 +156,18 @@ Features
         }
     }
 
+* Compare JSON schemas:
+
+.. code-block:: python
+
+    >>> from jsonmodels.utils import compare_schemas
+    >>> schema1 = {'type': 'object'}
+    >>> schema2 = {'type': 'list'}
+    >>> compare_schemas(schema1, schema1)
+    True
+    >>> compare_schemas(schema2, schema2)
+    False
+
 More
 ----
 

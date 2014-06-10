@@ -3,6 +3,11 @@
 History
 -------
 
+Current
++++++++
+
+* Added custom validators.
+
 1.1.1 (2014-06-07)
 ++++++++++++++++++
 

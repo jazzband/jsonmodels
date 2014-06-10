@@ -1,4 +1,4 @@
-"""Tests for more complicated utils."""
+"""Tests for utils."""
 
 import unittest
 

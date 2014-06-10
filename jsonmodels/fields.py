@@ -11,11 +11,20 @@ class BaseField(object):
 
     _types = None
 
-    def __init__(self, required=False, data_transformer=None, help_text=None):
+    def __init__(
+            self,
+            required=False,
+            data_transformer=None,
+            help_text=None,
+            validators=None):
         """Init."""
         self.required = required
         self.data_transformer = data_transformer
         self.help_text = help_text
+
+        if validators and not isinstance(validators, list):
+            validators = list((validators,))
+        self.validators = validators
 
     @property
     def types(self):
@@ -38,6 +47,10 @@ class BaseField(object):
 
         if value is None and self.required:
             raise ValidationError('Field "{}" is required!'.format(name))
+
+        if self.validators:
+            for validator in self.validators:
+                validator.validate(value)
 
     def to_struct(self, value):
         """Cast value to Python structure."""

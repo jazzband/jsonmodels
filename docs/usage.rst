@@ -147,5 +147,5 @@ is possible to you to operate just on models.
     >>> person = Person()
     >>> schema = person.to_json_schema()
 
-And thats it! You can serve then this schema through your api or use it for
-validation incomming data.
+And thats it! You can serve then this schema through your API or use it for
+validation incoming data.

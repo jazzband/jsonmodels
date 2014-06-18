@@ -1,0 +1,12 @@
+cieślik
+django
+docstring
+docstrings
+indices
+kwargs
+metaclass
+repo
+schemas
+szczepan
+validator
+validators

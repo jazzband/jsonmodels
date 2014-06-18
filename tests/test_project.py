@@ -42,3 +42,8 @@ class TestProject(unittest.TestCase):
 
         if any(result):
             raise RuntimeError('Tests for PEP8 and complexity have failed!')
+
+    def test_docs(self):
+            run(
+                'sphinx-build -b spelling -d docs/_build/doctress '
+                'docs docs/build/spelling')

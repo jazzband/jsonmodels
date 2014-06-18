@@ -1,18 +1,37 @@
 """Test for validators."""
 
 import unittest
-from mock import Mock
 
 from jsonmodels import models, fields
+
+class FakeValidator(object):
+
+    def __init__(self):
+        self.called_with = None
+        self.called_amount = 0
+
+    def validate(self, value):
+        self.called_amount = self.called_amount + 1
+        self.called_with = value
+
+    def assert_called_once_with(self, value):
+        if value != self.called_with or self.called_amount != 1:
+            raise ValidationError('Assert called once with "{}" failed!')
 
 
 class TestValidation(unittest.TestCase):
 
     def test_validation(self):
 
-        validator1 = Mock()
-        validator2 = Mock()
-        validator3 = Mock()
+        validator1 = FakeValidator()
+        validator2 = FakeValidator()
+
+        called = []
+        arg = []
+
+        def validator3(value):
+            called.append(1)
+            arg.append(value)
 
         class Person(models.Base):
 
@@ -30,6 +49,8 @@ class TestValidation(unittest.TestCase):
 
         person.validate()
 
-        validator1.validate.assert_called_once_with('John')
-        validator2.validate.assert_called_once_with('John')
-        validator3.validate.assert_called_once_with(33)
+        validator1.assert_called_once_with('John')
+        validator2.assert_called_once_with('John')
+
+        self.assertEqual(1, sum(called))
+        self.assertEqual(33, arg.pop())

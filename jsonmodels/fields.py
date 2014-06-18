@@ -50,7 +50,10 @@ class BaseField(object):
 
         if self.validators:
             for validator in self.validators:
-                validator.validate(value)
+                try:
+                    validator.validate(value)
+                except AttributeError:
+                    validator(value)
 
     def to_struct(self, value):
         """Cast value to Python structure."""

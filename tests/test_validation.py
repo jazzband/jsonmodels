@@ -4,6 +4,7 @@ import unittest
 
 from jsonmodels import models, fields
 
+
 class FakeValidator(object):
 
     def __init__(self):
@@ -16,7 +17,7 @@ class FakeValidator(object):
 
     def assert_called_once_with(self, value):
         if value != self.called_with or self.called_amount != 1:
-            raise ValidationError('Assert called once with "{}" failed!')
+            raise AssertionError('Assert called once with "{}" failed!')
 
 
 class TestValidation(unittest.TestCase):

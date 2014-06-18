@@ -48,12 +48,7 @@ class BaseField(object):
         if value is None and self.required:
             raise ValidationError('Field "{}" is required!'.format(name))
 
-        if self.validators:
-            for validator in self.validators:
-                try:
-                    validator.validate(value)
-                except AttributeError:
-                    validator(value)
+        self._validate_with_custom_validators(value)
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -65,6 +60,14 @@ class BaseField(object):
             return self.data_transformer.transform(value)
         else:
             return value
+
+    def _validate_with_custom_validators(self, value):
+        if self.validators:
+            for validator in self.validators:
+                try:
+                    validator.validate(value)
+                except AttributeError:
+                    validator(value)
 
     @staticmethod
     def get_value_replacement():

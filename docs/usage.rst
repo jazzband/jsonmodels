@@ -80,6 +80,37 @@ You can specify which fields are *required*, if required value is absent during
     >>> dafty.validate()
     *** ValidationError: Field "name" is required!
 
+Custom validators
+~~~~~~~~~~~~~~~~~
+
+You can always specify your own validators. Custom validator can be object with
+`validate` method (which takes precedence) or function (or callable object).
+
+Validators can be passed through `validators` keyword, as a single validator,
+or list of validators (so, as you may be expecting, you can't pass object that
+extends `List`). Each validator **must** raise exception to indicate validation
+didn't pass. Returning values like `False` won't have any effect.
+
+.. code-block:: python
+
+    >>> class RangeValidator(object):
+    ...
+    ...   def __init__(self, min, max):
+    ...     # Some logic here.
+    ...
+    ...   def validate(self, value):
+    ...     # Some logic here.
+
+    >>> def some_validator(value):
+    ...   # Some logic here.
+
+    >>> class Person(models.Base):
+    ...
+    ...   name = fields.StringField(required=True, validators=some_validator)
+    ...   surname = fields.StringField(required=True)
+    ...   age = fields.IntField(
+    ...     Car, validators=[some_validator, RangeValidator(0, 100)])
+
 Casting to Python struct (and JSON)
 -----------------------------------
 

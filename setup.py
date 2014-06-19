@@ -5,7 +5,6 @@
 import os
 import sys
 
-import tests
 from jsonmodels import __version__ as version
 
 
@@ -19,13 +18,17 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 # Hacking unittest.
-if 'test' in sys.argv and '--quick' in sys.argv:
-    tests.QUICK_TESTS = True
-    del sys.argv[sys.argv.index('--quick')]
+try:
+    import tests
+    if 'test' in sys.argv and '--quick' in sys.argv:
+        tests.QUICK_TESTS = True
+        del sys.argv[sys.argv.index('--quick')]
 
-if 'test' in sys.argv and '--spelling' in sys.argv:
-    tests.CHECK_SPELLING = True
-    del sys.argv[sys.argv.index('--spelling')]
+    if 'test' in sys.argv and '--spelling' in sys.argv:
+        tests.CHECK_SPELLING = True
+        del sys.argv[sys.argv.index('--spelling')]
+except ImportError:
+    pass
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')

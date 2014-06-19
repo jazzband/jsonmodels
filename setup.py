@@ -23,6 +23,10 @@ if 'test' in sys.argv and '--quick' in sys.argv:
     tests.QUICK_TESTS = True
     del sys.argv[sys.argv.index('--quick')]
 
+if 'test' in sys.argv and '--spelling' in sys.argv:
+    tests.CHECK_SPELLING = True
+    del sys.argv[sys.argv.index('--spelling')]
+
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 

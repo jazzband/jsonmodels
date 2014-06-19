@@ -43,6 +43,7 @@ class TestProject(unittest.TestCase):
         if any(result):
             raise RuntimeError('Tests for PEP8 and complexity have failed!')
 
+    @unittest.skipIf(not tests.CHECK_SPELLING, "No spelling check.")
     def test_docs(self):
             run(
                 'sphinx-build -b spelling -d docs/_build/doctress '

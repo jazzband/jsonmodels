@@ -96,3 +96,46 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema3.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_model_with_constructors(self):
+
+        class Car(models.Base):
+
+            def __init__(self, some_value):
+                pass
+
+            brand = fields.StringField(required=True)
+            registration = fields.StringField(required=True)
+
+        class Toy(models.Base):
+
+            def __init__(self, some_value):
+                pass
+
+            name = fields.StringField(required=True)
+
+        class Kid(models.Base):
+
+            def __init__(self, some_value):
+                pass
+
+            name = fields.StringField(required=True)
+            surname = fields.StringField(required=True)
+            age = fields.IntField()
+            toys = fields.ListField(Toy)
+
+        class Person(models.Base):
+
+            def __init__(self, some_value):
+                pass
+
+            name = fields.StringField(required=True)
+            surname = fields.StringField(required=True)
+            age = fields.IntField()
+            kids = fields.ListField(Kid)
+            car = fields.EmbeddedField(Car)
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema2.json')
+        self.assertTrue(compare_schemas(pattern, schema))

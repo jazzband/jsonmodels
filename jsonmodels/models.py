@@ -67,9 +67,10 @@ class PreBase(object):
         """Cast model to structure."""
         return parsers.to_struct(self)
 
-    def to_json_schema(self):
+    @classmethod
+    def to_json_schema(cls):
         """Cast model to JSON schema."""
-        return parsers.to_json_schema(self)
+        return parsers.to_json_schema(cls)
 
     def __repr__(self):
         """Get representation of model."""

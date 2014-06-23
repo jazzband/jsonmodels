@@ -44,10 +44,10 @@ def _specify_field_type(field):
 def _parse_embedded(field):
     types = field.types
     if len(types) == 1:
-        instance = types[0]()
-        return instance.to_json_schema()
+        cls = types[0]
+        return cls.to_json_schema()
     else:
-        return {'oneOf': [ins().to_json_schema() for ins in types]}
+        return {'oneOf': [cls.to_json_schema() for cls in types]}
 
 
 def _parse_list(field):
@@ -57,11 +57,11 @@ def _parse_list(field):
     if types_len == 0:
         items = None
     if types_len == 1:
-        instance = types[0]()
-        items = instance.to_json_schema()
+        cls = types[0]
+        items = cls.to_json_schema()
     elif types_len > 1:
         items = {
-            'oneOf': [ins().to_json_schema() for ins in types]}
+            'oneOf': [cls.to_json_schema() for cls in types]}
 
     result = {'type': 'list'}
     if items:
@@ -70,10 +70,10 @@ def _parse_list(field):
     return result
 
 
-def to_json_schema(model):
-    """Generate JSON schema for given instance of model.
+def to_json_schema(cls):
+    """Generate JSON schema for given class.
 
-    :param model: Model to be casted.
+    :param cls: Class to be casted.
     :rtype: ``dict``
 
     """
@@ -84,8 +84,8 @@ def to_json_schema(model):
 
     prop = {}
     required = []
-    for name, _ in model:
-        field = model.get_field(name)
+
+    for name, field in cls._fields.items():
 
         if field.required:
             required.append(name)

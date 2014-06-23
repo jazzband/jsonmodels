@@ -20,7 +20,7 @@ Models to make easier to deal with structures that are to be casted to JSON.
 Features
 --------
 
-* Fully tested with Python 2.7, 3.4 and PyPy.
+* Fully tested with Python 2.7, 3.3, 3.4 and PyPy.
 
 * Create Django-like models:
 

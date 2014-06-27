@@ -96,6 +96,15 @@ class FloatField(BaseField):
     _types = (float, int)
 
 
+class BoolField(BaseField):
+
+    _types = (bool,)
+
+    def parse_value(self, value):
+        parsed = super(BoolField, self).parse_value(value)
+        return bool(parsed) if parsed is not None else None
+
+
 class ListField(BaseField):
 
     """List field."""

@@ -427,3 +427,60 @@ class TestJsonmodels(unittest.TestCase):
 
         field = fields.ListField()
         self.assertEqual(tuple(), field.items_types)
+
+    def test_required_embedded_field(self):
+
+        class Secondary(models.Base):
+
+            data = fields.IntField()
+
+        class Primary(models.Base):
+
+            name = fields.StringField()
+            secondary = fields.EmbeddedField(Secondary, required=True)
+
+        entity = Primary()
+        self.assertRaises(error.ValidationError, entity.validate)
+
+        entity.secondary = Secondary()
+        entity.validate()
+
+        class Primary(models.Base):
+
+            name = fields.StringField()
+            secondary = fields.EmbeddedField(Secondary, required=False)
+
+        entity = Primary()
+        entity.secondary = None
+        entity.validate()
+
+    def test_required_list(self):
+
+        class Wheel(models.Base):
+            pass
+
+        class Car(models.Base):
+
+            wheels = fields.ListField(items_types=[Wheel], required=False)
+
+        viper = Car()
+        viper.validate()
+
+        viper.wheels = None
+        viper.validate()
+
+        viper.wheels = [Wheel()]
+        viper.validate()
+
+        class Car(models.Base):
+
+            wheels = fields.ListField(items_types=[Wheel], required=True)
+
+        viper = Car()
+        viper.validate()
+
+        viper.wheels = None
+        viper.validate()
+
+        viper.wheels = [Wheel()]
+        viper.validate()

@@ -120,7 +120,12 @@ class ListField(BaseField):
         return self._items_types
 
     def __init__(self, items_types=None, *args, **kwargs):
-        """Init."""
+        """Init.
+
+        `ListField` is **always not required**. If you want to control number
+        of items use validators.
+
+        """
         if items_types:
             try:
                 self._items_types = tuple(items_types)
@@ -129,6 +134,7 @@ class ListField(BaseField):
         else:
             self._items_types = tuple()
         super(ListField, self).__init__(*args, **kwargs)
+        self.required = False
 
     def validate(self, name, value):
         """Validation."""
@@ -137,15 +143,18 @@ class ListField(BaseField):
         if len(self._items_types) == 0:
             return
 
-        for item in value:
-            if not isinstance(item, self._items_types):
-                raise ValidationError(
-                    'All items of "{}" must be instances '
-                    'of "{}", and not "{}".'.format(
-                        name,
-                        ', '.join([t.__name__ for t in self._items_types]),
-                        type(item).__name__
-                    ))
+        try:
+            for item in value:
+                if not isinstance(item, self._items_types):
+                    raise ValidationError(
+                        'All items of "{}" must be instances '
+                        'of "{}", and not "{}".'.format(
+                            name,
+                            ', '.join([t.__name__ for t in self._items_types]),
+                            type(item).__name__
+                        ))
+        except TypeError:
+            pass
 
     def to_struct(self, value):
         """Cast value to structure."""

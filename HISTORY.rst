@@ -8,7 +8,7 @@ History
 
 * Fixed values population, when value is not dictionary.
 * Added custom validators.
-* Added tool for schema comparision.
+* Added tool for schema comparison.
 
 1.1.1 (2014-06-07)
 ++++++++++++++++++

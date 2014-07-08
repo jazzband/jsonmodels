@@ -1,6 +1,9 @@
 """Definitions of fields."""
 
+import datetime
+
 import six
+from dateutil.parser import parse
 
 from .error import ValidationError
 
@@ -229,3 +232,31 @@ class EmbeddedField(BaseField):
         embed_type = self._types[0]
 
         return embed_type(**value)
+
+
+class TimeField(BaseField):
+
+    """Time field."""
+
+    str_format = None
+    _types = (datetime.time,)
+
+    def __init__(self, str_format=None, *args, **kwargs):
+        """Init.
+
+        :param str str_format: Format to cast time to (if `None` - casting to
+            ISO 8601 format).
+
+        """
+        self.str_format = str_format
+        super(TimeField, self).__init__(*args, **kwargs)
+
+    def to_struct(self, value):
+        """Cast `time` object to string."""
+        if self.str_format:
+            return value.strftime(self.str_format)
+        return value.isoformat()
+
+    def parse_value(self, value):
+        """Parse string into instance of `time`."""
+        return parse(value).timetz()

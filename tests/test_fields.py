@@ -1,3 +1,5 @@
+"""Tests for fields."""
+
 import unittest
 
 from jsonmodels import models, fields

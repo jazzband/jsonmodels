@@ -32,7 +32,7 @@ class _TestUtc(datetime.tzinfo):
         return datetime.timedelta(0)
 
 
-class DateTimeFieldsTestCase(unittest.TestCase):
+class TimeFieldTestCase(unittest.TestCase):
 
     def test_time_field(self):
 
@@ -107,3 +107,57 @@ class DateTimeFieldsTestCase(unittest.TestCase):
         )
 
         self.assertRaises(TypeError, field.parse_value, 'not a time')
+
+
+class DateFieldTestCase(unittest.TestCase):
+
+    def test_date_field(self):
+
+        class Event(models.Base):
+
+            date = fields.DateField()
+
+        event = Event()
+        event.validate()
+
+        event.date = '2014-04-21'
+        self.assertRaises(error.ValidationError, event.validate)
+
+        event.date = datetime.date(2014, 4, 21)
+        event.validate()
+
+    def test_date_field_to_struct(self):
+
+        field = fields.DateField()
+
+        self.assertIsNone(field.str_format)
+
+        tt = datetime.date(2000, 1, 1)
+        self.assertEqual('2000-01-01', field.to_struct(tt))
+
+        tt = datetime.date(2491, 5, 6)
+        self.assertEqual('2491-05-06', field.to_struct(tt))
+
+    def test_date_field_to_struct_with_format(self):
+
+        field = fields.DateField(str_format='%Y/%m/%d')
+
+        self.assertEqual('%Y/%m/%d', field.str_format)
+
+        tt = datetime.date(2244, 5, 7)
+        self.assertEqual('2244/05/07', field.to_struct(tt))
+
+    def test_time_field_parse_value(self):
+
+        field = fields.DateField()
+
+        self.assertEqual(
+            datetime.date(2012, 12, 21),
+            field.parse_value('2012-12-21'),
+        )
+        self.assertEqual(
+            datetime.date(2014, 4, 21),
+            field.parse_value('2014-04-21'),
+        )
+
+        self.assertRaises(TypeError, field.parse_value, 'not a date')

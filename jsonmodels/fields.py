@@ -238,7 +238,6 @@ class TimeField(BaseField):
 
     """Time field."""
 
-    str_format = None
     _types = (datetime.time,)
 
     def __init__(self, str_format=None, *args, **kwargs):
@@ -260,3 +259,31 @@ class TimeField(BaseField):
     def parse_value(self, value):
         """Parse string into instance of `time`."""
         return parse(value).timetz()
+
+
+class DateField(BaseField):
+
+    """Date field."""
+
+    _types = (datetime.date,)
+    default_format = '%Y-%m-%d'
+
+    def __init__(self, str_format=None, *args, **kwargs):
+        """Init.
+
+        :param str str_format: Format to cast time to (if `None` - casting to
+            %Y-%m-%d format).
+
+        """
+        self.str_format = str_format
+        super(DateField, self).__init__(*args, **kwargs)
+
+    def to_struct(self, value):
+        """Cast `date` object to string."""
+        if self.str_format:
+            return value.strftime(self.str_format)
+        return value.strftime(self.default_format)
+
+    def parse_value(self, value):
+        """Parse string into instance of `date`."""
+        return parse(value).date()

@@ -17,4 +17,3 @@ sphinxcontrib-spelling==2.1.1
 tox==1.7.1
 virtualenv==1.11.4
 pyhistory==1.0.3
-python-dateutil==2.2

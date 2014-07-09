@@ -271,7 +271,7 @@ class DateField(BaseField):
     def __init__(self, str_format=None, *args, **kwargs):
         """Init.
 
-        :param str str_format: Format to cast time to (if `None` - casting to
+        :param str str_format: Format to cast date to (if `None` - casting to
             %Y-%m-%d format).
 
         """
@@ -298,19 +298,19 @@ class DateTimeField(BaseField):
     def __init__(self, str_format=None, *args, **kwargs):
         """Init.
 
-        :param str str_format: Format to cast time to (if `None` - casting to
-            ISO 8601 format).
+        :param str str_format: Format to cast datetime to (if `None` - casting
+            to ISO 8601 format).
 
         """
         self.str_format = str_format
         super(DateTimeField, self).__init__(*args, **kwargs)
 
     def to_struct(self, value):
-        """Cast `time` object to string."""
+        """Cast `datetime` object to string."""
         if self.str_format:
             return value.strftime(self.str_format)
         return value.isoformat()
 
     def parse_value(self, value):
-        """Parse string into instance of `date`."""
+        """Parse string into instance of `datetime`."""
         return parse(value)

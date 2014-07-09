@@ -220,12 +220,12 @@ class DateTimeFieldTestCase(unittest.TestCase):
         field = fields.DateTimeField()
 
         self.assertEqual(
-            datetime.datetime(2014, 04, 21, 12, 45, 56),
+            datetime.datetime(2014, 4, 21, 12, 45, 56),
             field.parse_value('2014-04-21T12:45:56'),
         )
         self.assertEqual(
             datetime.datetime(
-                2014, 04, 21, 12, 45, 56, tzinfo=tzoffset(None, 7200)),
+                2014, 4, 21, 12, 45, 56, tzinfo=tzoffset(None, 7200)),
             field.parse_value('2014-04-21T12:45:56+02:00'),
         )
 

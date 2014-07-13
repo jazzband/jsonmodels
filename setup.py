@@ -36,8 +36,8 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 setup(
     name='jsonmodels',
     version=version,
-    description='Models to make easier to deal with structures'
-    ' that are to be casted to JSON.',
+    description='Models to make easier to deal with structures that'
+    ' are converted to, or read from JSON.',
     long_description=readme + '\n\n' + history,
     author='Szczepan Cieślik',
     author_email='szczepan.cieslik@gmail.com',

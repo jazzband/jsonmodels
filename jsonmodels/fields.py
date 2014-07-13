@@ -234,7 +234,7 @@ class EmbeddedField(BaseField):
         return embed_type(**value)
 
 
-class TimeField(BaseField):
+class TimeField(StringField):
 
     """Time field."""
 
@@ -261,7 +261,7 @@ class TimeField(BaseField):
         return parse(value).timetz()
 
 
-class DateField(BaseField):
+class DateField(StringField):
 
     """Date field."""
 
@@ -289,7 +289,7 @@ class DateField(BaseField):
         return parse(value).date()
 
 
-class DateTimeField(BaseField):
+class DateTimeField(StringField):
 
     """Datetime field."""
 

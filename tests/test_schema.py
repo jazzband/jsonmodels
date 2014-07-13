@@ -139,3 +139,16 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema2.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_datetime_fields(self):
+
+        class Event(models.Base):
+
+            time = fields.TimeField()
+            date = fields.DateField()
+            end = fields.DateTimeField()
+
+        schema = Event.to_json_schema()
+
+        pattern = get_fixture('schema4.json')
+        self.assertTrue(compare_schemas(pattern, schema))

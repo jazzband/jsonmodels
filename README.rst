@@ -11,11 +11,12 @@ JSON models
 .. image:: https://pypip.in/d/jsonmodels/badge.png
     :target: https://crate.io/packages/jsonmodels?version=latest
 
-
-Models to make easier to deal with structures that are to be casted to JSON.
+Models to make easier to deal with structures that are converted to, or read
+from JSON.
 
 * Free software: BSD license
-* Documentation: http://jsonmodels.rtfd.org.
+* Documentation: http://jsonmodels.rtfd.org
+* Source: https://github.com/beregond/jsonmodels
 
 Features
 --------

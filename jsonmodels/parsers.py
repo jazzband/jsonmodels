@@ -39,6 +39,8 @@ def _specify_field_type(field):
         return {'type': 'integer'}
     elif isinstance(field, fields.FloatField):
         return {'type': 'float'}
+    elif isinstance(field, fields.BoolField):
+        return {'type': 'boolean'}
 
 
 def _parse_embedded(field):

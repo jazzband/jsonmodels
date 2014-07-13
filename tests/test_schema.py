@@ -152,3 +152,14 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema4.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_bool_field(self):
+
+        class Person(models.Base):
+
+            has_childen = fields.BoolField()
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema5.json')
+        self.assertTrue(compare_schemas(pattern, schema))

@@ -1,0 +1,9 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "has_childen": {
+            "type": "boolean"
+        }
+    },
+    "type": "object"
+}

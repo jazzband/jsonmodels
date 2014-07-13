@@ -3,6 +3,11 @@
 History
 -------
 
+1.3.1 (2014-07-13)
+++++++++++++++++++
+
+* Fixed generation of schema for BoolField.
+
 1.3 (2014-07-13)
 ++++++++++++++++
 

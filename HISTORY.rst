@@ -3,6 +3,13 @@
 History
 -------
 
+1.3 (2014-07-13)
+++++++++++++++++
+
+* Added new fields (BoolField, TimeField, DateField and DateTimeField).
+* ListField is always not required.
+* Schema can be now generated from class itself (not from an instance).
+
 1.2 (2014-06-18)
 ++++++++++++++++
 

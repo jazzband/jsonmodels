@@ -2,7 +2,7 @@
 
 import unittest
 
-from jsonmodels import models, fields
+from jsonmodels import models, fields, validators, error
 
 
 class FakeValidator(object):
@@ -66,3 +66,26 @@ class TestValidation(unittest.TestCase):
 
         self.assertTrue(
             isinstance(alan.get_field('children').validators, list))
+
+
+class TestMinValidator(unittest.TestCase):
+
+    def test_validation(self):
+
+        validator = validators.Min(3)
+        self.assertEqual(3, validator.minimum_value)
+
+        validator.validate(4)
+        validator.validate(3)
+        self.assertRaises(error.ValidationError, validator.validate, 2)
+        self.assertRaises(error.ValidationError, validator.validate, -2)
+
+    def test_exclusive_validation(self):
+
+        validator = validators.Min(3, True)
+        self.assertEqual(3, validator.minimum_value)
+
+        validator.validate(4)
+        self.assertRaises(error.ValidationError, validator.validate, 3)
+        self.assertRaises(error.ValidationError, validator.validate, 2)
+        self.assertRaises(error.ValidationError, validator.validate, -2)

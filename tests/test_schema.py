@@ -2,7 +2,7 @@
 
 import unittest
 
-from jsonmodels import models, fields
+from jsonmodels import models, fields, validators
 from jsonmodels.utils import compare_schemas
 
 from .utils import get_fixture
@@ -187,3 +187,29 @@ class TestJsonmodels(unittest.TestCase):
 
             pattern = get_fixture('schema6.json')
             self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_min_validator(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField(validators=validators.Min(18))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_min.json')
+        self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_min_validator_with_exclusive(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField(validators=validators.Min(18, True))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_min_exclusive.json')
+        self.assertTrue(compare_schemas(pattern, schema))

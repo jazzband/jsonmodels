@@ -55,3 +55,14 @@ class TestValidation(unittest.TestCase):
 
         self.assertEqual(1, sum(called))
         self.assertEqual(33, arg.pop())
+
+    def test_validators_are_always_iterable(self):
+
+        class Person(models.Base):
+
+            children = fields.ListField()
+
+        alan = Person()
+
+        self.assertTrue(
+            isinstance(alan.get_field('children').validators, list))

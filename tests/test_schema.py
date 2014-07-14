@@ -163,3 +163,27 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema5.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_validators_can_modify_schema(self):
+
+        class ClassBasedValidator(object):
+
+            def validate(self, value):
+                raise RuntimeError()
+
+            def modify_schema(self, field_schema):
+                field_schema['some'] = 'unproper value'
+
+        def function_validator(value):
+            raise RuntimeError()
+
+        class Person(models.Base):
+
+            name = fields.StringField(validators=ClassBasedValidator())
+            surname = fields.StringField(validators=function_validator)
+
+        for person in [Person, Person()]:
+            schema = person.to_json_schema()
+
+            pattern = get_fixture('schema6.json')
+            self.assertTrue(compare_schemas(pattern, schema))

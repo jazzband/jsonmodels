@@ -1,0 +1,13 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "some": "unproper value"
+        },
+        "surname": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

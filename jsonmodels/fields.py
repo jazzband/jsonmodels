@@ -26,8 +26,8 @@ class BaseField(object):
         self.help_text = help_text
 
         if validators and not isinstance(validators, list):
-            validators = list((validators,))
-        self.validators = validators
+            validators = [validators]
+        self.validators = validators or []
 
     @property
     def types(self):

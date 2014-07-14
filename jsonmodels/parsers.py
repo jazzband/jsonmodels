@@ -99,8 +99,18 @@ def to_json_schema(cls):
         else:
             prop[name] = _specify_field_type(field)
 
+        _apply_validators_modifications(prop[name], field)
+
     resp['properties'] = prop
     if required:
         resp['required'] = required
 
     return resp
+
+
+def _apply_validators_modifications(field_schema, field):
+        for validator in field.validators:
+            try:
+                validator.modify_schema(field_schema)
+            except AttributeError:
+                pass

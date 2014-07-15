@@ -1,0 +1,17 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "age": {
+            "type": "integer",
+            "maximum": 18,
+            "exclusiveMaximum": true
+        },
+        "name": {
+            "type": "string"
+        },
+        "surname": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

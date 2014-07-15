@@ -213,3 +213,29 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema_min_exclusive.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_max_validator(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField(validators=validators.Max(18))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_max.json')
+        self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_max_validator_with_exclusive(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField()
+            surname = fields.StringField()
+            age = fields.IntField(validators=validators.Max(18, True))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_max_exclusive.json')
+        self.assertTrue(compare_schemas(pattern, schema))

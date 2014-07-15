@@ -89,3 +89,26 @@ class TestMinValidator(unittest.TestCase):
         self.assertRaises(error.ValidationError, validator.validate, 3)
         self.assertRaises(error.ValidationError, validator.validate, 2)
         self.assertRaises(error.ValidationError, validator.validate, -2)
+
+
+class TestMaxValidator(unittest.TestCase):
+
+    def test_validation(self):
+
+        validator = validators.Max(42)
+        self.assertEqual(42, validator.maximum_value)
+
+        validator.validate(4)
+        validator.validate(42)
+        self.assertRaises(error.ValidationError, validator.validate, 42.01)
+        self.assertRaises(error.ValidationError, validator.validate, 43)
+
+    def test_exclusive_validation(self):
+
+        validator = validators.Max(42, True)
+        self.assertEqual(42, validator.maximum_value)
+
+        validator.validate(4)
+        self.assertRaises(error.ValidationError, validator.validate, 42)
+        self.assertRaises(error.ValidationError, validator.validate, 42.01)
+        self.assertRaises(error.ValidationError, validator.validate, 43)

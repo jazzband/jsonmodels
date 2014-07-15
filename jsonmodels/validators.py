@@ -19,6 +19,7 @@ class Min(object):
         self.exclusive = exclusive
 
     def validate(self, value):
+        """Validate value."""
         if self.exclusive:
             if value <= self.minimum_value:
                 raise ValidationError(
@@ -31,6 +32,7 @@ class Min(object):
                         value, self.minimum_value))
 
     def modify_schema(self, field_schema):
+        """Modify field schema."""
         field_schema['minimum'] = self.minimum_value
         if self.exclusive:
             field_schema['exclusiveMinimum'] = True

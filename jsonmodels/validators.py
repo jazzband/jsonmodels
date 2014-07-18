@@ -3,7 +3,7 @@
 import re
 
 from .error import ValidationError
-from .utils import convert_python_regex_to_ecma
+from . import utils
 
 
 class Min(object):
@@ -88,14 +88,27 @@ class Regex(object):
         :param bool multiline: Specify if `MULTILINE` flag should be added.
 
         """
-        self.pattern = pattern
-        self.ignorecase = ignorecase
-        self.multiline = multiline
+        if utils.is_ecma_regex(pattern):
+            result = utils.convert_ecma_regex_to_python(pattern)
+            self.pattern = result.regex
+
+            self.ignorecase = re.I in result.flags
+            self.multiline = re.M in result.flags
+        else:
+            self.pattern = pattern
+            self.ignorecase = ignorecase
+            self.multiline = multiline
 
     def validate(self, value):
         """Validate value."""
         flags = self._calculate_flags()
-        if not re.search(self.pattern, value, flags):
+
+        try:
+            result = re.search(self.pattern, value, flags)
+        except TypeError as te:
+            raise ValidationError(*te.args)
+
+        if not result:
             raise ValidationError(
                 'Value "{}" did not match pattern "{}".'.format(
                     value, self.pattern))
@@ -114,5 +127,5 @@ class Regex(object):
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
-        field_schema['pattern'] = convert_python_regex_to_ecma(
+        field_schema['pattern'] = utils.convert_python_regex_to_ecma(
             self.pattern, self._get_flags())

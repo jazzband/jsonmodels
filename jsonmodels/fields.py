@@ -43,7 +43,7 @@ class BaseField(object):
 
         if value is not None and not isinstance(value, self._types):
             raise ValidationError(
-                'Value of field "{}" is wrong, expected {}'.format(
+                'Value of field "{}" is wrong, expected type "{}"'.format(
                     name,
                     ', '.join([t.__name__ for t in self._types])
                 ))

@@ -155,3 +155,35 @@ class TestRegexValidator(unittest.TestCase):
         validator = validators.Regex('^s.*e$', multiline=True)
         validator.validate('some')
         validator.validate('some\nso more')
+
+    def test_regex_validator(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(
+                validators=validators.Regex('^[a-z]+$', ignorecase=True))
+
+        person = Person()
+        self.assertRaises(error.ValidationError, person.validate)
+
+        person.name = '123'
+        self.assertRaises(error.ValidationError, person.validate)
+
+        person.name = 'Jimmy'
+        person.validate()
+
+    def test_regex_validator_when_ecma_regex_given(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(
+                validators=validators.Regex('/^[a-z]+$/i', ignorecase=False))
+
+        person = Person()
+        self.assertRaises(error.ValidationError, person.validate)
+
+        person.name = '123'
+        self.assertRaises(error.ValidationError, person.validate)
+
+        person.name = 'Jimmy'
+        person.validate()

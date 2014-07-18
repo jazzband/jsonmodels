@@ -1,6 +1,10 @@
 """Predefined validators."""
 
 import re
+try:
+    from functools import reduce
+except ImportError:
+    pass
 
 from .error import ValidationError
 from . import utils

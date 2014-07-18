@@ -94,7 +94,6 @@ def is_ecma_regex(regex):
     :rtype: bool
 
     """
-
     parts = regex.split('/')
 
     if len(parts) == 1:

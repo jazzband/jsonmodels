@@ -29,7 +29,8 @@ class TestCompareSchemas(unittest.TestCase):
         self.assertFalse(utils.compare_schemas(True, False))
 
     def test_basic_comparison(self):
-        self.assertTrue(utils.compare_schemas({'one': 'value'}, {'one': 'value'}))
+        self.assertTrue(
+            utils.compare_schemas({'one': 'value'}, {'one': 'value'}))
         self.assertTrue(utils.compare_schemas(['one', 'two'], ['one', 'two']))
         self.assertTrue(utils.compare_schemas(['one', 'two'], ['two', 'one']))
 

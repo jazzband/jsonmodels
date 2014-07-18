@@ -81,11 +81,19 @@ class Regex(object):
     """Validator for regular expressions."""
 
     def __init__(self, pattern, ignorecase=False, multiline=False):
+        """Init.
+
+        :param string pattern: Pattern of regex.
+        :param bool ignorecase: Specify if `IGNORECASE` flag should be added.
+        :param bool multiline: Specify if `MULTILINE` flag should be added.
+
+        """
         self.pattern = pattern
         self.ignorecase = ignorecase
         self.multiline = multiline
 
     def validate(self, value):
+        """Validate value."""
         flags = self._calculate_flags()
         if not re.search(self.pattern, value, flags):
             raise ValidationError(

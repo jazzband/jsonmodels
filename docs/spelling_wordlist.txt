@@ -7,8 +7,10 @@ docstrings
 indices
 kwargs
 metaclass
+namedtuple
 repo
 schemas
 szczepan
+regex
 validator
 validators

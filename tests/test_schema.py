@@ -239,3 +239,40 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema_max_exclusive.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_regex_validator(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(
+                validators=validators.Regex('^some pattern$'))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_pattern.json')
+        self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_regex_validator_when_ecma_regex_given(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(
+                validators=validators.Regex('/^some pattern$/'))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_pattern.json')
+        self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_regex_validator_with_flags(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(
+                validators=validators.Regex(
+                    '^some pattern$', ignorecase=True, multiline=True))
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_pattern_flags.json')
+        self.assertTrue(compare_schemas(pattern, schema))

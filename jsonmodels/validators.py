@@ -1,6 +1,9 @@
 """Predefined validators."""
 
+import re
+
 from .error import ValidationError
+from .utils import convert_python_regex_to_ecma
 
 
 class Min(object):
@@ -71,3 +74,37 @@ class Max(object):
         field_schema['maximum'] = self.maximum_value
         if self.exclusive:
             field_schema['exclusiveMaximum'] = True
+
+
+class Regex(object):
+
+    """Validator for regular expressions."""
+
+    def __init__(self, pattern, ignorecase=False, multiline=False):
+        self.pattern = pattern
+        self.ignorecase = ignorecase
+        self.multiline = multiline
+
+    def validate(self, value):
+        flags = self._calculate_flags()
+        if not re.search(self.pattern, value, flags):
+            raise ValidationError(
+                'Value "{}" did not match pattern "{}".'.format(
+                    value, self.pattern))
+
+    def _get_flags(self):
+        flags = []
+        if self.ignorecase:
+            flags.append(re.I)
+        if self.multiline:
+            flags.append(re.M)
+
+        return flags
+
+    def _calculate_flags(self):
+        return reduce(lambda x, y: x | y, self._get_flags(), 0)
+
+    def modify_schema(self, field_schema):
+        """Modify field schema."""
+        field_schema['pattern'] = convert_python_regex_to_ecma(
+            self.pattern, self._get_flags())

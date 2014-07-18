@@ -1,0 +1,10 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "pattern": "/^some pattern$/"
+        }
+    },
+    "type": "object"
+}

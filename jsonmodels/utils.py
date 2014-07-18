@@ -1,8 +1,20 @@
 """Utilities."""
 
 import six
+import re
+from collections import namedtuple
 
 SCALAR_TYPES = tuple(list(six.string_types) + [int, float, bool])
+
+ECMA_TO_PYTHON_FLAGS = {
+    'i': re.I,
+    'm': re.M,
+}
+
+PYTHON_TO_ECMA_FLAGS = {
+    value: key for key, value in ECMA_TO_PYTHON_FLAGS.items()}
+
+PythonRegex = namedtuple('PythonRegex', ['regex', 'flags'])
 
 
 def _normalize_string_type(value):
@@ -74,3 +86,70 @@ def compare_schemas(one, two):
         return one == two
     else:
         raise RuntimeError('Not allowed type "{}"'.format(type(one).__name__))
+
+
+def is_ecma_regex(regex):
+    """Check if given regex is of type ECMA 262 or not.
+
+    :rtype: bool
+
+    """
+
+    parts = regex.split('/')
+
+    if len(parts) == 1:
+        return False
+
+    if len(parts) < 3:
+        raise ValueError('Given regex isn\'t ECMA regex nor Python regex.')
+    parts.pop()
+    parts.append('')
+
+    raw_regex = '/'.join(parts)
+    if raw_regex.startswith('/') and raw_regex.endswith('/'):
+        return True
+    return False
+
+
+def convert_ecma_regex_to_python(value):
+    """Convert ECMA 262 regex to Python tuple with regex and flags.
+
+    If given value is already Python regex it will be returned unchanged.
+
+    :param string value: ECMA regex.
+    :return: 2-tuple with `regex` and `flags`
+    :rtype: namedtuple
+
+    """
+    if not is_ecma_regex(value):
+        return PythonRegex(value, [])
+
+    parts = value.split('/')
+    flags = parts.pop()
+
+    try:
+        result_flags = [ECMA_TO_PYTHON_FLAGS[f] for f in flags]
+    except KeyError:
+        raise ValueError('Wrong flags "{}".'.format(flags))
+
+    return PythonRegex('/'.join(parts[1:]), result_flags)
+
+
+def convert_python_regex_to_ecma(value, flags=[]):
+    """Convert Python regex to ECMA 262 regex.
+
+    If given value is already ECMA regex it will be returned unchanged.
+
+    :param string value: Python regex.
+    :param list flags: List of flags (allowed flags: `re.I`, `re.M`)
+    :return: ECMA 262 regex
+    :rtype: str
+
+    """
+    if is_ecma_regex(value):
+        return value
+
+    result_flags = [PYTHON_TO_ECMA_FLAGS[f] for f in flags]
+    result_flags = ''.join(result_flags)
+
+    return '/{}/{}'.format(value, result_flags)

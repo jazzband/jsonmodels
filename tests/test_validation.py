@@ -112,3 +112,46 @@ class TestMaxValidator(unittest.TestCase):
         self.assertRaises(error.ValidationError, validator.validate, 42)
         self.assertRaises(error.ValidationError, validator.validate, 42.01)
         self.assertRaises(error.ValidationError, validator.validate, 43)
+
+
+class TestRegexValidator(unittest.TestCase):
+
+    def test_validation(self):
+
+        validator = validators.Regex('some')
+        self.assertEqual('some', validator.pattern)
+
+        validator.validate('some string')
+        validator.validate('get some chips')
+        self.assertRaises(error.ValidationError, validator.validate, 'asdf')
+        self.assertRaises(error.ValidationError, validator.validate, 'trololo')
+
+    def test_validation_2(self):
+
+        validator = validators.Regex('^some[0-9]$')
+        self.assertEqual('^some[0-9]$', validator.pattern)
+
+        validator.validate('some0')
+        self.assertRaises(error.ValidationError, validator.validate, 'some')
+        self.assertRaises(error.ValidationError, validator.validate, ' some')
+        self.assertRaises(error.ValidationError, validator.validate, 'asdf')
+        self.assertRaises(error.ValidationError, validator.validate, 'trololo')
+
+    def test_validation_ignorecase(self):
+        validator = validators.Regex('^some$')
+        validator.validate('some')
+        self.assertRaises(error.ValidationError, validator.validate, 'sOmE')
+
+        validator = validators.Regex('^some$', ignorecase=True)
+        validator.validate('some')
+        validator.validate('SoMe')
+
+    def test_validation_multiline(self):
+        validator = validators.Regex('^s.*e$')
+        validator.validate('some')
+        self.assertRaises(
+            error.ValidationError, validator.validate, 'some\nso more')
+
+        validator = validators.Regex('^s.*e$', multiline=True)
+        validator.validate('some')
+        validator.validate('some\nso more')

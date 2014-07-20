@@ -1,0 +1,17 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "age": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 20
+        },
+        "surname": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

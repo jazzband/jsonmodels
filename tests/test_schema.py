@@ -276,3 +276,29 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema_pattern_flag.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_length_validator_min(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(validators=validators.Length(5))
+            surname = fields.StringField()
+            age = fields.IntField()
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_length_min.json')
+        self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_length_validator(self):
+
+        class Person(models.Base):
+
+            name = fields.StringField(validators=validators.Length(5, 20))
+            surname = fields.StringField()
+            age = fields.IntField()
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_length.json')
+        self.assertTrue(compare_schemas(pattern, schema))

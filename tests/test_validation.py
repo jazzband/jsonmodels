@@ -187,3 +187,31 @@ class TestRegexValidator(unittest.TestCase):
 
         person.name = 'Jimmy'
         person.validate()
+
+
+class TestLengthValidator(unittest.TestCase):
+
+    def test_init(self):
+        validator = validators.Length(0, 10)
+        self.assertEqual(0, validator.minimum_value)
+        self.assertEqual(10, validator.maximum_value)
+
+        validator = validators.Length(0)
+        self.assertEqual(0, validator.minimum_value)
+        self.assertIsNone(validator.maximum_value)
+
+        validator = validators.Length(maximum_value=10)
+        self.assertEqual(10, validator.maximum_value)
+        self.assertIsNone(validator.minimum_value)
+
+        self.assertRaises(ValueError, validators.Length)
+
+    def test_validation(self):
+        validator = validators.Length(1, 10)
+        validator.validate('word')
+        validator.validate('w' * 10)
+        validator.validate('w')
+        validator.validate([1, 2, 3])
+
+        self.assertRaises(error.ValidationError, validator.validate, '')
+        self.assertRaises(error.ValidationError, validator.validate, 'na' * 10)

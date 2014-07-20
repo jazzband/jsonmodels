@@ -140,3 +140,48 @@ class Regex(object):
         """Modify field schema."""
         field_schema['pattern'] = utils.convert_python_regex_to_ecma(
             self.pattern, self.flags)
+
+
+class Length(object):
+
+    """Validator for length."""
+
+    def __init__(self, minimum_value=None, maximum_value=None):
+        """Init.
+
+        Note that if no `minimum_value` neither `maximum_value` will be
+        specified, `ValueError` will be raised.
+
+        :param int minimum_value: Minimum value (optional).
+        :param int maximum_value: Maximum value (optional).
+
+        """
+        if minimum_value is None and maximum_value is None:
+            raise ValueError(
+                "Either 'minimum_value' or 'maximum_value' must be specified.")
+
+        self.minimum_value = minimum_value
+        self.maximum_value = maximum_value
+
+    def validate(self, value):
+        """Validate value."""
+        len_ = len(value)
+
+        if self.minimum_value is not None and len_ < self.minimum_value:
+            raise ValidationError(
+                "Value '{}' length is lower than allowed minimum '{}'.".format(
+                    value, self.minimum_value))
+
+        if self.minimum_value is not None and len_ > self.maximum_value:
+            raise ValidationError(
+                "Value '{}' length is bigger than "
+                "allowed maximum '{}'.".format(
+                    value, self.maximum_value))
+
+    def modify_schema(self, field_schema):
+        """Modify field schema."""
+        if self.minimum_value:
+            field_schema['minLength'] = self.minimum_value
+
+        if self.maximum_value:
+            field_schema['maxLength'] = self.maximum_value

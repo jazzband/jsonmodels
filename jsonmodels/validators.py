@@ -84,24 +84,40 @@ class Regex(object):
 
     """Validator for regular expressions."""
 
-    def __init__(self, pattern, ignorecase=False, multiline=False):
+    ATTRIBUTES_TO_FLAGS = {
+        'ignorecase': re.I,
+        'multiline': re.M,
+    }
+
+    def __init__(self, pattern, **flags):
         """Init.
 
+        Note, that if given pattern is ECMA regex, given flags will be
+        **completely ignored** and taken from given regex.
+
+
         :param string pattern: Pattern of regex.
-        :param bool ignorecase: Specify if `IGNORECASE` flag should be added.
-        :param bool multiline: Specify if `MULTILINE` flag should be added.
+        :param dict flags: Allowed flags can be found in attribute
+            `ATTRIBUTES_TO_FLAGS`. Invalid flags will be ignored.
 
         """
+        flags = {
+            key: value for key, value in flags.items()
+            if key in self.ATTRIBUTES_TO_FLAGS}
+
         if utils.is_ecma_regex(pattern):
             result = utils.convert_ecma_regex_to_python(pattern)
             self.pattern = result.regex
 
-            self.ignorecase = re.I in result.flags
-            self.multiline = re.M in result.flags
+            for key, _ in flags.items():
+                flags.update(
+                    {key: self.ATTRIBUTES_TO_FLAGS[key] in result.flags})
         else:
             self.pattern = pattern
-            self.ignorecase = ignorecase
-            self.multiline = multiline
+
+        self.flags = [
+            self.ATTRIBUTES_TO_FLAGS[key] for key, value
+            in flags.items() if value]
 
     def validate(self, value):
         """Validate value."""
@@ -117,19 +133,10 @@ class Regex(object):
                 'Value "{}" did not match pattern "{}".'.format(
                     value, self.pattern))
 
-    def _get_flags(self):
-        flags = []
-        if self.ignorecase:
-            flags.append(re.I)
-        if self.multiline:
-            flags.append(re.M)
-
-        return flags
-
     def _calculate_flags(self):
-        return reduce(lambda x, y: x | y, self._get_flags(), 0)
+        return reduce(lambda x, y: x | y, self.flags, 0)
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
         field_schema['pattern'] = utils.convert_python_regex_to_ecma(
-            self.pattern, self._get_flags())
+            self.pattern, self.flags)

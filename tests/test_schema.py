@@ -264,15 +264,15 @@ class TestJsonmodels(unittest.TestCase):
         pattern = get_fixture('schema_pattern.json')
         self.assertTrue(compare_schemas(pattern, schema))
 
-    def test_regex_validator_with_flags(self):
+    def test_regex_validator_with_flag(self):
 
         class Person(models.Base):
 
             name = fields.StringField(
                 validators=validators.Regex(
-                    '^some pattern$', ignorecase=True, multiline=True))
+                    '^some pattern$', ignorecase=True))
 
         schema = Person.to_json_schema()
 
-        pattern = get_fixture('schema_pattern_flags.json')
+        pattern = get_fixture('schema_pattern_flag.json')
         self.assertTrue(compare_schemas(pattern, schema))

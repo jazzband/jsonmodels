@@ -84,7 +84,7 @@ class Regex(object):
 
     """Validator for regular expressions."""
 
-    ATTRIBUTES_TO_FLAGS = {
+    FLAGS = {
         'ignorecase': re.I,
         'multiline': re.M,
     }
@@ -103,7 +103,7 @@ class Regex(object):
         """
         flags = {
             key: value for key, value in flags.items()
-            if key in self.ATTRIBUTES_TO_FLAGS}
+            if key in self.FLAGS}
 
         if utils.is_ecma_regex(pattern):
             result = utils.convert_ecma_regex_to_python(pattern)
@@ -111,12 +111,12 @@ class Regex(object):
 
             for key, _ in flags.items():
                 flags.update(
-                    {key: self.ATTRIBUTES_TO_FLAGS[key] in result.flags})
+                    {key: self.FLAGS[key] in result.flags})
         else:
             self.pattern = pattern
 
         self.flags = [
-            self.ATTRIBUTES_TO_FLAGS[key] for key, value
+            self.FLAGS[key] for key, value
             in flags.items() if value]
 
     def validate(self, value):

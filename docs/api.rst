@@ -8,4 +8,5 @@ Contents:
     api/models
     api/fields
     api/parsers
+    api/validators
     api/error

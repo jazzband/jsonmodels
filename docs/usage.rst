@@ -80,15 +80,24 @@ You can specify which fields are *required*, if required value is absent during
     >>> dafty.validate()
     *** ValidationError: Field "name" is required!
 
+Validators
+~~~~~~~~~~
+
+Validators can be passed through `validators` keyword, as a single validator,
+or list of validators (so, as you may be expecting, you can't pass object that
+extends `List`).
+
+You can try to use validators shipped with this library. To get more details
+see :module:`jsonmodels.validators`. Shipped validators affect generated schema
+out of the box, to use full potential JSON schema gives you.
+
 Custom validators
 ~~~~~~~~~~~~~~~~~
 
 You can always specify your own validators. Custom validator can be object with
 `validate` method (which takes precedence) or function (or callable object).
 
-Validators can be passed through `validators` keyword, as a single validator,
-or list of validators (so, as you may be expecting, you can't pass object that
-extends `List`). Each validator **must** raise exception to indicate validation
+Each validator **must** raise exception to indicate validation
 didn't pass. Returning values like `False` won't have any effect.
 
 .. code-block:: python
@@ -110,6 +119,24 @@ didn't pass. Returning values like `False` won't have any effect.
     ...   surname = fields.StringField(required=True)
     ...   age = fields.IntField(
     ...     Car, validators=[some_validator, RangeValidator(0, 100)])
+
+If your validator have method `modify_schema` you can use it to affect
+generated schema in any way. Given argument is schema for single field. For
+example:
+
+.. code-block:: python
+
+    >>> class Length(object):
+    ...
+    ... def validate(self, value):
+    ...     # Some logic here.
+    ...
+    ... def modify_schema(self, field_schema):
+    ...     if self.minimum_value:
+    ...         field_schema['minLength'] = self.minimum_value
+    ...
+    ...     if self.maximum_value:
+    ...         field_schema['maxLength'] = self.maximum_value
 
 Casting to Python struct (and JSON)
 -----------------------------------

@@ -157,6 +157,66 @@ Features
         }
     }
 
+* Validate models and use validators, that affect generated schema:
+
+.. code-block:: python
+
+    >>> class Person(models.Base):
+    ...
+    ...     name = fields.StringField(
+    ...         required=True,
+    ...         validators=[
+    ...             validators.Regex('^[A-Za-z]+$'),
+    ...             validators.Length(3, 25),
+    ...         ],
+    ...     )
+    ...     age = fields.IntField(
+    ...         required=True,
+    ...         validators=[
+    ...             validators.Min(18),
+    ...             validators.Max(101),
+    ...         ]
+    ...     )
+
+    >>> person = Person()
+    >>> person.age = 11
+    >>> person.validate()
+    *** ValidationError: '11' is lower than minimum ('18').
+
+    >>> person.age = 19
+    >>> person.name = 'Scott_'
+    >>> person.validate()
+    *** ValidationError: Value "Scott_" did not match pattern "^[A-Za-z]+$".
+
+    >>> person.name = 'Scott'
+    >>> person.validate()
+    None
+
+    >>> person.to_json_schema()
+    {
+        "additionalProperties": false,
+        "properties": {
+            "age": {
+                "maximum": 101,
+                "minimum": 18,
+                "type": "integer"
+            },
+            "name": {
+                "maxLength": 25,
+                "minLength": 3,
+                "pattern": "/^[A-Za-z]+$/",
+                "type": "string"
+            }
+        },
+        "required": [
+            "age",
+            "name"
+        ],
+        "type": "object"
+    }
+
+For more information, please see topic about validation in documentation.
+
 * Compare JSON schemas:
 
 .. code-block:: python

@@ -27,7 +27,7 @@ Features
 
 .. code-block:: python
 
-    from jsonmodels import models, fields
+    from jsonmodels import models, fields, error, validators
 
 
     class Cat(models.Base):

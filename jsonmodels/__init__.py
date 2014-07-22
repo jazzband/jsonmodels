@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 """Jsonmodels."""
 
 __author__ = 'Szczepan Cieślik'
 __email__ = 'szczepan.cieslik@gmail.com'
-__version__ = '1.3.1'
+__version__ = '1.4'

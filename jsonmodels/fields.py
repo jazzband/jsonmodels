@@ -12,7 +12,7 @@ class BaseField(object):
 
     """Base class for all fields."""
 
-    _types = None
+    types = None
 
     def __init__(
             self,
@@ -27,23 +27,18 @@ class BaseField(object):
             validators = [validators]
         self.validators = validators or []
 
-    @property
-    def types(self):
-        """Get types."""
-        return self._types
-
     def validate(self, name, value):
         """Validate value."""
-        if self._types is None:
+        if self.types is None:
             raise ValidationError(
                 'Field "{}" is of type "{}" that is not usable, try '
                 'different field type.'.format(name, type(self).__name__))
 
-        if value is not None and not isinstance(value, self._types):
+        if value is not None and not isinstance(value, self.types):
             raise ValidationError(
                 'Value of field "{}" is wrong, expected type "{}"'.format(
                     name,
-                    ', '.join([t.__name__ for t in self._types])
+                    ', '.join([t.__name__ for t in self.types])
                 ))
 
         if value is None and self.required:
@@ -77,28 +72,28 @@ class StringField(BaseField):
 
     """String field."""
 
-    _types = six.string_types
+    types = six.string_types
 
 
 class IntField(BaseField):
 
     """Integer field."""
 
-    _types = (int,)
+    types = (int,)
 
 
 class FloatField(BaseField):
 
     """Float field."""
 
-    _types = (float, int)
+    types = (float, int)
 
 
 class BoolField(BaseField):
 
     """Bool field."""
 
-    _types = (bool,)
+    types = (bool,)
 
     def parse_value(self, value):
         """Cast value to `bool`."""
@@ -110,12 +105,7 @@ class ListField(BaseField):
 
     """List field."""
 
-    _types = (list,)
-
-    @property
-    def items_types(self):
-        """Get items types."""
-        return self._items_types
+    types = (list,)
 
     def __init__(self, items_types=None, *args, **kwargs):
         """Init.
@@ -126,11 +116,11 @@ class ListField(BaseField):
         """
         if items_types:
             try:
-                self._items_types = tuple(items_types)
+                self.items_types = tuple(items_types)
             except TypeError:
-                self._items_types = items_types,
+                self.items_types = items_types,
         else:
-            self._items_types = tuple()
+            self.items_types = tuple()
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
 
@@ -138,17 +128,17 @@ class ListField(BaseField):
         """Validation."""
         super(ListField, self).validate(name, value)
 
-        if len(self._items_types) == 0:
+        if len(self.items_types) == 0:
             return
 
         try:
             for item in value:
-                if not isinstance(item, self._items_types):
+                if not isinstance(item, self.items_types):
                     raise ValidationError(
                         'All items of "{}" must be instances '
                         'of "{}", and not "{}".'.format(
                             name,
-                            ', '.join([t.__name__ for t in self._items_types]),
+                            ', '.join([t.__name__ for t in self.items_types]),
                             type(item).__name__
                         ))
         except TypeError:
@@ -168,15 +158,15 @@ class ListField(BaseField):
 
     def parse_value(self, values):
         """Parse value to proper type."""
-        embed_type = self._items_types[0]
+        embed_type = self.items_types[0]
 
         if not hasattr(getattr(embed_type, 'populate', None), '__call__'):
             return values
 
-        if len(self._items_types) != 1:
+        if len(self.items_types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
-                    ', '.join([t.__name__ for t in self._items_types])
+                    ', '.join([t.__name__ for t in self.items_types])
                 )
             )
 
@@ -199,9 +189,9 @@ class EmbeddedField(BaseField):
         """Init."""
         try:
             iter(model_types)
-            self._types = tuple(model_types)
+            self.types = tuple(model_types)
         except TypeError:
-            self._types = (model_types,)
+            self.types = (model_types,)
 
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
@@ -218,13 +208,13 @@ class EmbeddedField(BaseField):
         if not isinstance(value, dict):
             return value
 
-        if len(self._types) != 1:
+        if len(self.types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
-                    ', '.join([t.__name__ for t in self._types])
+                    ', '.join([t.__name__ for t in self.types])
                 )
             )
-        embed_type = self._types[0]
+        embed_type = self.types[0]
 
         return embed_type(**value)
 
@@ -233,7 +223,7 @@ class TimeField(StringField):
 
     """Time field."""
 
-    _types = (datetime.time,)
+    types = (datetime.time,)
 
     def __init__(self, str_format=None, *args, **kwargs):
         """Init.
@@ -260,7 +250,7 @@ class DateField(StringField):
 
     """Date field."""
 
-    _types = (datetime.date,)
+    types = (datetime.date,)
     default_format = '%Y-%m-%d'
 
     def __init__(self, str_format=None, *args, **kwargs):
@@ -288,7 +278,7 @@ class DateTimeField(StringField):
 
     """Datetime field."""
 
-    _types = (datetime.datetime,)
+    types = (datetime.datetime,)
 
     def __init__(self, str_format=None, *args, **kwargs):
         """Init.

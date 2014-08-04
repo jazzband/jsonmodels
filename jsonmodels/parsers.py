@@ -20,11 +20,6 @@ def to_struct(model):
         if value is None:
             continue
 
-        field = model.get_field(name)
-
-        if hasattr(field.data_transformer, 'reverse_transform'):
-            value = field.data_transformer.reverse_transform(value)
-
         if isinstance(value, list):
             resp[name] = [to_struct(item) for item in value]
         else:

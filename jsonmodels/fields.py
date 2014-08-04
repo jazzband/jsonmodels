@@ -17,12 +17,10 @@ class BaseField(object):
     def __init__(
             self,
             required=False,
-            data_transformer=None,
             help_text=None,
             validators=None):
         """Init."""
         self.required = required
-        self.data_transformer = data_transformer
         self.help_text = help_text
 
         if validators and not isinstance(validators, list):
@@ -59,10 +57,7 @@ class BaseField(object):
 
     def parse_value(self, value):
         """Parse value from primitive to desired format."""
-        if self.data_transformer:
-            return self.data_transformer.transform(value)
-        else:
-            return value
+        return value
 
     def _validate_with_custom_validators(self, value):
         if self.validators:

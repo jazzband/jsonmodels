@@ -8,10 +8,11 @@ History
 
 * Allowed validators to modify generated schema.
 * Added validator for maximum value.
-* Added utils to convert regexes between Python and ECMA formats.
+* Added utilities to convert regular expressions between Python and ECMA
+  formats.
 * Added validator for regex.
 * Added validator for minimum value.
-* By default "validators" of field are empty list.
+* By default "validators" property of field is an empty list.
 
 1.3.1 (2014-07-13)
 ++++++++++++++++++

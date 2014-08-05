@@ -2,7 +2,7 @@
 
 import unittest
 
-from jsonmodels import models, fields, error
+from jsonmodels import models, fields, errors
 
 
 class TestJsonmodels(unittest.TestCase):
@@ -32,7 +32,7 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
-        self.assertRaises(error.ValidationError, alan.validate)
+        self.assertRaises(errors.ValidationError, alan.validate)
 
         alan.name = 'Chuck'
         alan.validate()
@@ -46,7 +46,7 @@ class TestJsonmodels(unittest.TestCase):
 
         alan = Person()
         alan.age = '42'
-        self.assertRaises(error.ValidationError, alan.validate)
+        self.assertRaises(errors.ValidationError, alan.validate)
 
         alan.age = 42
         alan.validate()
@@ -59,13 +59,13 @@ class TestJsonmodels(unittest.TestCase):
             name = fields.BaseField()
 
         alan = Person()
-        self.assertRaises(error.ValidationError, alan.validate)
+        self.assertRaises(errors.ValidationError, alan.validate)
 
         alan.name = 'some name'
-        self.assertRaises(error.ValidationError, alan.validate)
+        self.assertRaises(errors.ValidationError, alan.validate)
 
         alan.name = 2345
-        self.assertRaises(error.ValidationError, alan.validate)
+        self.assertRaises(errors.ValidationError, alan.validate)
 
     def test_value_replacements(self):
 
@@ -117,7 +117,7 @@ class TestJsonmodels(unittest.TestCase):
         viper.validate()
 
         viper.wheels.append(Wheel2)
-        self.assertRaises(error.ValidationError, viper.validate)
+        self.assertRaises(errors.ValidationError, viper.validate)
 
     def test_list_field_for_subtypes(self):
 
@@ -156,7 +156,7 @@ class TestJsonmodels(unittest.TestCase):
         garage.validate()
 
         garage.cars.append(Car())
-        self.assertRaises(error.ValidationError, garage.validate)
+        self.assertRaises(errors.ValidationError, garage.validate)
 
     def test_list_validation(self):
 
@@ -168,7 +168,7 @@ class TestJsonmodels(unittest.TestCase):
         garage.validate()
 
         garage.cars = 'some string'
-        self.assertRaises(error.ValidationError, garage.validate)
+        self.assertRaises(errors.ValidationError, garage.validate)
 
     def test_embedded_model(self):
 
@@ -195,13 +195,13 @@ class TestJsonmodels(unittest.TestCase):
         entity.validate()
 
         entity.secondary.data = '42'
-        self.assertRaises(error.ValidationError, entity.validate)
+        self.assertRaises(errors.ValidationError, entity.validate)
 
         entity.secondary.data = 42
         entity.validate()
 
         entity.secondary = 'something different'
-        self.assertRaises(error.ValidationError, entity.validate)
+        self.assertRaises(errors.ValidationError, entity.validate)
 
         entity.secondary = None
         entity.validate()
@@ -223,7 +223,7 @@ class TestJsonmodels(unittest.TestCase):
         entity.secondary = sec
         entity.validate()
         entity.secondary.data = None
-        self.assertRaises(error.ValidationError, entity.validate)
+        self.assertRaises(errors.ValidationError, entity.validate)
 
         entity.secondary = None
         entity.validate()
@@ -239,7 +239,7 @@ class TestJsonmodels(unittest.TestCase):
         entity.secondary = sec
         entity.validate()
         entity.secondary.data = None
-        self.assertRaises(error.ValidationError, entity.validate)
+        self.assertRaises(errors.ValidationError, entity.validate)
 
     def test_embedded_inheritance(self):
 
@@ -266,7 +266,7 @@ class TestJsonmodels(unittest.TestCase):
         place.validate()
 
         place.car = Car()
-        self.assertRaises(error.ValidationError, place.validate)
+        self.assertRaises(errors.ValidationError, place.validate)
 
         class ParkingPlace(models.Base):
 
@@ -440,7 +440,7 @@ class TestJsonmodels(unittest.TestCase):
             secondary = fields.EmbeddedField(Secondary, required=True)
 
         entity = Primary()
-        self.assertRaises(error.ValidationError, entity.validate)
+        self.assertRaises(errors.ValidationError, entity.validate)
 
         entity.secondary = Secondary()
         entity.validate()

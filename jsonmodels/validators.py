@@ -6,7 +6,7 @@ try:
 except ImportError:
     pass
 
-from .error import ValidationError
+from .errors import ValidationError
 from . import utils
 
 

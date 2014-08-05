@@ -5,7 +5,7 @@ import unittest
 
 from dateutil.tz import tzoffset
 
-from jsonmodels import models, fields, error
+from jsonmodels import models, fields, errors
 
 
 class _TestCet(datetime.tzinfo):
@@ -44,7 +44,7 @@ class TimeFieldTestCase(unittest.TestCase):
         event.validate()
 
         event.time = '12:03:34'
-        self.assertRaises(error.ValidationError, event.validate)
+        self.assertRaises(errors.ValidationError, event.validate)
 
         event.time = datetime.time()
         event.validate()
@@ -121,7 +121,7 @@ class DateFieldTestCase(unittest.TestCase):
         event.validate()
 
         event.date = '2014-04-21'
-        self.assertRaises(error.ValidationError, event.validate)
+        self.assertRaises(errors.ValidationError, event.validate)
 
         event.date = datetime.date(2014, 4, 21)
         event.validate()
@@ -175,8 +175,7 @@ class DateTimeFieldTestCase(unittest.TestCase):
         event.validate()
 
         event.date = '2013-05-06 12:03:34'
-        self.assertRaises(error.ValidationError, event.validate)
-
+        self.assertRaises(errors.ValidationError, event.validate)
         event.date = datetime.datetime.now()
         event.validate()
 

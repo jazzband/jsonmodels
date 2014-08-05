@@ -9,4 +9,4 @@ Contents:
     api/fields
     api/parsers
     api/validators
-    api/error
+    api/errors

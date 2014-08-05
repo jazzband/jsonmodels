@@ -3,7 +3,7 @@
 import unittest
 from datetime import datetime
 
-from jsonmodels import models, fields, error
+from jsonmodels import models, fields, errors
 
 
 class _DateField(fields.BaseField):
@@ -23,7 +23,7 @@ class TestToStructMethod(unittest.TestCase):
             cash = fields.FloatField()
 
         alan = Person()
-        self.assertRaises(error.ValidationError, alan.to_struct)
+        self.assertRaises(errors.ValidationError, alan.to_struct)
 
         alan.name = 'Alan'
         alan.surname = 'Wake'

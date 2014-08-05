@@ -2,7 +2,7 @@
 
 import unittest
 
-from jsonmodels import models, fields, validators, error
+from jsonmodels import models, fields, validators, errors
 
 
 class FakeValidator(object):
@@ -77,8 +77,8 @@ class TestMinValidator(unittest.TestCase):
 
         validator.validate(4)
         validator.validate(3)
-        self.assertRaises(error.ValidationError, validator.validate, 2)
-        self.assertRaises(error.ValidationError, validator.validate, -2)
+        self.assertRaises(errors.ValidationError, validator.validate, 2)
+        self.assertRaises(errors.ValidationError, validator.validate, -2)
 
     def test_exclusive_validation(self):
 
@@ -86,9 +86,9 @@ class TestMinValidator(unittest.TestCase):
         self.assertEqual(3, validator.minimum_value)
 
         validator.validate(4)
-        self.assertRaises(error.ValidationError, validator.validate, 3)
-        self.assertRaises(error.ValidationError, validator.validate, 2)
-        self.assertRaises(error.ValidationError, validator.validate, -2)
+        self.assertRaises(errors.ValidationError, validator.validate, 3)
+        self.assertRaises(errors.ValidationError, validator.validate, 2)
+        self.assertRaises(errors.ValidationError, validator.validate, -2)
 
 
 class TestMaxValidator(unittest.TestCase):
@@ -100,8 +100,8 @@ class TestMaxValidator(unittest.TestCase):
 
         validator.validate(4)
         validator.validate(42)
-        self.assertRaises(error.ValidationError, validator.validate, 42.01)
-        self.assertRaises(error.ValidationError, validator.validate, 43)
+        self.assertRaises(errors.ValidationError, validator.validate, 42.01)
+        self.assertRaises(errors.ValidationError, validator.validate, 43)
 
     def test_exclusive_validation(self):
 
@@ -109,9 +109,9 @@ class TestMaxValidator(unittest.TestCase):
         self.assertEqual(42, validator.maximum_value)
 
         validator.validate(4)
-        self.assertRaises(error.ValidationError, validator.validate, 42)
-        self.assertRaises(error.ValidationError, validator.validate, 42.01)
-        self.assertRaises(error.ValidationError, validator.validate, 43)
+        self.assertRaises(errors.ValidationError, validator.validate, 42)
+        self.assertRaises(errors.ValidationError, validator.validate, 42.01)
+        self.assertRaises(errors.ValidationError, validator.validate, 43)
 
 
 class TestRegexValidator(unittest.TestCase):
@@ -123,8 +123,9 @@ class TestRegexValidator(unittest.TestCase):
 
         validator.validate('some string')
         validator.validate('get some chips')
-        self.assertRaises(error.ValidationError, validator.validate, 'asdf')
-        self.assertRaises(error.ValidationError, validator.validate, 'trololo')
+        self.assertRaises(errors.ValidationError, validator.validate, 'asdf')
+        self.assertRaises(
+            errors.ValidationError, validator.validate, 'trololo')
 
     def test_validation_2(self):
 
@@ -132,15 +133,16 @@ class TestRegexValidator(unittest.TestCase):
         self.assertEqual('^some[0-9]$', validator.pattern)
 
         validator.validate('some0')
-        self.assertRaises(error.ValidationError, validator.validate, 'some')
-        self.assertRaises(error.ValidationError, validator.validate, ' some')
-        self.assertRaises(error.ValidationError, validator.validate, 'asdf')
-        self.assertRaises(error.ValidationError, validator.validate, 'trololo')
+        self.assertRaises(errors.ValidationError, validator.validate, 'some')
+        self.assertRaises(errors.ValidationError, validator.validate, ' some')
+        self.assertRaises(errors.ValidationError, validator.validate, 'asdf')
+        self.assertRaises(
+            errors.ValidationError, validator.validate, 'trololo')
 
     def test_validation_ignorecase(self):
         validator = validators.Regex('^some$')
         validator.validate('some')
-        self.assertRaises(error.ValidationError, validator.validate, 'sOmE')
+        self.assertRaises(errors.ValidationError, validator.validate, 'sOmE')
 
         validator = validators.Regex('^some$', ignorecase=True)
         validator.validate('some')
@@ -150,7 +152,7 @@ class TestRegexValidator(unittest.TestCase):
         validator = validators.Regex('^s.*e$')
         validator.validate('some')
         self.assertRaises(
-            error.ValidationError, validator.validate, 'some\nso more')
+            errors.ValidationError, validator.validate, 'some\nso more')
 
         validator = validators.Regex('^s.*e$', multiline=True)
         validator.validate('some')
@@ -164,10 +166,10 @@ class TestRegexValidator(unittest.TestCase):
                 validators=validators.Regex('^[a-z]+$', ignorecase=True))
 
         person = Person()
-        self.assertRaises(error.ValidationError, person.validate)
+        self.assertRaises(errors.ValidationError, person.validate)
 
         person.name = '123'
-        self.assertRaises(error.ValidationError, person.validate)
+        self.assertRaises(errors.ValidationError, person.validate)
 
         person.name = 'Jimmy'
         person.validate()
@@ -180,10 +182,10 @@ class TestRegexValidator(unittest.TestCase):
                 validators=validators.Regex('/^[a-z]+$/i', ignorecase=False))
 
         person = Person()
-        self.assertRaises(error.ValidationError, person.validate)
+        self.assertRaises(errors.ValidationError, person.validate)
 
         person.name = '123'
-        self.assertRaises(error.ValidationError, person.validate)
+        self.assertRaises(errors.ValidationError, person.validate)
 
         person.name = 'Jimmy'
         person.validate()
@@ -213,5 +215,6 @@ class TestLengthValidator(unittest.TestCase):
         validator.validate('w')
         validator.validate([1, 2, 3])
 
-        self.assertRaises(error.ValidationError, validator.validate, '')
-        self.assertRaises(error.ValidationError, validator.validate, 'na' * 10)
+        self.assertRaises(errors.ValidationError, validator.validate, '')
+        self.assertRaises(
+            errors.ValidationError, validator.validate, 'na' * 10)

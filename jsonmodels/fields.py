@@ -5,7 +5,7 @@ import datetime
 import six
 from dateutil.parser import parse
 
-from .error import ValidationError
+from .errors import ValidationError
 
 
 class BaseField(object):

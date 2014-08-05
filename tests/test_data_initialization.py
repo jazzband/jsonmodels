@@ -1,6 +1,6 @@
 import unittest
 
-from jsonmodels import models, fields, error
+from jsonmodels import models, fields, errors
 
 
 class TestJsonmodelsInitialization(unittest.TestCase):
@@ -91,10 +91,10 @@ class TestJsonmodelsInitialization(unittest.TestCase):
             }
         }
 
-        self.assertRaises(error.ValidationError, ParkingPlace, **data)
+        self.assertRaises(errors.ValidationError, ParkingPlace, **data)
 
         place = ParkingPlace()
-        self.assertRaises(error.ValidationError, place.populate, **data)
+        self.assertRaises(errors.ValidationError, place.populate, **data)
 
     def test_deep_initialization_with_list(self):
 
@@ -171,10 +171,10 @@ class TestJsonmodelsInitialization(unittest.TestCase):
             ],
         }
 
-        self.assertRaises(error.ValidationError, Parking, **data)
+        self.assertRaises(errors.ValidationError, Parking, **data)
 
         parking = Parking()
-        self.assertRaises(error.ValidationError, parking.populate, **data)
+        self.assertRaises(errors.ValidationError, parking.populate, **data)
 
         # Case for not iterable data.
         data = {
@@ -182,10 +182,10 @@ class TestJsonmodelsInitialization(unittest.TestCase):
             'cars': object(),
         }
 
-        self.assertRaises(error.ValidationError, Parking, **data)
+        self.assertRaises(errors.ValidationError, Parking, **data)
 
         parking = Parking()
-        self.assertRaises(error.ValidationError, parking.populate, **data)
+        self.assertRaises(errors.ValidationError, parking.populate, **data)
 
     def test_initialization_with_non_models_types(self):
 

@@ -22,14 +22,9 @@ class BaseMetaclass(type):
         return super(BaseMetaclass, cls).__new__(cls, class_name, bases, attr)
 
 
-class PreBase(object):
+class Base(six.with_metaclass(BaseMetaclass)):
 
-    """Base class for all models.
-
-    For compatibility reasons (Python 2 and 3) it is called `PreBase` and
-    models MUST in fact inherit from class `Base`, otherwise it won't work.
-
-    """
+    """Base class for all models."""
 
     def __init__(self, **kwargs):
         """Init."""
@@ -83,6 +78,3 @@ class PreBase(object):
     def __str__(self):
         """Get informal representation."""
         return '{} object'.format(self.__class__.__name__)
-
-# Actual base for models.
-Base = BaseMetaclass('Base', (PreBase,), {})

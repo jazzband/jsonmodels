@@ -25,7 +25,7 @@ Features
 
 * Create Django-like models:
 
-.. code-block:: python
+  .. code-block:: python
 
     from jsonmodels import models, fields, error, validators
 
@@ -58,7 +58,7 @@ Features
 
 * Access to values through attributes:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> cat = Cat()
     >>> cat.populate(name='Garfield')
@@ -70,7 +70,7 @@ Features
 
 * Validate models:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> person = Person(name='Chuck', surname='Norris')
     >>> person.validate()
@@ -82,7 +82,7 @@ Features
 
 * Cast models to python struct and JSON:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> cat = Cat(name='Garfield')
     >>> dog = Dog(name='Dogmeat', age=9)
@@ -108,7 +108,7 @@ Features
 
 * You don't like to write JSON Schema? Let `jsonmodels` do it for you:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> person = Person()
     >>> person.to_json_schema()
@@ -159,7 +159,7 @@ Features
 
 * Validate models and use validators, that affect generated schema:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> class Person(models.Base):
     ...
@@ -215,11 +215,11 @@ Features
         "type": "object"
     }
 
-For more information, please see topic about validation in documentation.
+  For more information, please see topic about validation in documentation.
 
 * Compare JSON schemas:
 
-.. code-block:: python
+  .. code-block:: python
 
     >>> from jsonmodels.utils import compare_schemas
     >>> schema1 = {'type': 'object'}

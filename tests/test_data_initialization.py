@@ -55,14 +55,10 @@ class TestJsonmodelsInitialization(unittest.TestCase):
         parking2 = ParkingPlace()
         parking2.populate(**data)
         for parking in [parking1, parking2]:
-            parking.validate()
-
             self.assertEqual(parking.location, 'somewhere')
             car = parking.car
             self.assertTrue(isinstance(car, Car))
             self.assertEqual(car.brand, 'awesome brand')
-
-            parking.validate()
 
             self.assertEqual(parking.location, 'somewhere')
             car = parking.car
@@ -126,8 +122,6 @@ class TestJsonmodelsInitialization(unittest.TestCase):
         parking2 = Parking()
         parking2.populate(**data)
         for parking in [parking1, parking2]:
-            parking.validate()
-
             self.assertEqual(parking.location, 'somewhere')
             cars = parking.cars
             self.assertTrue(isinstance(cars, list))
@@ -204,7 +198,6 @@ class TestJsonmodelsInitialization(unittest.TestCase):
         person2.populate(**data)
 
         for person in [person1, person2]:
-            person.validate()
             self.assertEqual(person.surname, 'Norris')
             self.assertEqual(len(person.names), 2)
             self.assertIn('Chuck', person.names)
@@ -227,7 +220,6 @@ class TestJsonmodelsInitialization(unittest.TestCase):
         person2.populate(**data)
 
         for person in [person1, person2]:
-            person.validate()
             self.assertEqual(person.name, 'Chuck')
             self.assertEqual(len(person.mix), 3)
             self.assertIn('something', person.mix)
@@ -254,14 +246,10 @@ class TestJsonmodelsInitialization(unittest.TestCase):
         parking2 = ParkingPlace()
         parking2.populate(**data)
         for parking in [parking1, parking2]:
-            parking.validate()
-
             self.assertEqual(parking.location, 'somewhere')
             car = parking.car
             self.assertTrue(isinstance(car, Car))
             self.assertEqual(car.brand, 'awesome brand')
-
-            parking.validate()
 
             self.assertEqual(parking.location, 'somewhere')
             car = parking.car

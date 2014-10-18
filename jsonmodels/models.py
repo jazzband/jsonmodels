@@ -2,27 +2,11 @@
 
 import six
 
-from . import parsers
+from . import parsers, errors
 from .fields import BaseField
 
 
-class BaseMetaclass(type):
-
-    """Metaclass for models."""
-
-    def __new__(cls, class_name, bases, attr):
-        """Rewriting defined fields."""
-        fields = {}
-        for name, field in attr.items():
-            if isinstance(field, BaseField):
-                attr[name] = field.get_value_replacement()
-                fields[name] = field
-        attr['_fields'] = fields
-
-        return super(BaseMetaclass, cls).__new__(cls, class_name, bases, attr)
-
-
-class Base(six.with_metaclass(BaseMetaclass)):
+class Base(object):
 
     """Base class for all models."""
 
@@ -32,31 +16,30 @@ class Base(six.with_metaclass(BaseMetaclass)):
 
     def populate(self, **kw):
         """Populate values to fields. Skip non-existing."""
-        for name, value in kw.items():
-            try:
-                field = self._fields[name]
-            except KeyError:
-                continue
+        for name, field in self:
+            if name in kw:
+                field.__set__(self, kw[name])
 
-            parsed_value = field.parse_value(value)
-
-            setattr(self, name, parsed_value)
-
-    def get_field(self, name):
+    def get_field(self, field_name):
         """Get field associated with given attribute."""
-        return self._fields[name]
+        for attr_name, field in self:
+            if field_name == attr_name:
+                return field
 
-    def validate(self):
-        """Validate."""
-        for name, field in self._fields.items():
-            value = getattr(self, name)
-            field.validate(name, value)
+        raise errors.FieldNotFound('Field not found', field_name)
 
     def __iter__(self):
         """Iterate through fields and values."""
-        for name, field in self._fields.items():
-            value = getattr(self, name)
-            yield name, value
+        for name, field in self.iterate_over_fields():
+            yield name, field
+
+    @classmethod
+    def iterate_over_fields(cls):
+        """Iterate through fields and values."""
+        for attr in dir(cls):
+            clsattr = getattr(cls, attr)
+            if isinstance(clsattr, BaseField):
+                yield attr, clsattr
 
     def to_struct(self):
         """Cast model to structure."""

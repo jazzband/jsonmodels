@@ -121,17 +121,14 @@ class TestToStructMethod(unittest.TestCase):
 
         person.surname = 'Norris'
         pattern['surname'] = 'Norris'
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
         person.names.append('Chuck')
         pattern['names'].append('Chuck')
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
         person.names.append('Testa')
         pattern['names'].append('Testa')
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
     def test_to_struct_with_multi_non_models_types(self):
@@ -143,20 +140,16 @@ class TestToStructMethod(unittest.TestCase):
 
         person = Person()
         pattern = {'mix': []}
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
         person.mix.append('something')
         pattern['mix'].append('something')
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
         person.mix.append(42.0)
         pattern['mix'].append(42.0)
-        person.validate()
         self.assertEqual(pattern, person.to_struct())
 
         person.mix.append('different')
         pattern['mix'].append('different')
-        person.validate()
         self.assertEqual(pattern, person.to_struct())

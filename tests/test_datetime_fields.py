@@ -41,13 +41,12 @@ class TimeFieldTestCase(unittest.TestCase):
             time = fields.TimeField()
 
         event = Event()
-        event.validate()
 
-        event.time = '12:03:34'
-        self.assertRaises(errors.ValidationError, event.validate)
+        def assign():
+            event.time = '12:03:34'
+        self.assertRaises(errors.ValidationError, assign)
 
         event.time = datetime.time()
-        event.validate()
 
     def test_time_field_to_struct(self):
 
@@ -118,13 +117,12 @@ class DateFieldTestCase(unittest.TestCase):
             date = fields.DateField()
 
         event = Event()
-        event.validate()
 
-        event.date = '2014-04-21'
-        self.assertRaises(errors.ValidationError, event.validate)
+        def assign():
+            event.date = '2014-04-21'
+        self.assertRaises(errors.ValidationError, assign)
 
         event.date = datetime.date(2014, 4, 21)
-        event.validate()
 
     def test_date_field_to_struct(self):
 
@@ -172,12 +170,11 @@ class DateTimeFieldTestCase(unittest.TestCase):
             date = fields.DateTimeField()
 
         event = Event()
-        event.validate()
 
-        event.date = '2013-05-06 12:03:34'
-        self.assertRaises(errors.ValidationError, event.validate)
+        def assign():
+            event.date = '2013-05-06 12:03:34'
+        self.assertRaises(errors.ValidationError, assign)
         event.date = datetime.datetime.now()
-        event.validate()
 
     def test_datetime_field_to_struct(self):
 

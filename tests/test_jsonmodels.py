@@ -16,12 +16,10 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
-        alan.validate()
 
         alan.name = 'Alan'
         alan.surname = 'Wake'
         alan.age = 34
-        alan.validate()
 
     def test_required(self):
 
@@ -32,10 +30,7 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
-        self.assertRaises(errors.ValidationError, alan.validate)
-
         alan.name = 'Chuck'
-        alan.validate()
 
     def test_type_validation(self):
 
@@ -45,11 +40,11 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
-        alan.age = '42'
-        self.assertRaises(errors.ValidationError, alan.validate)
+        def assign():
+            alan.age = '42'
+        self.assertRaises(errors.ValidationError, assign)
 
         alan.age = 42
-        alan.validate()
 
     def test_base_validation(self):
         """BaseField should not be usable."""
@@ -59,13 +54,14 @@ class TestJsonmodels(unittest.TestCase):
             name = fields.BaseField()
 
         alan = Person()
-        self.assertRaises(errors.ValidationError, alan.validate)
 
-        alan.name = 'some name'
-        self.assertRaises(errors.ValidationError, alan.validate)
+        def assign():
+            alan.name = 'some name'
+        self.assertRaises(errors.ValidationError, assign)
 
-        alan.name = 2345
-        self.assertRaises(errors.ValidationError, alan.validate)
+        def assign():
+            alan.name = 2345
+        self.assertRaises(errors.ValidationError, assign)
 
     def test_value_replacements(self):
 
@@ -89,13 +85,11 @@ class TestJsonmodels(unittest.TestCase):
             wheels = fields.ListField()
 
         viper = Car()
-        viper.validate()
 
         viper.wheels.append('some')
         viper.wheels.append('not necessarily')
         viper.wheels.append('proper')
         viper.wheels.append('wheels')
-        viper.validate()
 
     def test_list_field_types(self):
 
@@ -110,14 +104,14 @@ class TestJsonmodels(unittest.TestCase):
             wheels = fields.ListField(items_types=[Wheel])
 
         viper = Car()
-        viper.validate()
 
         viper.wheels.append(Wheel())
         viper.wheels.append(Wheel())
-        viper.validate()
 
-        viper.wheels.append(Wheel2)
-        self.assertRaises(errors.ValidationError, viper.validate)
+        self.assertRaises(
+            errors.ValidationError,
+            lambda: viper.wheels.append(Wheel2)
+        )
 
     def test_list_field_for_subtypes(self):
 
@@ -135,28 +129,22 @@ class TestJsonmodels(unittest.TestCase):
             cars = fields.ListField(items_types=[Car])
 
         garage = Garage1()
-        garage.validate()
-
         garage.cars.append(Car())
-        garage.validate()
-
         garage.cars.append(Viper())
         garage.cars.append(Lamborghini())
-        garage.validate()
 
         class Garage2(models.Base):
 
             cars = fields.ListField(items_types=[Viper, Lamborghini])
 
         garage = Garage2()
-        garage.validate()
-
         garage.cars.append(Viper())
         garage.cars.append(Lamborghini())
-        garage.validate()
 
-        garage.cars.append(Car())
-        self.assertRaises(errors.ValidationError, garage.validate)
+        self.assertRaises(
+            errors.ValidationError,
+            lambda: garage.cars.append(Car())
+        )
 
     def test_list_validation(self):
 
@@ -165,10 +153,10 @@ class TestJsonmodels(unittest.TestCase):
             cars = fields.ListField()
 
         garage = Garage()
-        garage.validate()
 
-        garage.cars = 'some string'
-        self.assertRaises(errors.ValidationError, garage.validate)
+        def assign():
+            garage.cars = 'some string'
+        self.assertRaises(errors.ValidationError, assign)
 
     def test_embedded_model(self):
 
@@ -182,29 +170,22 @@ class TestJsonmodels(unittest.TestCase):
             secondary = fields.EmbeddedField(Secondary)
 
         entity = Primary()
-        entity.validate()
         self.assertIsNone(entity.secondary)
-
         entity.name = 'chuck'
-        entity.validate()
-
         entity.secondary = Secondary()
-        entity.validate()
+        entity.secondary.data = 42
+
+        def assign():
+            entity.secondary.data = '42'
+        self.assertRaises(errors.ValidationError, assign)
 
         entity.secondary.data = 42
-        entity.validate()
 
-        entity.secondary.data = '42'
-        self.assertRaises(errors.ValidationError, entity.validate)
-
-        entity.secondary.data = 42
-        entity.validate()
-
-        entity.secondary = 'something different'
-        self.assertRaises(errors.ValidationError, entity.validate)
+        def assign():
+            entity.secondary = 'something different'
+        self.assertRaises(errors.ValidationError, assign)
 
         entity.secondary = None
-        entity.validate()
 
     def test_embedded_required_validation(self):
 
@@ -221,12 +202,12 @@ class TestJsonmodels(unittest.TestCase):
         sec = Secondary()
         sec.data = 33
         entity.secondary = sec
-        entity.validate()
-        entity.secondary.data = None
-        self.assertRaises(errors.ValidationError, entity.validate)
+
+        def assign():
+            entity.secondary.data = None
+        self.assertRaises(errors.ValidationError, assign)
 
         entity.secondary = None
-        entity.validate()
 
         class Primary(models.Base):
 
@@ -237,9 +218,10 @@ class TestJsonmodels(unittest.TestCase):
         sec = Secondary()
         sec.data = 33
         entity.secondary = sec
-        entity.validate()
-        entity.secondary.data = None
-        self.assertRaises(errors.ValidationError, entity.validate)
+
+        def assign():
+            entity.secondary.data = None
+        self.assertRaises(errors.ValidationError, assign)
 
     def test_embedded_inheritance(self):
 
@@ -260,13 +242,11 @@ class TestJsonmodels(unittest.TestCase):
         place = ParkingPlace()
 
         place.car = Viper()
-        place.validate()
-
         place.car = Lamborghini()
-        place.validate()
 
-        place.car = Car()
-        self.assertRaises(errors.ValidationError, place.validate)
+        def assign():
+            place.car = Car()
+        self.assertRaises(errors.ValidationError, assign)
 
         class ParkingPlace(models.Base):
 
@@ -276,13 +256,8 @@ class TestJsonmodels(unittest.TestCase):
         place = ParkingPlace()
 
         place.car = Viper()
-        place.validate()
-
         place.car = Lamborghini()
-        place.validate()
-
         place.car = Car()
-        place.validate()
 
     def test_iterable(self):
 
@@ -308,8 +283,8 @@ class TestJsonmodels(unittest.TestCase):
         }
 
         result = {}
-        for name, value in alan:
-            result[name] = value
+        for name, field in alan:
+            result[name] = field.__get__(alan)
 
         self.assertEqual(pattern, result)
 
@@ -376,8 +351,6 @@ class TestJsonmodels(unittest.TestCase):
         person.names.append('Chuck')
         person.names.append('Testa')
 
-        person.validate()
-
     def test_help_text(self):
 
         class Person(models.Base):
@@ -440,10 +413,7 @@ class TestJsonmodels(unittest.TestCase):
             secondary = fields.EmbeddedField(Secondary, required=True)
 
         entity = Primary()
-        self.assertRaises(errors.ValidationError, entity.validate)
-
         entity.secondary = Secondary()
-        entity.validate()
 
         class Primary(models.Base):
 
@@ -452,35 +422,16 @@ class TestJsonmodels(unittest.TestCase):
 
         entity = Primary()
         entity.secondary = None
-        entity.validate()
 
-    def test_required_list(self):
+    def test_assignation_of_list_of_models(self):
 
         class Wheel(models.Base):
             pass
 
         class Car(models.Base):
 
-            wheels = fields.ListField(items_types=[Wheel], required=False)
+            wheels = fields.ListField(items_types=[Wheel])
 
         viper = Car()
-        viper.validate()
-
         viper.wheels = None
-        viper.validate()
-
         viper.wheels = [Wheel()]
-        viper.validate()
-
-        class Car(models.Base):
-
-            wheels = fields.ListField(items_types=[Wheel], required=True)
-
-        viper = Car()
-        viper.validate()
-
-        viper.wheels = None
-        viper.validate()
-
-        viper.wheels = [Wheel()]
-        viper.validate()

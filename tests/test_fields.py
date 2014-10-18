@@ -16,8 +16,6 @@ class TestFields(unittest.TestCase):
             is_programmer = field
 
         person = Person()
-        person.validate()
-
         self.assertIsNone(person.is_programmer)
 
         person.is_programmer = True

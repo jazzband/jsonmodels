@@ -20,6 +20,7 @@ class BaseField(object):
             help_text=None,
             validators=None):
         """Init."""
+        self._memory = {}
         self.required = required
         self.help_text = help_text
 
@@ -27,7 +28,24 @@ class BaseField(object):
             validators = [validators]
         self.validators = validators or []
 
-    def validate(self, name, value):
+    def __set__(self, obj, value):
+        value = self.parse_value(value)
+        self.validate(value)
+        self._memory[obj] = value
+
+    def __get__(self, obj, owner=None):
+        if obj is None:
+            return self
+
+        self._check_value(obj)
+        return self._memory[obj]
+
+    def _check_value(self, obj):
+        if obj not in self._memory:
+            self.__set__(obj, self.get_value_replacement())
+
+    def validate(self, value):
+        name = 'some name'  # FIXME
         """Validate value."""
         if self.types is None:
             raise ValidationError(
@@ -124,9 +142,10 @@ class ListField(BaseField):
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
 
-    def validate(self, name, value):
+    def validate(self, value):
+        name = 'some name'  # FIXME
         """Validation."""
-        super(ListField, self).validate(name, value)
+        super(ListField, self).validate(value)
 
         if len(self.items_types) == 0:
             return
@@ -158,6 +177,14 @@ class ListField(BaseField):
 
     def parse_value(self, values):
         """Parse value to proper type."""
+        result = self.get_value_replacement()
+
+        if not values:
+            return result
+
+        if not isinstance(values, list):
+            return values
+
         embed_type = self.items_types[0]
 
         if not hasattr(getattr(embed_type, 'populate', None), '__call__'):
@@ -168,13 +195,14 @@ class ListField(BaseField):
                 'Cannot decide which type to choose from "{}".'.format(
                     ', '.join([t.__name__ for t in self.items_types])
                 )
-            )
-
-        result = self.get_value_replacement()
+                )
 
         try:
             for value in values:
-                result.append(embed_type(**value))
+                if isinstance(value, self.items_types):
+                    result.append(value)
+                else:
+                    result.append(embed_type(**value))
         except TypeError:
             raise ValidationError('Given value for field is not iterable.')
 
@@ -195,9 +223,10 @@ class EmbeddedField(BaseField):
 
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
-    def validate(self, name, value):
+    def validate(self, value):
+        name = 'some name'  #FIXME
         """Validation."""
-        super(EmbeddedField, self).validate(name, value)
+        super(EmbeddedField, self).validate(value)
         try:
             value.validate()
         except AttributeError:

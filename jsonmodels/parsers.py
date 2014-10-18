@@ -10,13 +10,14 @@ def to_struct(model):
     :rtype: ``dict``
 
     """
-    try:
-        model.validate()
-    except AttributeError:
+    from .models import Base
+
+    if not isinstance(model, Base):
         return model
 
     resp = {}
-    for name, value in model:
+    for name, field in model:
+        value = field.__get__(model)
         if value is None:
             continue
 
@@ -82,7 +83,7 @@ def to_json_schema(cls):
     prop = {}
     required = []
 
-    for name, field in cls._fields.items():
+    for name, field in cls.iterate_over_fields():
 
         if field.required:
             required.append(name)

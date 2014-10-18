@@ -48,8 +48,6 @@ class TestValidation(unittest.TestCase):
         person.age = 33
         person.cash = 123567.89
 
-        person.validate()
-
         validator1.assert_called_once_with('John')
         validator2.assert_called_once_with('John')
 
@@ -166,13 +164,12 @@ class TestRegexValidator(unittest.TestCase):
                 validators=validators.Regex('^[a-z]+$', ignorecase=True))
 
         person = Person()
-        self.assertRaises(errors.ValidationError, person.validate)
 
-        person.name = '123'
-        self.assertRaises(errors.ValidationError, person.validate)
+        def assign():
+            person.name = '123'
+        self.assertRaises(errors.ValidationError, assign)
 
         person.name = 'Jimmy'
-        person.validate()
 
     def test_regex_validator_when_ecma_regex_given(self):
 
@@ -182,13 +179,12 @@ class TestRegexValidator(unittest.TestCase):
                 validators=validators.Regex('/^[a-z]+$/i', ignorecase=False))
 
         person = Person()
-        self.assertRaises(errors.ValidationError, person.validate)
 
-        person.name = '123'
-        self.assertRaises(errors.ValidationError, person.validate)
+        def assign():
+            person.name = '123'
+        self.assertRaises(errors.ValidationError, assign)
 
         person.name = 'Jimmy'
-        person.validate()
 
 
 class TestLengthValidator(unittest.TestCase):

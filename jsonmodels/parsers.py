@@ -28,46 +28,6 @@ def to_struct(model):
     return resp
 
 
-def _specify_field_type(field):
-    if isinstance(field, fields.StringField):
-        return {'type': 'string'}
-    elif isinstance(field, fields.IntField):
-        return {'type': 'integer'}
-    elif isinstance(field, fields.FloatField):
-        return {'type': 'float'}
-    elif isinstance(field, fields.BoolField):
-        return {'type': 'boolean'}
-
-
-def _parse_embedded(field):
-    types = field.types
-    if len(types) == 1:
-        cls = types[0]
-        return cls.to_json_schema()
-    else:
-        return {'oneOf': [cls.to_json_schema() for cls in types]}
-
-
-def _parse_list(field):
-    types = field.items_types
-    types_len = len(types)
-
-    if types_len == 0:
-        items = None
-    if types_len == 1:
-        cls = types[0]
-        items = cls.to_json_schema()
-    elif types_len > 1:
-        items = {
-            'oneOf': [cls.to_json_schema() for cls in types]}
-
-    result = {'type': 'list'}
-    if items:
-        result['items'] = items
-
-    return result
-
-
 def to_json_schema(cls):
     """Generate JSON schema for given class.
 
@@ -110,3 +70,43 @@ def _apply_validators_modifications(field_schema, field):
                 validator.modify_schema(field_schema)
             except AttributeError:
                 pass
+
+
+def _parse_list(field):
+    types = field.items_types
+    types_len = len(types)
+
+    if types_len == 0:
+        items = None
+    if types_len == 1:
+        cls = types[0]
+        items = cls.to_json_schema()
+    elif types_len > 1:
+        items = {
+            'oneOf': [cls.to_json_schema() for cls in types]}
+
+    result = {'type': 'list'}
+    if items:
+        result['items'] = items
+
+    return result
+
+
+def _specify_field_type(field):
+    if isinstance(field, fields.StringField):
+        return {'type': 'string'}
+    elif isinstance(field, fields.IntField):
+        return {'type': 'integer'}
+    elif isinstance(field, fields.FloatField):
+        return {'type': 'float'}
+    elif isinstance(field, fields.BoolField):
+        return {'type': 'boolean'}
+
+
+def _parse_embedded(field):
+    types = field.types
+    if len(types) == 1:
+        cls = types[0]
+        return cls.to_json_schema()
+    else:
+        return {'oneOf': [cls.to_json_schema() for cls in types]}

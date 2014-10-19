@@ -44,7 +44,7 @@ class BaseField(object):
 
     def _check_value(self, obj):
         if obj not in self._memory:
-            self.__set__(obj, self.get_value_replacement())
+            self.__set__(obj, self.get_default_value())
 
     def validate_for(self, obj):
         """Validate given object."""
@@ -89,7 +89,7 @@ class BaseField(object):
                     validator(value)
 
     @staticmethod
-    def get_value_replacement():
+    def get_default_value():
         """Get replacement for field."""
         return None
 
@@ -179,13 +179,13 @@ class ListField(BaseField):
         return result
 
     @staticmethod
-    def get_value_replacement():
+    def get_default_value():
         """Get replacement for field."""
         return list()
 
     def parse_value(self, values):
         """Parse value to proper type."""
-        result = self.get_value_replacement()
+        result = self.get_default_value()
 
         if not values:
             return result

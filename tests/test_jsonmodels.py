@@ -30,7 +30,9 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
+        self.assertRaises(errors.ValidationError, alan.validate)
         alan.name = 'Chuck'
+        alan.validate()
 
     def test_type_validation(self):
 
@@ -40,6 +42,7 @@ class TestJsonmodels(unittest.TestCase):
             age = fields.IntField()
 
         alan = Person()
+
         def assign():
             alan.age = '42'
         self.assertRaises(errors.ValidationError, assign)
@@ -413,7 +416,9 @@ class TestJsonmodels(unittest.TestCase):
             secondary = fields.EmbeddedField(Secondary, required=True)
 
         entity = Primary()
+        self.assertRaises(errors.ValidationError, entity.validate)
         entity.secondary = Secondary()
+        entity.validate()
 
         class Primary(models.Base):
 
@@ -421,7 +426,10 @@ class TestJsonmodels(unittest.TestCase):
             secondary = fields.EmbeddedField(Secondary, required=False)
 
         entity = Primary()
+        entity.validate()
+
         entity.secondary = None
+        entity.validate()
 
     def test_assignation_of_list_of_models(self):
 

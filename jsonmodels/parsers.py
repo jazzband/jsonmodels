@@ -15,6 +15,8 @@ def to_struct(model):
     if not isinstance(model, Base):
         return model
 
+    model.validate()
+
     resp = {}
     for name, field in model:
         value = field.__get__(model)
@@ -65,11 +67,11 @@ def to_json_schema(cls):
 
 
 def _apply_validators_modifications(field_schema, field):
-        for validator in field.validators:
-            try:
-                validator.modify_schema(field_schema)
-            except AttributeError:
-                pass
+    for validator in field.validators:
+        try:
+            validator.modify_schema(field_schema)
+        except AttributeError:
+            pass
 
 
 def _parse_list(field):

@@ -5,7 +5,7 @@ import unittest
 
 from dateutil.tz import tzoffset
 
-from jsonmodels import models, fields, errors
+from jsonmodels import models, fields
 
 
 class _TestCet(datetime.tzinfo):
@@ -42,10 +42,8 @@ class TimeFieldTestCase(unittest.TestCase):
 
         event = Event()
 
-        def assign():
-            event.time = '12:03:34'
-        self.assertRaises(errors.ValidationError, assign)
-
+        event.time = '12:03:34'
+        self.assertIs(True, isinstance(event.time, datetime.time))
         event.time = datetime.time()
 
     def test_time_field_to_struct(self):
@@ -118,10 +116,8 @@ class DateFieldTestCase(unittest.TestCase):
 
         event = Event()
 
-        def assign():
-            event.date = '2014-04-21'
-        self.assertRaises(errors.ValidationError, assign)
-
+        event.date = '2014-04-21'
+        self.assertIs(True, isinstance(event.date, datetime.date))
         event.date = datetime.date(2014, 4, 21)
 
     def test_date_field_to_struct(self):
@@ -170,10 +166,9 @@ class DateTimeFieldTestCase(unittest.TestCase):
             date = fields.DateTimeField()
 
         event = Event()
+        event.date = '2013-05-06 12:03:34'
 
-        def assign():
-            event.date = '2013-05-06 12:03:34'
-        self.assertRaises(errors.ValidationError, assign)
+        self.assertIs(True, isinstance(event.date, datetime.datetime))
         event.date = datetime.datetime.now()
 
     def test_datetime_field_to_struct(self):

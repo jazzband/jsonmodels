@@ -33,6 +33,11 @@ class Base(object):
         for name, field in self.iterate_over_fields():
             yield name, field
 
+    def validate(self):
+        """Explicitly validate all the fields."""
+        for _, field in self:
+            field.validate_for(self)
+
     @classmethod
     def iterate_over_fields(cls):
         """Iterate through fields and values."""

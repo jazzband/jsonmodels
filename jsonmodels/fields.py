@@ -31,7 +31,8 @@ class BaseField(object):
     def __set__(self, obj, value):
         """Set value."""
         value = self.parse_value(value)
-        self.validate(value)
+        name = self._get_name_for(obj)
+        self.validate(value, name)
         self._memory[obj] = value
 
     def __get__(self, obj, owner=None):
@@ -49,11 +50,17 @@ class BaseField(object):
     def validate_for(self, obj):
         """Validate given object."""
         value = self.__get__(obj)
-        self.validate(value)
+        name = self._get_name_for(obj)
+        self.validate(value, name)
 
-    def validate(self, value):
-        """Validate value."""
-        name = 'some name'  # FIXME
+    def _get_name_for(self, obj):
+        for name, field in obj:
+            if field is field:
+                return name
+
+        raise ValueError('Name for object not found!', field, obj)
+
+    def validate(self, value, name):
         """Validate value."""
         if self.types is None:
             raise ValidationError(
@@ -150,26 +157,28 @@ class ListField(BaseField):
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
 
-    def validate(self, value):
+    def validate(self, value, name):
         """Validation."""
-        name = 'some name'  # FIXME
-        super(ListField, self).validate(value)
+        super(ListField, self).validate(value, name)
 
         if len(self.items_types) == 0:
             return
 
         try:
             for item in value:
-                if not isinstance(item, self.items_types):
-                    raise ValidationError(
-                        'All items of "{}" must be instances '
-                        'of "{}", and not "{}".'.format(
-                            name,
-                            ', '.join([t.__name__ for t in self.items_types]),
-                            type(item).__name__
-                        ))
+                self.validate_single_item(item, name)
         except TypeError:
             pass
+
+    def validate_single_item(self, item, name):
+        if not isinstance(item, self.items_types):
+            raise ValidationError(
+                'All items of "{}" must be instances '
+                'of "{}", and not "{}".'.format(
+                    name,
+                    ', '.join([t.__name__ for t in self.items_types]),
+                    type(item).__name__
+                ))
 
     def to_struct(self, value):
         """Cast value to structure."""
@@ -237,9 +246,9 @@ class EmbeddedField(BaseField):
 
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
-    def validate(self, value):
+    def validate(self, value, name):
         """Validation."""
-        super(EmbeddedField, self).validate(value)
+        super(EmbeddedField, self).validate(value, name)
         try:
             value.validate()
         except AttributeError:

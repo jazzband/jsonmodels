@@ -53,22 +53,21 @@ class BaseField(object):
 
     def validate(self, value):
         """Validate value."""
-        name = 'some name'  # FIXME
-        """Validate value."""
         if self.types is None:
             raise ValidationError(
-                'Field "{}" is of type "{}" that is not usable, try '
-                'different field type.'.format(name, type(self).__name__))
+                'Field "{}" is not usable, try '
+                'different field type.'.format(type(self).__name__))
 
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value of field "{}" is wrong, expected type "{}"'.format(
-                    name,
+                'Value is wrong, expected type "{}"'.format(
                     ', '.join([t.__name__ for t in self.types])
-                ))
+                ),
+                value
+            )
 
         if value is None and self.required:
-            raise ValidationError('Field "{}" is required!'.format(name))
+            raise ValidationError('Field is required!')
 
         self._validate_with_custom_validators(value)
 
@@ -152,7 +151,6 @@ class ListField(BaseField):
 
     def validate(self, value):
         """Validation."""
-        name = 'some name'  # FIXME
         super(ListField, self).validate(value)
 
         if len(self.items_types) == 0:
@@ -162,9 +160,8 @@ class ListField(BaseField):
             for item in value:
                 if not isinstance(item, self.items_types):
                     raise ValidationError(
-                        'All items of "{}" must be instances '
+                        'All items must be instances '
                         'of "{}", and not "{}".'.format(
-                            name,
                             ', '.join([t.__name__ for t in self.items_types]),
                             type(item).__name__
                         ))

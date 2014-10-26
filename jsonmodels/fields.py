@@ -21,7 +21,9 @@ class BaseField(object):
         self._memory = {}
         self.required = required
         self.help_text = help_text
+        self._assign_validators(validators)
 
+    def _assign_validators(self, validators):
         if validators and not isinstance(validators, list):
             validators = [validators]
         self.validators = validators or []
@@ -47,11 +49,16 @@ class BaseField(object):
         self.validate(value)
 
     def validate(self, value):
-        if self.types is None:
-            raise ValidationError(
-                'Field "{}" is not usable, try '
-                'different field type.'.format(type(self).__name__))
+        self._check_types()
+        self._validate_against_types(value)
+        self._check_against_required(value)
+        self._validate_with_custom_validators(value)
 
+    def _check_against_required(self, value):
+        if value is None and self.required:
+            raise ValidationError('Field is required!')
+
+    def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
                 'Value is wrong, expected type "{}"'.format(
@@ -60,10 +67,11 @@ class BaseField(object):
                 value
             )
 
-        if value is None and self.required:
-            raise ValidationError('Field is required!')
-
-        self._validate_with_custom_validators(value)
+    def _check_types(self):
+        if self.types is None:
+            raise ValidationError(
+                'Field "{}" is not usable, try '
+                'different field type.'.format(type(self).__name__))
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -79,12 +87,11 @@ class BaseField(object):
         return value
 
     def _validate_with_custom_validators(self, value):
-        if self.validators:
-            for validator in self.validators:
-                try:
-                    validator.validate(value)
-                except AttributeError:
-                    validator(value)
+        for validator in self.validators:
+            try:
+                validator.validate(value)
+            except AttributeError:
+                validator(value)
 
     @staticmethod
     def get_default_value():
@@ -142,6 +149,11 @@ class ListField(BaseField):
         of items use validators.
 
         """
+        self._assign_types(items_types)
+        super(ListField, self).__init__(*args, **kwargs)
+        self.required = False
+
+    def _assign_types(self, items_types):
         if items_types:
             try:
                 self.items_types = tuple(items_types)
@@ -149,8 +161,6 @@ class ListField(BaseField):
                 self.items_types = items_types,
         else:
             self.items_types = tuple()
-        super(ListField, self).__init__(*args, **kwargs)
-        self.required = False
 
     def validate(self, value):
         super(ListField, self).validate(value)
@@ -214,12 +224,15 @@ class ListField(BaseField):
     def _parse_values_to_result(self, values, embed_type, result):
         try:
             for value in values:
-                if isinstance(value, self.items_types):
-                    result.append(value)
-                else:
-                    result.append(embed_type(**value))
+                self._append_value_to_result(value, result, embed_type)
         except TypeError:
             raise ValidationError('Given value for field is not iterable.')
+
+    def _append_value_to_result(self, value, result, embed_type):
+        if isinstance(value, self.items_types):
+            result.append(value)
+        else:
+            result.append(embed_type(**value))
 
 
 class EmbeddedField(BaseField):
@@ -227,13 +240,15 @@ class EmbeddedField(BaseField):
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
+        self._assign_model_types(model_types)
+        super(EmbeddedField, self).__init__(*args, **kwargs)
+
+    def _assign_model_types(self, model_types):
         try:
             iter(model_types)
             self.types = tuple(model_types)
         except TypeError:
             self.types = (model_types,)
-
-        super(EmbeddedField, self).__init__(*args, **kwargs)
 
     def validate(self, value):
         super(EmbeddedField, self).validate(value)
@@ -247,15 +262,17 @@ class EmbeddedField(BaseField):
         if not isinstance(value, dict):
             return value
 
+        embed_type = self._get_embed_type()
+        return embed_type(**value)
+
+    def _get_embed_type(self):
         if len(self.types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{}".'.format(
                     ', '.join([t.__name__ for t in self.types])
                 )
             )
-        embed_type = self.types[0]
-
-        return embed_type(**value)
+        return self.types[0]
 
 
 class TimeField(StringField):

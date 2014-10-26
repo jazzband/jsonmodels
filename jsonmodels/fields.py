@@ -6,6 +6,7 @@ import six
 from dateutil.parser import parse
 
 from .errors import ValidationError
+from .collections import ModelCollection
 
 
 class BaseField(object):
@@ -158,15 +159,22 @@ class ListField(BaseField):
 
         try:
             for item in value:
-                if not isinstance(item, self.items_types):
-                    raise ValidationError(
-                        'All items must be instances '
-                        'of "{}", and not "{}".'.format(
-                            ', '.join([t.__name__ for t in self.items_types]),
-                            type(item).__name__
-                        ))
+                self.validate_single_value(item)
         except TypeError:
             pass
+
+    def validate_single_value(self, item):
+        """Validate single value."""
+        if len(self.items_types) == 0:
+            return
+
+        if not isinstance(item, self.items_types):
+            raise ValidationError(
+                'All items must be instances '
+                'of "{}", and not "{}".'.format(
+                    ', '.join([t.__name__ for t in self.items_types]),
+                    type(item).__name__
+                ))
 
     def to_struct(self, value):
         """Cast value to structure."""
@@ -175,10 +183,9 @@ class ListField(BaseField):
             result.append(item.to_struct())
         return result
 
-    @staticmethod
-    def get_default_value():
+    def get_default_value(self):
         """Get replacement for field."""
-        return list()
+        return ModelCollection(self)
 
     def parse_value(self, values):
         """Parse value to proper type."""

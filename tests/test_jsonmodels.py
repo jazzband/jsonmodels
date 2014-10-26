@@ -116,6 +116,27 @@ class TestJsonmodels(unittest.TestCase):
             lambda: viper.wheels.append(Wheel2)
         )
 
+    def test_list_field_types_when_assigning(self):
+
+        class Wheel(models.Base):
+            pass
+
+        class Wheel2(models.Base):
+            pass
+
+        class Car(models.Base):
+
+            wheels = fields.ListField(items_types=[Wheel])
+
+        viper = Car()
+
+        viper.wheels.append(Wheel())
+
+        def assign():
+            viper.wheels[1] = Wheel2
+
+        self.assertRaises(errors.ValidationError, assign)
+
     def test_list_field_for_subtypes(self):
 
         class Car(models.Base):

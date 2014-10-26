@@ -1,5 +1,3 @@
-"""Base models."""
-
 import six
 
 from . import parsers, errors
@@ -11,7 +9,6 @@ class Base(object):
     """Base class for all models."""
 
     def __init__(self, **kwargs):
-        """Init."""
         self.populate(**kwargs)
 
     def populate(self, **kw):
@@ -36,7 +33,7 @@ class Base(object):
     def validate(self):
         """Explicitly validate all the fields."""
         for _, field in self:
-            field.validate_for(self)
+            field.validate_for_object(self)
 
     @classmethod
     def iterate_over_fields(cls):
@@ -47,16 +44,15 @@ class Base(object):
                 yield attr, clsattr
 
     def to_struct(self):
-        """Cast model to structure."""
+        """Cast model to Python structure."""
         return parsers.to_struct(self)
 
     @classmethod
     def to_json_schema(cls):
-        """Cast model to JSON schema."""
+        """Generate JSON schema for model."""
         return parsers.to_json_schema(cls)
 
     def __repr__(self):
-        """Get representation of model."""
         try:
             txt = six.text_type(self)
         except TypeError:
@@ -64,5 +60,4 @@ class Base(object):
         return '<{}: {}>'.format(self.__class__.__name__, txt)
 
     def __str__(self):
-        """Get informal representation."""
         return '{} object'.format(self.__class__.__name__)

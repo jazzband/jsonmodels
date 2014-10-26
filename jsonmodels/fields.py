@@ -1,5 +1,3 @@
-"""Definitions of fields."""
-
 import datetime
 
 import six
@@ -20,7 +18,6 @@ class BaseField(object):
             required=False,
             help_text=None,
             validators=None):
-        """Init."""
         self._memory = {}
         self.required = required
         self.help_text = help_text
@@ -30,13 +27,11 @@ class BaseField(object):
         self.validators = validators or []
 
     def __set__(self, obj, value):
-        """Set value."""
         value = self.parse_value(value)
         self.validate(value)
         self._memory[obj] = value
 
     def __get__(self, obj, owner=None):
-        """Get value."""
         if obj is None:
             return self
 
@@ -47,13 +42,11 @@ class BaseField(object):
         if obj not in self._memory:
             self.__set__(obj, self.get_default_value())
 
-    def validate_for(self, obj):
-        """Validate given object."""
+    def validate_for_object(self, obj):
         value = self.__get__(obj)
         self.validate(value)
 
     def validate(self, value):
-        """Validate value."""
         if self.types is None:
             raise ValidationError(
                 'Field "{}" is not usable, try '
@@ -77,7 +70,12 @@ class BaseField(object):
         return value
 
     def parse_value(self, value):
-        """Parse value from primitive to desired format."""
+        """Parse value from primitive to desired format.
+
+        Each field can parse value to form it wants it to be (like string or
+        int).
+
+        """
         return value
 
     def _validate_with_custom_validators(self, value):
@@ -90,7 +88,11 @@ class BaseField(object):
 
     @staticmethod
     def get_default_value():
-        """Get replacement for field."""
+        """Get default value for field.
+
+        Each field can specify its default.
+
+        """
         return None
 
 
@@ -151,7 +153,6 @@ class ListField(BaseField):
         self.required = False
 
     def validate(self, value):
-        """Validation."""
         super(ListField, self).validate(value)
 
         if len(self.items_types) == 0:
@@ -164,7 +165,6 @@ class ListField(BaseField):
             pass
 
     def validate_single_value(self, item):
-        """Validate single value."""
         if len(self.items_types) == 0:
             return
 
@@ -177,18 +177,14 @@ class ListField(BaseField):
                 ))
 
     def to_struct(self, value):
-        """Cast value to structure."""
-        result = []
-        for item in value:
-            result.append(item.to_struct())
-        return result
+        """Cast value to list."""
+        return [item.to_struct() for item in value]
 
     def get_default_value(self):
-        """Get replacement for field."""
         return ModelCollection(self)
 
     def parse_value(self, values):
-        """Parse value to proper type."""
+        """Cast value to proper collection."""
         result = self.get_default_value()
 
         if not values:
@@ -203,7 +199,6 @@ class ListField(BaseField):
             return values
 
         self._check_items_types_count()
-
         self._parse_values_to_result(values, embed_type, result)
 
         return result
@@ -232,7 +227,6 @@ class EmbeddedField(BaseField):
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
-        """Init."""
         try:
             iter(model_types)
             self.types = tuple(model_types)
@@ -242,7 +236,6 @@ class EmbeddedField(BaseField):
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
     def validate(self, value):
-        """Validation."""
         super(EmbeddedField, self).validate(value)
         try:
             value.validate()
@@ -250,7 +243,7 @@ class EmbeddedField(BaseField):
             pass
 
     def parse_value(self, value):
-        """Parse value to proper type."""
+        """Parse value to proper model type."""
         if not isinstance(value, dict):
             return value
 

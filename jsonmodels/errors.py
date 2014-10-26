@@ -1,11 +1,10 @@
-"""Errors classes for jsonmodels."""
 
 
 class ValidationError(RuntimeError):
 
-    """Validation error."""
+    pass
 
 
 class FieldNotFound(RuntimeError):
 
-    """Field not found error."""
+    pass

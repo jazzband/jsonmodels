@@ -1,4 +1,4 @@
-"""Parsers to change model structure into different one."""
+"""Parsers to change model structure into different ones."""
 
 from . import fields
 

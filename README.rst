@@ -11,8 +11,8 @@ JSON models
 .. image:: https://pypip.in/d/jsonmodels/badge.png
     :target: https://crate.io/packages/jsonmodels?version=latest
 
-Models to make easier to deal with structures that are converted to, or read
-from JSON.
+`jsonmodels` is library to make it easier for you to deal with structures that
+are converted to, or read from JSON.
 
 * Free software: BSD license
 * Documentation: http://jsonmodels.rtfd.org

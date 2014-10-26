@@ -34,14 +34,6 @@ def _collect_static(dirs):
 @unittest.skipIf(tests.QUICK_TESTS, "Quick tests.")
 class TestProject(unittest.TestCase):
 
-    def test_pep257(self):
-        result = []
-        for filename in _collect_static([source_dir]):
-            result.append(subprocess.call(['pep257', filename]))
-
-        if any(result):
-            raise RuntimeError("Tests for PEP257 compliance have failed!")
-
     def test_pep8_and_complexity(self):
         result = []
         for filename in _collect_static([source_dir, tests_dir]):

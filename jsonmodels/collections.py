@@ -4,7 +4,8 @@ class ModelCollection(list):
 
     """`ModelCollection` is list which validates stored values.
 
-    Validation is made with use of field passed to `__init__`.
+    Validation is made with use of field passed to `__init__` at each point,
+    when new value is assigned.
 
     """
 

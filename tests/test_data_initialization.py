@@ -1,257 +1,283 @@
-import unittest
+import pytest
 
 from jsonmodels import models, fields, errors
 
 
-class TestJsonmodelsInitialization(unittest.TestCase):
+def test_initialization():
 
-    def test_initialization(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField()
+        cash = fields.FloatField()
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField()
-            cash = fields.FloatField()
+    data = dict(
+        name='Alan',
+        surname='Wake',
+        age=24,
+        cash=2445.45,
+        trash='123qwe',
+    )
 
-        data = dict(
-            name='Alan',
-            surname='Wake',
-            age=24,
-            cash=2445.45,
-            trash='123qwe',
-        )
+    alan1 = Person(**data)
+    alan2 = Person()
+    alan2.populate(**data)
+    for alan in [alan1, alan2]:
+        assert alan.name == 'Alan'
+        assert alan.surname == 'Wake'
+        assert alan.age == 24
+        assert alan.cash == 2445.45
 
-        alan1 = Person(**data)
-        alan2 = Person()
-        alan2.populate(**data)
-        for alan in [alan1, alan2]:
-            self.assertEqual(alan.name, 'Alan')
-            self.assertEqual(alan.surname, 'Wake')
-            self.assertEqual(alan.age, 24)
-            self.assertEqual(alan.cash, 2445.45)
+        assert not hasattr(alan, 'trash')
 
-            self.assertTrue(not hasattr(alan, 'trash'))
 
-    def test_deep_initialization(self):
+def test_deep_initialization():
 
-        class Car(models.Base):
+    class Car(models.Base):
 
-            brand = fields.StringField()
+        brand = fields.StringField()
 
-        class ParkingPlace(models.Base):
+    class ParkingPlace(models.Base):
 
-            location = fields.StringField()
-            car = fields.EmbeddedField(Car)
+        location = fields.StringField()
+        car = fields.EmbeddedField(Car)
 
-        data = {
-            'location': 'somewhere',
-            'car': {
-                'brand': 'awesome brand'
-            }
+    data = {
+        'location': 'somewhere',
+        'car': {
+            'brand': 'awesome brand'
         }
+    }
 
-        parking1 = ParkingPlace(**data)
-        parking2 = ParkingPlace()
-        parking2.populate(**data)
-        for parking in [parking1, parking2]:
-            self.assertEqual(parking.location, 'somewhere')
-            car = parking.car
-            self.assertTrue(isinstance(car, Car))
-            self.assertEqual(car.brand, 'awesome brand')
+    parking1 = ParkingPlace(**data)
+    parking2 = ParkingPlace()
+    parking2.populate(**data)
+    for parking in [parking1, parking2]:
+        assert parking.location == 'somewhere'
+        car = parking.car
+        assert isinstance(car, Car)
+        assert car.brand == 'awesome brand'
 
-            self.assertEqual(parking.location, 'somewhere')
-            car = parking.car
-            self.assertTrue(isinstance(car, Car))
-            self.assertEqual(car.brand, 'awesome brand')
+        assert parking.location == 'somewhere'
+        car = parking.car
+        assert isinstance(car, Car)
+        assert car.brand == 'awesome brand'
 
-    def test_deep_initialization_error_with_multitypes(self):
 
-        class Viper(models.Base):
+def test_deep_initialization_error_with_multitypes():
 
-            brand = fields.StringField()
+    class Viper(models.Base):
 
-        class Lamborghini(models.Base):
+        brand = fields.StringField()
 
-            brand = fields.StringField()
+    class Lamborghini(models.Base):
 
-        class ParkingPlace(models.Base):
+        brand = fields.StringField()
 
-            location = fields.StringField()
-            car = fields.EmbeddedField([Viper, Lamborghini])
+    class ParkingPlace(models.Base):
 
-        data = {
-            'location': 'somewhere',
-            'car': {
-                'brand': 'awesome brand'
-            }
+        location = fields.StringField()
+        car = fields.EmbeddedField([Viper, Lamborghini])
+
+    data = {
+        'location': 'somewhere',
+        'car': {
+            'brand': 'awesome brand'
         }
+    }
 
-        self.assertRaises(errors.ValidationError, ParkingPlace, **data)
+    with pytest.raises(errors.ValidationError):
+        ParkingPlace(**data)
 
-        place = ParkingPlace()
-        self.assertRaises(errors.ValidationError, place.populate, **data)
+    place = ParkingPlace()
+    with pytest.raises(errors.ValidationError):
+        place.populate(**data)
 
-    def test_deep_initialization_with_list(self):
 
-        class Car(models.Base):
+def test_deep_initialization_with_list():
 
-            brand = fields.StringField()
+    class Car(models.Base):
 
-        class Parking(models.Base):
+        brand = fields.StringField()
 
-            location = fields.StringField()
-            cars = fields.ListField(items_types=Car)
+    class Parking(models.Base):
 
-        data = {
-            'location': 'somewhere',
-            'cars': [
-                {
-                    'brand': 'one',
-                },
-                {
-                    'brand': 'two',
-                },
-                {
-                    'brand': 'three',
-                },
-            ],
-        }
+        location = fields.StringField()
+        cars = fields.ListField(items_types=Car)
 
-        parking1 = Parking(**data)
-        parking2 = Parking()
-        parking2.populate(**data)
-        for parking in [parking1, parking2]:
-            self.assertEqual(parking.location, 'somewhere')
-            cars = parking.cars
-            self.assertTrue(isinstance(cars, list))
-            self.assertEqual(len(cars), 3)
+    data = {
+        'location': 'somewhere',
+        'cars': [
+            {
+                'brand': 'one',
+            },
+            {
+                'brand': 'two',
+            },
+            {
+                'brand': 'three',
+            },
+        ],
+    }
 
-            values = []
-            for car in cars:
-                self.assertIsInstance(car, Car)
-                values.append(car.brand)
-            self.assertTrue('one' in values)
-            self.assertTrue('two' in values)
-            self.assertTrue('three' in values)
+    parking1 = Parking(**data)
+    parking2 = Parking()
+    parking2.populate(**data)
+    for parking in [parking1, parking2]:
+        assert parking.location == 'somewhere'
+        cars = parking.cars
+        assert isinstance(cars, list)
+        assert len(cars) == 3
 
-    def test_deep_initialization_error_with_list_and_multitypes(self):
+        values = []
+        for car in cars:
+            assert isinstance(car, Car)
+            values.append(car.brand)
+        assert 'one' in values
+        assert 'two' in values
+        assert 'three' in values
 
-        class Viper(models.Base):
 
-            brand = fields.StringField()
+def test_deep_initialization_error_with_list_and_multitypes():
 
-        class Lamborghini(models.Base):
+    class Viper(models.Base):
 
-            brand = fields.StringField()
+        brand = fields.StringField()
 
-        class Parking(models.Base):
+    class Lamborghini(models.Base):
 
-            location = fields.StringField()
-            cars = fields.ListField([Viper, Lamborghini])
+        brand = fields.StringField()
 
-        data = {
-            'location': 'somewhere',
-            'cars': [
-                {
-                    'brand': 'one',
-                },
-                {
-                    'brand': 'two',
-                },
-                {
-                    'brand': 'three',
-                },
-            ],
-        }
+    class Parking(models.Base):
 
-        self.assertRaises(errors.ValidationError, Parking, **data)
+        location = fields.StringField()
+        cars = fields.ListField([Viper, Lamborghini])
 
-        parking = Parking()
-        self.assertRaises(errors.ValidationError, parking.populate, **data)
+    data = {
+        'location': 'somewhere',
+        'cars': [
+            {
+                'brand': 'one',
+            },
+            {
+                'brand': 'two',
+            },
+            {
+                'brand': 'three',
+            },
+        ],
+    }
 
-        # Case for not iterable data.
-        data = {
-            'location': 'somewhere',
-            'cars': object(),
-        }
+    with pytest.raises(errors.ValidationError):
+        Parking(**data)
 
-        self.assertRaises(errors.ValidationError, Parking, **data)
+    parking = Parking()
+    with pytest.raises(errors.ValidationError):
+        parking.populate(**data)
 
-        parking = Parking()
-        self.assertRaises(errors.ValidationError, parking.populate, **data)
 
-    def test_initialization_with_non_models_types(self):
+def test_deep_initialization_error_when_result_non_iterable():
 
-        class Person(models.Base):
+    class Viper(models.Base):
 
-            names = fields.ListField(str)
-            surname = fields.StringField()
+        brand = fields.StringField()
 
-        data = {
-            'names': ['Chuck', 'Testa'],
-            'surname': 'Norris'
-        }
+    class Lamborghini(models.Base):
 
-        person1 = Person(**data)
-        person2 = Person()
-        person2.populate(**data)
+        brand = fields.StringField()
 
-        for person in [person1, person2]:
-            self.assertEqual(person.surname, 'Norris')
-            self.assertEqual(len(person.names), 2)
-            self.assertIn('Chuck', person.names)
-            self.assertIn('Testa', person.names)
+    class Parking(models.Base):
 
-    def test_initialization_with_multi_non_models_types(self):
+        location = fields.StringField()
+        cars = fields.ListField([Viper, Lamborghini])
 
-        class Person(models.Base):
+    data = {
+        'location': 'somewhere',
+        'cars': object(),
+    }
 
-            name = fields.StringField()
-            mix = fields.ListField((str, float))
+    with pytest.raises(errors.ValidationError):
+        Parking(**data)
 
-        data = {
-            'name': 'Chuck',
-            'mix': ['something', 42.0, 'weird']
-        }
+    parking = Parking()
+    with pytest.raises(errors.ValidationError):
+        parking.populate(**data)
 
-        person1 = Person(**data)
-        person2 = Person()
-        person2.populate(**data)
 
-        for person in [person1, person2]:
-            self.assertEqual(person.name, 'Chuck')
-            self.assertEqual(len(person.mix), 3)
-            self.assertIn('something', person.mix)
-            self.assertIn(42.0, person.mix)
-            self.assertIn('weird', person.mix)
+def test_initialization_with_non_models_types():
 
-    def test_deep_initialization_for_embed_field(self):
+    class Person(models.Base):
 
-        class Car(models.Base):
+        names = fields.ListField(str)
+        surname = fields.StringField()
 
-            brand = fields.StringField()
+    data = {
+        'names': ['Chuck', 'Testa'],
+        'surname': 'Norris'
+    }
 
-        class ParkingPlace(models.Base):
+    person1 = Person(**data)
+    person2 = Person()
+    person2.populate(**data)
 
-            location = fields.StringField()
-            car = fields.EmbeddedField(Car)
+    for person in [person1, person2]:
+        assert person.surname == 'Norris'
+        assert len(person.names) == 2
+        assert 'Chuck' in person.names
+        assert 'Testa' in person.names
 
-        data = {
-            'location': 'somewhere',
-            'car': Car(brand='awesome brand'),
-        }
 
-        parking1 = ParkingPlace(**data)
-        parking2 = ParkingPlace()
-        parking2.populate(**data)
-        for parking in [parking1, parking2]:
-            self.assertEqual(parking.location, 'somewhere')
-            car = parking.car
-            self.assertTrue(isinstance(car, Car))
-            self.assertEqual(car.brand, 'awesome brand')
+def test_initialization_with_multi_non_models_types():
 
-            self.assertEqual(parking.location, 'somewhere')
-            car = parking.car
-            self.assertTrue(isinstance(car, Car))
-            self.assertEqual(car.brand, 'awesome brand')
+    class Person(models.Base):
+
+        name = fields.StringField()
+        mix = fields.ListField((str, float))
+
+    data = {
+        'name': 'Chuck',
+        'mix': ['something', 42.0, 'weird']
+    }
+
+    person1 = Person(**data)
+    person2 = Person()
+    person2.populate(**data)
+
+    for person in [person1, person2]:
+        assert person.name == 'Chuck'
+        assert len(person.mix) == 3
+        assert 'something' in person.mix
+        assert 42.0 in person.mix
+        assert 'weird' in person.mix
+
+
+def test_deep_initialization_for_embed_field():
+
+    class Car(models.Base):
+
+        brand = fields.StringField()
+
+    class ParkingPlace(models.Base):
+
+        location = fields.StringField()
+        car = fields.EmbeddedField(Car)
+
+    data = {
+        'location': 'somewhere',
+        'car': Car(brand='awesome brand'),
+    }
+
+    parking1 = ParkingPlace(**data)
+    parking2 = ParkingPlace()
+    parking2.populate(**data)
+    for parking in [parking1, parking2]:
+        assert parking.location == 'somewhere'
+        car = parking.car
+        assert isinstance(car, Car)
+        assert car.brand == 'awesome brand'
+
+        assert parking.location == 'somewhere'
+        car = parking.car
+        assert isinstance(car, Car)
+        assert car.brand == 'awesome brand'

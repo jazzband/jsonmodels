@@ -1,10 +1,8 @@
-"""Tests for code."""
-
-import unittest
 import os
 import re
 import subprocess
 
+import pytest
 from invoke import run
 
 import tests
@@ -31,20 +29,20 @@ def _collect_static(dirs):
     return matches
 
 
-@unittest.skipIf(tests.QUICK_TESTS, "Quick tests.")
-class TestProject(unittest.TestCase):
+@pytest.mark.skipif(tests.QUICK_TESTS, reason="Quick tests.")
+def test_pep8_and_complexity():
+    result = []
+    for filename in _collect_static([source_dir, tests_dir]):
+        result.append(subprocess.call(['flake8', filename]))
 
-    def test_pep8_and_complexity(self):
-        result = []
-        for filename in _collect_static([source_dir, tests_dir]):
-            result.append(subprocess.call(['flake8', filename]))
+    if any(result):
+        raise RuntimeError(
+            "Tests for PEP8 compliance and complexity have failed!")
 
-        if any(result):
-            raise RuntimeError(
-                "Tests for PEP8 compliance and complexity have failed!")
 
-    @unittest.skipIf(not tests.CHECK_SPELLING, "No spelling check.")
-    def test_docs(self):
-            run(
-                'sphinx-build -b spelling -d docs/_build/doctress '
-                'docs docs/build/spelling')
+@pytest.mark.skipif(
+    tests.QUICK_TESTS or not tests.CHECK_SPELLING, reason="No spelling check.")
+def test_docs():
+        run(
+            'sphinx-build -b spelling -d docs/_build/doctress '
+            'docs docs/build/spelling')

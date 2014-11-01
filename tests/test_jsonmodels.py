@@ -1,466 +1,470 @@
-"""Tests for `jsonmodels` module."""
-
-import unittest
+import pytest
 
 from jsonmodels import models, fields, errors
 
 
-class TestJsonmodels(unittest.TestCase):
+def test_model1():
 
-    def test_model1(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField()
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField()
+    alan = Person()
 
-        alan = Person()
+    alan.name = 'Alan'
+    alan.surname = 'Wake'
+    alan.age = 34
 
-        alan.name = 'Alan'
-        alan.surname = 'Wake'
-        alan.age = 34
 
-    def test_required(self):
+def test_required():
 
-        class Person(models.Base):
+    class Person(models.Base):
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField()
-            age = fields.IntField()
+        name = fields.StringField(required=True)
+        surname = fields.StringField()
+        age = fields.IntField()
 
-        alan = Person()
-        self.assertRaises(errors.ValidationError, alan.validate)
-        alan.name = 'Chuck'
+    alan = Person()
+    with pytest.raises(errors.ValidationError):
         alan.validate()
 
-    def test_type_validation(self):
+    alan.name = 'Chuck'
+    alan.validate()
 
-        class Person(models.Base):
 
-            name = fields.StringField()
-            age = fields.IntField()
+def test_type_validation():
 
-        alan = Person()
+    class Person(models.Base):
 
-        def assign():
-            alan.age = '42'
-        self.assertRaises(errors.ValidationError, assign)
+        name = fields.StringField()
+        age = fields.IntField()
 
-        alan.age = 42
+    alan = Person()
 
-    def test_base_validation(self):
-        """BaseField should not be usable."""
+    with pytest.raises(errors.ValidationError):
+        alan.age = '42'
 
-        class Person(models.Base):
+    alan.age = 42
 
-            name = fields.BaseField()
 
-        alan = Person()
+def test_base_field_should_not_be_usable():
 
-        def assign():
-            alan.name = 'some name'
-        self.assertRaises(errors.ValidationError, assign)
+    class Person(models.Base):
 
-        def assign():
-            alan.name = 2345
-        self.assertRaises(errors.ValidationError, assign)
+        name = fields.BaseField()
 
-    def test_value_replacements(self):
+    alan = Person()
 
-        class Person(models.Base):
+    with pytest.raises(errors.ValidationError):
+        alan.name = 'some name'
 
-            name = fields.StringField()
-            age = fields.IntField()
-            cash = fields.FloatField()
-            children = fields.ListField()
+    with pytest.raises(errors.ValidationError):
+        alan.name = 2345
 
-        alan = Person()
-        self.assertIsNone(alan.name)
-        self.assertIsNone(alan.age)
-        self.assertIsNone(alan.cash)
-        self.assertIsInstance(alan.children, list)
 
-    def test_list_field(self):
+def test_value_replacements():
 
-        class Car(models.Base):
+    class Person(models.Base):
 
-            wheels = fields.ListField()
+        name = fields.StringField()
+        age = fields.IntField()
+        cash = fields.FloatField()
+        children = fields.ListField()
 
-        viper = Car()
+    alan = Person()
+    assert alan.name is None
+    assert alan.age is None
+    assert alan.cash is None
+    assert isinstance(alan.children, list)
 
-        viper.wheels.append('some')
-        viper.wheels.append('not necessarily')
-        viper.wheels.append('proper')
-        viper.wheels.append('wheels')
 
-    def test_list_field_types(self):
+def test_list_field():
 
-        class Wheel(models.Base):
-            pass
+    class Car(models.Base):
 
-        class Wheel2(models.Base):
-            pass
+        wheels = fields.ListField()
 
-        class Car(models.Base):
+    viper = Car()
 
-            wheels = fields.ListField(items_types=[Wheel])
+    viper.wheels.append('some')
+    viper.wheels.append('not necessarily')
+    viper.wheels.append('proper')
+    viper.wheels.append('wheels')
 
-        viper = Car()
 
-        viper.wheels.append(Wheel())
-        viper.wheels.append(Wheel())
+def test_list_field_types():
 
-        self.assertRaises(
-            errors.ValidationError,
-            lambda: viper.wheels.append(Wheel2)
-        )
+    class Wheel(models.Base):
+        pass
 
-    def test_list_field_types_when_assigning(self):
+    class Wheel2(models.Base):
+        pass
 
-        class Wheel(models.Base):
-            pass
+    class Car(models.Base):
 
-        class Wheel2(models.Base):
-            pass
+        wheels = fields.ListField(items_types=[Wheel])
 
-        class Car(models.Base):
+    viper = Car()
 
-            wheels = fields.ListField(items_types=[Wheel])
+    viper.wheels.append(Wheel())
+    viper.wheels.append(Wheel())
 
-        viper = Car()
+    with pytest.raises(errors.ValidationError):
+        viper.wheels.append(Wheel2)
 
-        viper.wheels.append(Wheel())
 
-        def assign():
-            viper.wheels[1] = Wheel2
+def test_list_field_types_when_assigning():
 
-        self.assertRaises(errors.ValidationError, assign)
+    class Wheel(models.Base):
+        pass
 
-    def test_list_field_for_subtypes(self):
+    class Wheel2(models.Base):
+        pass
 
-        class Car(models.Base):
-            pass
+    class Car(models.Base):
 
-        class Viper(Car):
-            pass
+        wheels = fields.ListField(items_types=[Wheel])
 
-        class Lamborghini(Car):
-            pass
+    viper = Car()
 
-        class Garage1(models.Base):
+    viper.wheels.append(Wheel())
 
-            cars = fields.ListField(items_types=[Car])
+    with pytest.raises(errors.ValidationError):
+        viper.wheels[1] = Wheel2
 
-        garage = Garage1()
+
+def test_list_field_for_subtypes():
+
+    class Car(models.Base):
+        pass
+
+    class Viper(Car):
+        pass
+
+    class Lamborghini(Car):
+        pass
+
+    class Garage1(models.Base):
+
+        cars = fields.ListField(items_types=[Car])
+
+    garage = Garage1()
+    garage.cars.append(Car())
+    garage.cars.append(Viper())
+    garage.cars.append(Lamborghini())
+
+    class Garage2(models.Base):
+
+        cars = fields.ListField(items_types=[Viper, Lamborghini])
+
+    garage = Garage2()
+    garage.cars.append(Viper())
+    garage.cars.append(Lamborghini())
+
+    with pytest.raises(errors.ValidationError):
         garage.cars.append(Car())
-        garage.cars.append(Viper())
-        garage.cars.append(Lamborghini())
 
-        class Garage2(models.Base):
 
-            cars = fields.ListField(items_types=[Viper, Lamborghini])
+def test_list_validation():
 
-        garage = Garage2()
-        garage.cars.append(Viper())
-        garage.cars.append(Lamborghini())
+    class Garage(models.Base):
 
-        self.assertRaises(
-            errors.ValidationError,
-            lambda: garage.cars.append(Car())
-        )
+        cars = fields.ListField()
 
-    def test_list_validation(self):
+    garage = Garage()
 
-        class Garage(models.Base):
+    with pytest.raises(errors.ValidationError):
+        garage.cars = 'some string'
 
-            cars = fields.ListField()
 
-        garage = Garage()
+def test_embedded_model():
 
-        def assign():
-            garage.cars = 'some string'
-        self.assertRaises(errors.ValidationError, assign)
+    class Secondary(models.Base):
 
-    def test_embedded_model(self):
+        data = fields.IntField()
 
-        class Secondary(models.Base):
+    class Primary(models.Base):
 
-            data = fields.IntField()
+        name = fields.StringField()
+        secondary = fields.EmbeddedField(Secondary)
 
-        class Primary(models.Base):
+    entity = Primary()
+    assert entity.secondary is None
+    entity.name = 'chuck'
+    entity.secondary = Secondary()
+    entity.secondary.data = 42
 
-            name = fields.StringField()
-            secondary = fields.EmbeddedField(Secondary)
+    with pytest.raises(errors.ValidationError):
+        entity.secondary.data = '42'
 
-        entity = Primary()
-        self.assertIsNone(entity.secondary)
-        entity.name = 'chuck'
-        entity.secondary = Secondary()
-        entity.secondary.data = 42
+    entity.secondary.data = 42
 
-        def assign():
-            entity.secondary.data = '42'
-        self.assertRaises(errors.ValidationError, assign)
+    with pytest.raises(errors.ValidationError):
+        entity.secondary = 'something different'
 
-        entity.secondary.data = 42
+    entity.secondary = None
 
-        def assign():
-            entity.secondary = 'something different'
-        self.assertRaises(errors.ValidationError, assign)
 
-        entity.secondary = None
+def test_embedded_required_validation():
 
-    def test_embedded_required_validation(self):
+    class Secondary(models.Base):
 
-        class Secondary(models.Base):
+        data = fields.IntField(required=True)
 
-            data = fields.IntField(required=True)
+    class Primary(models.Base):
 
-        class Primary(models.Base):
+        name = fields.StringField()
+        secondary = fields.EmbeddedField(Secondary)
 
-            name = fields.StringField()
-            secondary = fields.EmbeddedField(Secondary)
+    entity = Primary()
+    sec = Secondary()
+    sec.data = 33
+    entity.secondary = sec
 
-        entity = Primary()
-        sec = Secondary()
-        sec.data = 33
-        entity.secondary = sec
+    with pytest.raises(errors.ValidationError):
+        entity.secondary.data = None
 
-        def assign():
-            entity.secondary.data = None
-        self.assertRaises(errors.ValidationError, assign)
+    entity.secondary = None
 
-        entity.secondary = None
+    class Primary(models.Base):
 
-        class Primary(models.Base):
+        name = fields.StringField()
+        secondary = fields.EmbeddedField(Secondary, required=True)
 
-            name = fields.StringField()
-            secondary = fields.EmbeddedField(Secondary, required=True)
+    entity = Primary()
+    sec = Secondary()
+    sec.data = 33
+    entity.secondary = sec
 
-        entity = Primary()
-        sec = Secondary()
-        sec.data = 33
-        entity.secondary = sec
+    with pytest.raises(errors.ValidationError):
+        entity.secondary.data = None
 
-        def assign():
-            entity.secondary.data = None
-        self.assertRaises(errors.ValidationError, assign)
 
-    def test_embedded_inheritance(self):
+def test_embedded_inheritance():
 
-        class Car(models.Base):
-            pass
+    class Car(models.Base):
+        pass
 
-        class Viper(Car):
-            pass
+    class Viper(Car):
+        pass
 
-        class Lamborghini(Car):
-            pass
+    class Lamborghini(Car):
+        pass
 
-        class ParkingPlace(models.Base):
+    class ParkingPlace(models.Base):
 
-            location = fields.StringField()
-            car = fields.EmbeddedField([Viper, Lamborghini])
+        location = fields.StringField()
+        car = fields.EmbeddedField([Viper, Lamborghini])
 
-        place = ParkingPlace()
+    place = ParkingPlace()
 
-        place.car = Viper()
-        place.car = Lamborghini()
+    place.car = Viper()
+    place.car = Lamborghini()
 
-        def assign():
-            place.car = Car()
-        self.assertRaises(errors.ValidationError, assign)
-
-        class ParkingPlace(models.Base):
-
-            location = fields.StringField()
-            car = fields.EmbeddedField(Car)
-
-        place = ParkingPlace()
-
-        place.car = Viper()
-        place.car = Lamborghini()
+    with pytest.raises(errors.ValidationError):
         place.car = Car()
 
-    def test_iterable(self):
+    class ParkingPlace(models.Base):
 
-        class Person(models.Base):
+        location = fields.StringField()
+        car = fields.EmbeddedField(Car)
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField()
-            cash = fields.FloatField()
+    place = ParkingPlace()
 
-        alan = Person()
+    place.car = Viper()
+    place.car = Lamborghini()
+    place.car = Car()
 
-        alan.name = 'Alan'
-        alan.surname = 'Wake'
-        alan.age = 24
-        alan.cash = 2445.45
 
-        pattern = {
-            'name': 'Alan',
-            'surname': 'Wake',
-            'age': 24,
-            'cash': 2445.45,
-        }
+def test_iterable():
 
-        result = {}
-        for name, field in alan:
-            result[name] = field.__get__(alan)
+    class Person(models.Base):
 
-        self.assertEqual(pattern, result)
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField()
+        cash = fields.FloatField()
 
-    def test_get_field(self):
+    alan = Person()
 
-        name_field = fields.StringField()
-        surname_field = fields.StringField()
-        age_field = fields.IntField()
+    alan.name = 'Alan'
+    alan.surname = 'Wake'
+    alan.age = 24
+    alan.cash = 2445.45
 
-        class Person(models.Base):
+    pattern = {
+        'name': 'Alan',
+        'surname': 'Wake',
+        'age': 24,
+        'cash': 2445.45,
+    }
 
-            name = name_field
-            surname = surname_field
-            age = age_field
+    result = {}
+    for name, field in alan:
+        result[name] = field.__get__(alan)
 
-        alan = Person()
+    assert pattern == result
 
-        self.assertIs(alan.get_field('name'), name_field)
-        self.assertIs(alan.get_field('surname'), surname_field)
-        self.assertIs(alan.get_field('age'), age_field)
 
-    def test_repr(self):
+def test_get_field():
 
-        class Person(models.Base):
+    name_field = fields.StringField()
+    surname_field = fields.StringField()
+    age_field = fields.IntField()
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField()
+    class Person(models.Base):
 
-        chuck = Person()
+        name = name_field
+        surname = surname_field
+        age = age_field
 
-        self.assertEqual(chuck.__repr__(), '<Person: Person object>')
-        self.assertEqual(chuck.__str__(), 'Person object')
+    alan = Person()
 
-        class Person2(models.Base):
+    assert alan.get_field('name') is name_field
+    assert alan.get_field('surname') is surname_field
+    assert alan.get_field('age') is age_field
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField()
 
-            def __str__(self):
-                return self.name
+def test_repr():
 
-        chuck = Person2()
+    class Person(models.Base):
 
-        self.assertEqual(chuck.__repr__(), '<Person2: >')
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField()
 
-        chuck.name = 'Chuck'
-        self.assertEqual(chuck.__repr__(), '<Person2: Chuck>')
-        self.assertEqual(chuck.__str__(), 'Chuck')
+    chuck = Person()
 
-        chuck.name = 'Testa'
-        self.assertEqual(chuck.__repr__(), '<Person2: Testa>')
-        self.assertEqual(chuck.__str__(), 'Testa')
+    assert chuck.__repr__() == '<Person: Person object>'
+    assert chuck.__str__() == 'Person object'
 
-    def test_list_field_with_non_model_types(self):
+    class Person2(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField()
 
-            names = fields.ListField(str)
-            surname = fields.StringField()
+        def __str__(self):
+            return self.name
 
-        person = Person(surname='Norris')
-        person.names.append('Chuck')
-        person.names.append('Testa')
+    chuck = Person2()
 
-    def test_help_text(self):
+    assert chuck.__repr__() == '<Person2: >'
 
-        class Person(models.Base):
+    chuck.name = 'Chuck'
+    assert chuck.__repr__() == '<Person2: Chuck>'
+    assert chuck.__str__() == 'Chuck'
 
-            name = fields.StringField(help_text='Name of person.')
-            age = fields.IntField(help_text='Age of person.')
+    chuck.name = 'Testa'
+    assert chuck.__repr__() == '<Person2: Testa>'
+    assert chuck.__str__() == 'Testa'
 
-        person = Person()
-        self.assertEqual(person.get_field('name').help_text, 'Name of person.')
-        self.assertEqual(person.get_field('age').help_text, 'Age of person.')
 
-    def test_types(self):
+def test_list_field_with_non_model_types():
 
-        class Person(object):
-            pass
+    class Person(models.Base):
 
-        class Person2(object):
-            pass
+        names = fields.ListField(str)
+        surname = fields.StringField()
 
-        allowed_types = (Person,)
+    person = Person(surname='Norris')
+    person.names.append('Chuck')
+    person.names.append('Testa')
 
-        field = fields.EmbeddedField(allowed_types)
-        self.assertEqual(allowed_types, field.types)
 
-        allowed_types = (Person, Person2)
+def test_help_text():
 
-        field = fields.EmbeddedField(allowed_types)
-        self.assertEqual(allowed_types, field.types)
+    class Person(models.Base):
 
-    def test_items_types(self):
+        name = fields.StringField(help_text='Name of person.')
+        age = fields.IntField(help_text='Age of person.')
 
-        class Person(object):
-            pass
+    person = Person()
+    assert person.get_field('name').help_text == 'Name of person.'
+    assert person.get_field('age').help_text == 'Age of person.'
 
-        class Person2(object):
-            pass
 
-        allowed_types = (Person,)
+def test_types():
 
-        field = fields.ListField(allowed_types)
-        self.assertEqual(allowed_types, field.items_types)
+    class Person(object):
+        pass
 
-        allowed_types = (Person, Person2)
+    class Person2(object):
+        pass
 
-        field = fields.ListField(allowed_types)
-        self.assertEqual(allowed_types, field.items_types)
+    allowed_types = (Person,)
 
-        field = fields.ListField()
-        self.assertEqual(tuple(), field.items_types)
+    field = fields.EmbeddedField(allowed_types)
+    assert allowed_types == field.types
 
-    def test_required_embedded_field(self):
+    allowed_types = (Person, Person2)
 
-        class Secondary(models.Base):
+    field = fields.EmbeddedField(allowed_types)
+    assert allowed_types == field.types
 
-            data = fields.IntField()
 
-        class Primary(models.Base):
+def test_items_types():
 
-            name = fields.StringField()
-            secondary = fields.EmbeddedField(Secondary, required=True)
+    class Person(object):
+        pass
 
-        entity = Primary()
-        self.assertRaises(errors.ValidationError, entity.validate)
-        entity.secondary = Secondary()
+    class Person2(object):
+        pass
+
+    allowed_types = (Person,)
+
+    field = fields.ListField(allowed_types)
+    assert allowed_types == field.items_types
+
+    allowed_types = (Person, Person2)
+
+    field = fields.ListField(allowed_types)
+    assert allowed_types == field.items_types
+
+    field = fields.ListField()
+    assert tuple() == field.items_types
+
+
+def test_required_embedded_field():
+
+    class Secondary(models.Base):
+
+        data = fields.IntField()
+
+    class Primary(models.Base):
+
+        name = fields.StringField()
+        secondary = fields.EmbeddedField(Secondary, required=True)
+
+    entity = Primary()
+    with pytest.raises(errors.ValidationError):
         entity.validate()
+    entity.secondary = Secondary()
+    entity.validate()
 
-        class Primary(models.Base):
+    class Primary(models.Base):
 
-            name = fields.StringField()
-            secondary = fields.EmbeddedField(Secondary, required=False)
+        name = fields.StringField()
+        secondary = fields.EmbeddedField(Secondary, required=False)
 
-        entity = Primary()
-        entity.validate()
+    entity = Primary()
+    entity.validate()
 
-        entity.secondary = None
-        entity.validate()
+    entity.secondary = None
+    entity.validate()
 
-    def test_assignation_of_list_of_models(self):
 
-        class Wheel(models.Base):
-            pass
+def test_assignation_of_list_of_models():
 
-        class Car(models.Base):
+    class Wheel(models.Base):
+        pass
 
-            wheels = fields.ListField(items_types=[Wheel])
+    class Car(models.Base):
 
-        viper = Car()
-        viper.wheels = None
-        viper.wheels = [Wheel()]
+        wheels = fields.ListField(items_types=[Wheel])
+
+    viper = Car()
+    viper.wheels = None
+    viper.wheels = [Wheel()]

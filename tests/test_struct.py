@@ -1,7 +1,6 @@
-"""Tests for casting to structure."""
-
-import unittest
 from datetime import datetime
+
+import pytest
 
 from jsonmodels import models, fields, errors
 
@@ -11,145 +10,148 @@ class _DateField(fields.BaseField):
     _types = (datetime,)
 
 
-class TestToStructMethod(unittest.TestCase):
+def test_to_struct_basic():
 
-    def test_to_struct_basic(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        cash = fields.FloatField()
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            cash = fields.FloatField()
+    alan = Person()
+    with pytest.raises(errors.ValidationError):
+        alan.to_struct()
 
-        alan = Person()
-        self.assertRaises(errors.ValidationError, alan.to_struct)
+    alan.name = 'Alan'
+    alan.surname = 'Wake'
+    assert {'name': 'Alan', 'surname': 'Wake'} == alan.to_struct()
 
-        alan.name = 'Alan'
-        alan.surname = 'Wake'
-        self.assertEqual({'name': 'Alan', 'surname': 'Wake'}, alan.to_struct())
+    alan.age = 24
+    alan.cash = 2445.45
 
-        alan.age = 24
-        alan.cash = 2445.45
+    pattern = {
+        'name': 'Alan',
+        'surname': 'Wake',
+        'age': 24,
+        'cash': 2445.45,
+    }
 
-        pattern = {
-            'name': 'Alan',
-            'surname': 'Wake',
-            'age': 24,
-            'cash': 2445.45,
-        }
+    assert pattern == alan.to_struct()
 
-        self.assertEqual(pattern, alan.to_struct())
 
-    def test_to_struct_nested_1(self):
+def test_to_struct_nested_1():
 
-        class Car(models.Base):
+    class Car(models.Base):
 
-            brand = fields.StringField()
+        brand = fields.StringField()
 
-        class ParkingPlace(models.Base):
+    class ParkingPlace(models.Base):
 
-            location = fields.StringField()
-            car = fields.EmbeddedField(Car)
+        location = fields.StringField()
+        car = fields.EmbeddedField(Car)
 
-        place = ParkingPlace()
-        place.location = 'never never land'
+    place = ParkingPlace()
+    place.location = 'never never land'
 
-        pattern = {
-            'location': 'never never land',
-        }
-        self.assertEqual(pattern, place.to_struct())
+    pattern = {
+        'location': 'never never land',
+    }
+    assert pattern == place.to_struct()
 
-        place.car = Car()
-        pattern['car'] = {}
-        self.assertEqual(pattern, place.to_struct())
+    place.car = Car()
+    pattern['car'] = {}
+    assert pattern == place.to_struct()
 
-        place.car.brand = 'Fiat'
-        pattern['car']['brand'] = 'Fiat'
-        self.assertEqual(pattern, place.to_struct())
+    place.car.brand = 'Fiat'
+    pattern['car']['brand'] = 'Fiat'
+    assert pattern == place.to_struct()
 
-    def test_to_struct_nested_2(self):
 
-        class Viper(models.Base):
+def test_to_struct_nested_2():
 
-            serial = fields.StringField()
+    class Viper(models.Base):
 
-        class Lamborghini(models.Base):
+        serial = fields.StringField()
 
-            serial = fields.StringField()
+    class Lamborghini(models.Base):
 
-        class Parking(models.Base):
+        serial = fields.StringField()
 
-            location = fields.StringField()
-            cars = fields.ListField([Viper, Lamborghini])
+    class Parking(models.Base):
 
-        parking = Parking()
-        pattern = {'cars': []}
-        self.assertEqual(pattern, parking.to_struct())
+        location = fields.StringField()
+        cars = fields.ListField([Viper, Lamborghini])
 
-        parking.location = 'somewhere'
-        pattern['location'] = 'somewhere'
-        self.assertEqual(pattern, parking.to_struct())
+    parking = Parking()
+    pattern = {'cars': []}
+    assert pattern == parking.to_struct()
 
-        v = Viper()
-        v.serial = '12345'
-        parking.cars.append(v)
-        pattern['cars'].append({'serial': '12345'})
-        self.assertEqual(pattern, parking.to_struct())
+    parking.location = 'somewhere'
+    pattern['location'] = 'somewhere'
+    assert pattern == parking.to_struct()
 
-        parking.cars.append(Viper())
-        pattern['cars'].append({})
-        self.assertEqual(pattern, parking.to_struct())
+    v = Viper()
+    v.serial = '12345'
+    parking.cars.append(v)
+    pattern['cars'].append({'serial': '12345'})
+    assert pattern == parking.to_struct()
 
-        l = Lamborghini()
-        l.serial = '54321'
-        parking.cars.append(l)
-        pattern['cars'].append({'serial': '54321'})
-        self.assertEqual(pattern, parking.to_struct())
+    parking.cars.append(Viper())
+    pattern['cars'].append({})
+    assert pattern == parking.to_struct()
 
-    def test_to_struct_with_non_models_types(self):
+    l = Lamborghini()
+    l.serial = '54321'
+    parking.cars.append(l)
+    pattern['cars'].append({'serial': '54321'})
+    assert pattern == parking.to_struct()
 
-        class Person(models.Base):
 
-            names = fields.ListField(str)
-            surname = fields.StringField()
+def test_to_struct_with_non_models_types():
 
-        person = Person()
-        pattern = {'names': []}
+    class Person(models.Base):
 
-        self.assertEqual(pattern, person.to_struct())
+        names = fields.ListField(str)
+        surname = fields.StringField()
 
-        person.surname = 'Norris'
-        pattern['surname'] = 'Norris'
-        self.assertEqual(pattern, person.to_struct())
+    person = Person()
+    pattern = {'names': []}
 
-        person.names.append('Chuck')
-        pattern['names'].append('Chuck')
-        self.assertEqual(pattern, person.to_struct())
+    assert pattern == person.to_struct()
 
-        person.names.append('Testa')
-        pattern['names'].append('Testa')
-        self.assertEqual(pattern, person.to_struct())
+    person.surname = 'Norris'
+    pattern['surname'] = 'Norris'
+    assert pattern == person.to_struct()
 
-    def test_to_struct_with_multi_non_models_types(self):
+    person.names.append('Chuck')
+    pattern['names'].append('Chuck')
+    assert pattern == person.to_struct()
 
-        class Person(models.Base):
+    person.names.append('Testa')
+    pattern['names'].append('Testa')
+    pattern == person.to_struct()
 
-            name = fields.StringField()
-            mix = fields.ListField((str, float))
 
-        person = Person()
-        pattern = {'mix': []}
-        self.assertEqual(pattern, person.to_struct())
+def test_to_struct_with_multi_non_models_types():
 
-        person.mix.append('something')
-        pattern['mix'].append('something')
-        self.assertEqual(pattern, person.to_struct())
+    class Person(models.Base):
 
-        person.mix.append(42.0)
-        pattern['mix'].append(42.0)
-        self.assertEqual(pattern, person.to_struct())
+        name = fields.StringField()
+        mix = fields.ListField((str, float))
 
-        person.mix.append('different')
-        pattern['mix'].append('different')
-        self.assertEqual(pattern, person.to_struct())
+    person = Person()
+    pattern = {'mix': []}
+    assert pattern == person.to_struct()
+
+    person.mix.append('something')
+    pattern['mix'].append('something')
+    assert pattern == person.to_struct()
+
+    person.mix.append(42.0)
+    pattern['mix'].append(42.0)
+    assert pattern == person.to_struct()
+
+    person.mix.append('different')
+    pattern['mix'].append('different')
+    assert pattern == person.to_struct()

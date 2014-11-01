@@ -1,8 +1,6 @@
-"""Tests for datetime related fields."""
-
 import datetime
-import unittest
 
+import pytest
 from dateutil.tz import tzoffset
 
 from jsonmodels import models, fields
@@ -32,192 +30,202 @@ class _TestUtc(datetime.tzinfo):
         return datetime.timedelta(0)
 
 
-class TimeFieldTestCase(unittest.TestCase):
+def test_time_field():
 
-    def test_time_field(self):
+    class Event(models.Base):
 
-        class Event(models.Base):
+        time = fields.TimeField()
 
-            time = fields.TimeField()
+    event = Event()
 
-        event = Event()
+    event.time = '12:03:34'
+    assert isinstance(event.time, datetime.time)
+    event.time = datetime.time()
 
-        event.time = '12:03:34'
-        self.assertIs(True, isinstance(event.time, datetime.time))
-        event.time = datetime.time()
 
-    def test_time_field_to_struct(self):
+def test_time_field_to_struct():
 
-        field = fields.TimeField()
+    field = fields.TimeField()
 
-        self.assertIsNone(field.str_format)
+    assert field.str_format is None
 
-        tt = datetime.time()
-        self.assertEqual('00:00:00', field.to_struct(tt))
+    tt = datetime.time()
+    assert '00:00:00' == field.to_struct(tt)
 
-        tt = datetime.time(12, 34, 56)
-        self.assertEqual('12:34:56', field.to_struct(tt))
+    tt = datetime.time(12, 34, 56)
+    assert '12:34:56' == field.to_struct(tt)
 
-    def test_time_field_to_struct_with_format(self):
 
-        field = fields.TimeField(str_format='%H:%M')
+def test_time_field_to_struct_with_format():
 
-        self.assertEqual('%H:%M', field.str_format)
+    field = fields.TimeField(str_format='%H:%M')
 
-        tt = datetime.time()
-        self.assertEqual('00:00', field.to_struct(tt))
+    assert '%H:%M' == field.str_format
 
-        tt = datetime.time(12, 34, 56)
-        self.assertEqual('12:34', field.to_struct(tt))
+    tt = datetime.time()
+    assert '00:00' == field.to_struct(tt)
 
-    def test_time_field_to_struct_with_tz(self):
+    tt = datetime.time(12, 34, 56)
+    assert '12:34' == field.to_struct(tt)
 
-        field = fields.TimeField()
 
-        tt = datetime.time(tzinfo=_TestCet())
-        self.assertEqual('00:00:00+02:00', field.to_struct(tt))
+def test_time_field_to_struct_with_tz():
 
-        tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
-        self.assertEqual('12:34:56+02:00', field.to_struct(tt))
+    field = fields.TimeField()
 
-        tt = datetime.time(tzinfo=_TestUtc())
-        self.assertEqual('00:00:00+00:00', field.to_struct(tt))
+    tt = datetime.time(tzinfo=_TestCet())
+    assert '00:00:00+02:00' == field.to_struct(tt)
 
-        tt = datetime.time(12, 34, 56, tzinfo=_TestUtc())
-        self.assertEqual('12:34:56+00:00', field.to_struct(tt))
+    tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
+    assert '12:34:56+02:00' == field.to_struct(tt)
 
-    def test_time_field_format_has_precedence(self):
+    tt = datetime.time(tzinfo=_TestUtc())
+    assert '00:00:00+00:00' == field.to_struct(tt)
 
-        field = fields.TimeField(str_format='%H:%M')
+    tt = datetime.time(12, 34, 56, tzinfo=_TestUtc())
+    assert '12:34:56+00:00' == field.to_struct(tt)
 
-        tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
-        self.assertEqual('12:34', field.to_struct(tt))
 
-    def test_time_field_parse_value(self):
+def test_time_field_format_has_precedence():
 
-        field = fields.TimeField()
+    field = fields.TimeField(str_format='%H:%M')
 
-        self.assertEqual(datetime.time(), field.parse_value('00:00:00'))
-        self.assertEqual(
-            datetime.time(2, 34, 45, tzinfo=tzoffset(None, 7200)),
-            field.parse_value('2:34:45+02:00'),
-        )
+    tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
+    assert '12:34' == field.to_struct(tt)
 
-        self.assertRaises(TypeError, field.parse_value, 'not a time')
 
+def test_time_field_parse_value():
 
-class DateFieldTestCase(unittest.TestCase):
+    field = fields.TimeField()
 
-    def test_date_field(self):
+    assert datetime.time() == field.parse_value('00:00:00')
+    assert (
+        datetime.time(2, 34, 45, tzinfo=tzoffset(None, 7200)) ==
+        field.parse_value('2:34:45+02:00'),
+    )
 
-        class Event(models.Base):
+    with pytest.raises(TypeError):
+        field.parse_value('not a time')
 
-            date = fields.DateField()
 
-        event = Event()
+def test_date_field():
 
-        event.date = '2014-04-21'
-        self.assertIs(True, isinstance(event.date, datetime.date))
-        event.date = datetime.date(2014, 4, 21)
+    class Event(models.Base):
 
-    def test_date_field_to_struct(self):
+        date = fields.DateField()
 
-        field = fields.DateField()
+    event = Event()
 
-        self.assertIsNone(field.str_format)
+    event.date = '2014-04-21'
+    assert isinstance(event.date, datetime.date)
+    event.date = datetime.date(2014, 4, 21)
 
-        tt = datetime.date(2000, 1, 1)
-        self.assertEqual('2000-01-01', field.to_struct(tt))
 
-        tt = datetime.date(2491, 5, 6)
-        self.assertEqual('2491-05-06', field.to_struct(tt))
+def test_date_field_to_struct():
 
-    def test_date_field_to_struct_with_format(self):
+    field = fields.DateField()
 
-        field = fields.DateField(str_format='%Y/%m/%d')
+    assert field.str_format is None
 
-        self.assertEqual('%Y/%m/%d', field.str_format)
+    tt = datetime.date(2000, 1, 1)
+    assert '2000-01-01' == field.to_struct(tt)
 
-        tt = datetime.date(2244, 5, 7)
-        self.assertEqual('2244/05/07', field.to_struct(tt))
+    tt = datetime.date(2491, 5, 6)
+    assert '2491-05-06' == field.to_struct(tt)
 
-    def test_date_field_parse_value(self):
 
-        field = fields.DateField()
+def test_date_field_to_struct_with_format():
 
-        self.assertEqual(
-            datetime.date(2012, 12, 21),
-            field.parse_value('2012-12-21'),
-        )
-        self.assertEqual(
-            datetime.date(2014, 4, 21),
-            field.parse_value('2014-04-21'),
-        )
+    field = fields.DateField(str_format='%Y/%m/%d')
 
-        self.assertRaises(TypeError, field.parse_value, 'not a date')
+    assert '%Y/%m/%d' == field.str_format
 
+    tt = datetime.date(2244, 5, 7)
+    assert '2244/05/07' == field.to_struct(tt)
 
-class DateTimeFieldTestCase(unittest.TestCase):
 
-    def test_datetime_field(self):
+def test_date_field_parse_value():
 
-        class Event(models.Base):
+    field = fields.DateField()
 
-            date = fields.DateTimeField()
+    assert (
+        datetime.date(2012, 12, 21) ==
+        field.parse_value('2012-12-21')
+    )
+    assert (
+        datetime.date(2014, 4, 21) ==
+        field.parse_value('2014-04-21')
+    )
 
-        event = Event()
-        event.date = '2013-05-06 12:03:34'
+    with pytest.raises(TypeError):
+        field.parse_value('not a date')
 
-        self.assertIs(True, isinstance(event.date, datetime.datetime))
-        event.date = datetime.datetime.now()
 
-    def test_datetime_field_to_struct(self):
+def test_datetime_field():
 
-        field = fields.DateTimeField()
+    class Event(models.Base):
 
-        self.assertIsNone(field.str_format)
+        date = fields.DateTimeField()
 
-        tt = datetime.datetime(2014, 5, 7, 12, 45, 56)
-        self.assertEqual('2014-05-07T12:45:56', field.to_struct(tt))
+    event = Event()
+    event.date = '2013-05-06 12:03:34'
 
-    def test_datetime_field_to_struct_with_format(self):
+    assert isinstance(event.date, datetime.datetime)
+    event.date = datetime.datetime.now()
 
-        field = fields.TimeField(str_format='%H:%M %Y/%m')
 
-        self.assertEqual('%H:%M %Y/%m', field.str_format)
+def test_datetime_field_to_struct():
 
-        tt = datetime.datetime(2014, 5, 7, 12, 45, 56)
-        self.assertEqual('12:45 2014/05', field.to_struct(tt))
+    field = fields.DateTimeField()
 
-    def test_datetime_field_to_struct_with_tz(self):
+    assert field.str_format is None
 
-        field = fields.DateTimeField()
+    tt = datetime.datetime(2014, 5, 7, 12, 45, 56)
+    assert '2014-05-07T12:45:56' == field.to_struct(tt)
 
-        tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
-        self.assertEqual('2014-05-07T12:45:56+02:00', field.to_struct(tt))
 
-        tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestUtc())
-        self.assertEqual('2014-05-07T12:45:56+00:00', field.to_struct(tt))
+def test_datetime_field_to_struct_with_format():
 
-    def test_datetime_field_format_has_precedence(self):
+    field = fields.TimeField(str_format='%H:%M %Y/%m')
 
-        field = fields.DateTimeField(str_format='%H:%M %Y/%m')
+    assert '%H:%M %Y/%m' == field.str_format
 
-        tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
-        self.assertEqual('12:45 2014/05', field.to_struct(tt))
+    tt = datetime.datetime(2014, 5, 7, 12, 45, 56)
+    assert '12:45 2014/05' == field.to_struct(tt)
 
-    def test_datetime_field_parse_value(self):
 
-        field = fields.DateTimeField()
+def test_datetime_field_to_struct_with_tz():
 
-        self.assertEqual(
-            datetime.datetime(2014, 4, 21, 12, 45, 56),
-            field.parse_value('2014-04-21T12:45:56'),
-        )
-        self.assertEqual(
-            datetime.datetime(
-                2014, 4, 21, 12, 45, 56, tzinfo=tzoffset(None, 7200)),
-            field.parse_value('2014-04-21T12:45:56+02:00'),
-        )
+    field = fields.DateTimeField()
 
-        self.assertRaises(TypeError, field.parse_value, 'not a datetime')
+    tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
+    assert '2014-05-07T12:45:56+02:00' == field.to_struct(tt)
+
+    tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestUtc())
+    assert '2014-05-07T12:45:56+00:00' == field.to_struct(tt)
+
+
+def test_datetime_field_format_has_precedence():
+
+    field = fields.DateTimeField(str_format='%H:%M %Y/%m')
+
+    tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
+    assert '12:45 2014/05' == field.to_struct(tt)
+
+
+def test_datetime_field_parse_value():
+
+    field = fields.DateTimeField()
+
+    assert (
+        datetime.datetime(2014, 4, 21, 12, 45, 56) ==
+        field.parse_value('2014-04-21T12:45:56')
+    )
+    assert (
+        datetime.datetime(
+            2014, 4, 21, 12, 45, 56, tzinfo=tzoffset(None, 7200)) ==
+        field.parse_value('2014-04-21T12:45:56+02:00')
+    )
+
+    with pytest.raises(TypeError):
+        field.parse_value('not a datetime')

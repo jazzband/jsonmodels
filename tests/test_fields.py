@@ -1,36 +1,30 @@
-"""Tests for fields."""
-
-import unittest
-
 from jsonmodels import models, fields
 
 
-class TestFields(unittest.TestCase):
+def test_bool_field():
 
-    def test_bool_field(self):
+    field = fields.BoolField()
 
-        field = fields.BoolField()
+    class Person(models.Base):
 
-        class Person(models.Base):
+        is_programmer = field
 
-            is_programmer = field
+    person = Person()
+    assert person.is_programmer is None
 
-        person = Person()
-        self.assertIsNone(person.is_programmer)
+    person.is_programmer = True
+    assert person.is_programmer is True
 
-        person.is_programmer = True
-        self.assertTrue(person.is_programmer)
+    person.is_programmer = False
+    assert person.is_programmer is False
 
-        person.is_programmer = False
-        self.assertFalse(person.is_programmer)
+    assert field.parse_value(True) is True
+    assert field.parse_value('something') is True
+    assert field.parse_value(object()) is True
 
-        self.assertIs(field.parse_value(True), True)
-        self.assertIs(field.parse_value('something'), True)
-        self.assertIs(field.parse_value(object()), True)
+    assert field.parse_value(None) is None
 
-        self.assertIsNone(field.parse_value(None))
-
-        self.assertIs(field.parse_value(False), False)
-        self.assertIs(field.parse_value(0), False)
-        self.assertIs(field.parse_value(''), False)
-        self.assertIs(field.parse_value([]), False)
+    assert field.parse_value(False) is False
+    assert field.parse_value(0) is False
+    assert field.parse_value('') is False
+    assert field.parse_value([]) is False

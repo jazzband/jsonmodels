@@ -1,304 +1,313 @@
-"""Tests for JSON schema generation."""
-
-import unittest
-
 from jsonmodels import models, fields, validators
 from jsonmodels.utils import compare_schemas
 
 from .utils import get_fixture
 
 
-class TestJsonmodels(unittest.TestCase):
+def test_model1():
 
-    def test_model1(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
+    alan = Person()
+    schema = alan.to_json_schema()
 
-        alan = Person()
-        schema = alan.to_json_schema()
+    pattern = get_fixture('schema1.json')
+    assert compare_schemas(pattern, schema) is True
 
-        pattern = get_fixture('schema1.json')
-        self.assertTrue(compare_schemas(pattern, schema))
 
-    def test_model2(self):
+def test_model2():
 
-        class Car(models.Base):
+    class Car(models.Base):
 
-            brand = fields.StringField(required=True)
-            registration = fields.StringField(required=True)
+        brand = fields.StringField(required=True)
+        registration = fields.StringField(required=True)
 
-        class Toy(models.Base):
+    class Toy(models.Base):
 
-            name = fields.StringField(required=True)
+        name = fields.StringField(required=True)
 
-        class Kid(models.Base):
+    class Kid(models.Base):
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            toys = fields.ListField(Toy)
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        toys = fields.ListField(Toy)
 
-        class Person(models.Base):
+    class Person(models.Base):
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            kids = fields.ListField(Kid)
-            car = fields.EmbeddedField(Car)
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        kids = fields.ListField(Kid)
+        car = fields.EmbeddedField(Car)
 
-        chuck = Person()
-        schema = chuck.to_json_schema()
+    chuck = Person()
+    schema = chuck.to_json_schema()
 
-        pattern = get_fixture('schema2.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    pattern = get_fixture('schema2.json')
+    assert compare_schemas(pattern, schema) is True
 
-    def test_model3(self):
 
-        class Viper(models.Base):
+def test_model3():
 
-            brand = fields.StringField()
-            capacity = fields.FloatField()
+    class Viper(models.Base):
 
-        class Lamborghini(models.Base):
+        brand = fields.StringField()
+        capacity = fields.FloatField()
 
-            brand = fields.StringField()
-            velocity = fields.FloatField()
+    class Lamborghini(models.Base):
 
-        class PC(models.Base):
+        brand = fields.StringField()
+        velocity = fields.FloatField()
 
-            name = fields.StringField()
-            ports = fields.StringField()
+    class PC(models.Base):
 
-        class Laptop(models.Base):
+        name = fields.StringField()
+        ports = fields.StringField()
 
-            name = fields.StringField()
-            battery_voltage = fields.FloatField()
+    class Laptop(models.Base):
 
-        class Tablet(models.Base):
+        name = fields.StringField()
+        battery_voltage = fields.FloatField()
 
-            name = fields.StringField()
-            os = fields.StringField()
+    class Tablet(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField()
+        os = fields.StringField()
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            car = fields.EmbeddedField([Viper, Lamborghini])
-            computer = fields.ListField([PC, Laptop, Tablet])
+    class Person(models.Base):
 
-        chuck = Person()
-        schema = chuck.to_json_schema()
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        car = fields.EmbeddedField([Viper, Lamborghini])
+        computer = fields.ListField([PC, Laptop, Tablet])
 
-        pattern = get_fixture('schema3.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    chuck = Person()
+    schema = chuck.to_json_schema()
 
-    def test_model_with_constructors(self):
+    pattern = get_fixture('schema3.json')
+    assert compare_schemas(pattern, schema) is True
 
-        class Car(models.Base):
 
-            def __init__(self, some_value):
-                pass
+def test_model_with_constructors():
 
-            brand = fields.StringField(required=True)
-            registration = fields.StringField(required=True)
+    class Car(models.Base):
 
-        class Toy(models.Base):
+        def __init__(self, some_value):
+            pass
 
-            def __init__(self, some_value):
-                pass
+        brand = fields.StringField(required=True)
+        registration = fields.StringField(required=True)
 
-            name = fields.StringField(required=True)
+    class Toy(models.Base):
 
-        class Kid(models.Base):
+        def __init__(self, some_value):
+            pass
 
-            def __init__(self, some_value):
-                pass
+        name = fields.StringField(required=True)
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            toys = fields.ListField(Toy)
+    class Kid(models.Base):
 
-        class Person(models.Base):
+        def __init__(self, some_value):
+            pass
 
-            def __init__(self, some_value):
-                pass
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        toys = fields.ListField(Toy)
 
-            name = fields.StringField(required=True)
-            surname = fields.StringField(required=True)
-            age = fields.IntField()
-            kids = fields.ListField(Kid)
-            car = fields.EmbeddedField(Car)
+    class Person(models.Base):
 
-        schema = Person.to_json_schema()
+        def __init__(self, some_value):
+            pass
 
-        pattern = get_fixture('schema2.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        age = fields.IntField()
+        kids = fields.ListField(Kid)
+        car = fields.EmbeddedField(Car)
 
-    def test_datetime_fields(self):
+    schema = Person.to_json_schema()
 
-        class Event(models.Base):
+    pattern = get_fixture('schema2.json')
+    assert compare_schemas(pattern, schema) is True
 
-            time = fields.TimeField()
-            date = fields.DateField()
-            end = fields.DateTimeField()
 
-        schema = Event.to_json_schema()
+def test_datetime_fields():
 
-        pattern = get_fixture('schema4.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    class Event(models.Base):
 
-    def test_bool_field(self):
+        time = fields.TimeField()
+        date = fields.DateField()
+        end = fields.DateTimeField()
 
-        class Person(models.Base):
+    schema = Event.to_json_schema()
 
-            has_childen = fields.BoolField()
+    pattern = get_fixture('schema4.json')
+    assert compare_schemas(pattern, schema) is True
 
-        schema = Person.to_json_schema()
 
-        pattern = get_fixture('schema5.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+def test_bool_field():
 
-    def test_validators_can_modify_schema(self):
+    class Person(models.Base):
 
-        class ClassBasedValidator(object):
+        has_childen = fields.BoolField()
 
-            def validate(self, value):
-                raise RuntimeError()
+    schema = Person.to_json_schema()
 
-            def modify_schema(self, field_schema):
-                field_schema['some'] = 'unproper value'
+    pattern = get_fixture('schema5.json')
+    assert compare_schemas(pattern, schema) is True
 
-        def function_validator(value):
+
+def test_validators_can_modify_schema():
+
+    class ClassBasedValidator(object):
+
+        def validate(self, value):
             raise RuntimeError()
 
-        class Person(models.Base):
+        def modify_schema(self, field_schema):
+            field_schema['some'] = 'unproper value'
 
-            name = fields.StringField(validators=ClassBasedValidator())
-            surname = fields.StringField(validators=function_validator)
+    def function_validator(value):
+        raise RuntimeError()
 
-        for person in [Person, Person()]:
-            schema = person.to_json_schema()
+    class Person(models.Base):
 
-            pattern = get_fixture('schema6.json')
-            self.assertTrue(compare_schemas(pattern, schema))
+        name = fields.StringField(validators=ClassBasedValidator())
+        surname = fields.StringField(validators=function_validator)
 
-    def test_min_validator(self):
+    for person in [Person, Person()]:
+        schema = person.to_json_schema()
 
-        class Person(models.Base):
+        pattern = get_fixture('schema6.json')
+        assert compare_schemas(pattern, schema) is True
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField(validators=validators.Min(18))
 
-        schema = Person.to_json_schema()
+def test_min_validator():
 
-        pattern = get_fixture('schema_min.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    class Person(models.Base):
 
-    def test_min_validator_with_exclusive(self):
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField(validators=validators.Min(18))
 
-        class Person(models.Base):
+    schema = Person.to_json_schema()
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField(validators=validators.Min(18, True))
+    pattern = get_fixture('schema_min.json')
+    assert compare_schemas(pattern, schema)
 
-        schema = Person.to_json_schema()
 
-        pattern = get_fixture('schema_min_exclusive.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+def test_min_validator_with_exclusive():
 
-    def test_max_validator(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField(validators=validators.Min(18, True))
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField(validators=validators.Max(18))
+    schema = Person.to_json_schema()
 
-        schema = Person.to_json_schema()
+    pattern = get_fixture('schema_min_exclusive.json')
+    assert compare_schemas(pattern, schema)
 
-        pattern = get_fixture('schema_max.json')
-        self.assertTrue(compare_schemas(pattern, schema))
 
-    def test_max_validator_with_exclusive(self):
+def test_max_validator():
 
-        class Person(models.Base):
+    class Person(models.Base):
 
-            name = fields.StringField()
-            surname = fields.StringField()
-            age = fields.IntField(validators=validators.Max(18, True))
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField(validators=validators.Max(18))
 
-        schema = Person.to_json_schema()
+    schema = Person.to_json_schema()
 
-        pattern = get_fixture('schema_max_exclusive.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    pattern = get_fixture('schema_max.json')
+    assert compare_schemas(pattern, schema)
 
-    def test_regex_validator(self):
 
-        class Person(models.Base):
+def test_max_validator_with_exclusive():
 
-            name = fields.StringField(
-                validators=validators.Regex('^some pattern$'))
+    class Person(models.Base):
 
-        schema = Person.to_json_schema()
+        name = fields.StringField()
+        surname = fields.StringField()
+        age = fields.IntField(validators=validators.Max(18, True))
 
-        pattern = get_fixture('schema_pattern.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    schema = Person.to_json_schema()
 
-    def test_regex_validator_when_ecma_regex_given(self):
+    pattern = get_fixture('schema_max_exclusive.json')
+    assert compare_schemas(pattern, schema)
 
-        class Person(models.Base):
 
-            name = fields.StringField(
-                validators=validators.Regex('/^some pattern$/'))
+def test_regex_validator():
 
-        schema = Person.to_json_schema()
+    class Person(models.Base):
 
-        pattern = get_fixture('schema_pattern.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+        name = fields.StringField(
+            validators=validators.Regex('^some pattern$'))
 
-    def test_regex_validator_with_flag(self):
+    schema = Person.to_json_schema()
 
-        class Person(models.Base):
+    pattern = get_fixture('schema_pattern.json')
+    assert compare_schemas(pattern, schema)
 
-            name = fields.StringField(
-                validators=validators.Regex(
-                    '^some pattern$', ignorecase=True))
 
-        schema = Person.to_json_schema()
+def test_regex_validator_when_ecma_regex_given():
 
-        pattern = get_fixture('schema_pattern_flag.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+    class Person(models.Base):
 
-    def test_length_validator_min(self):
+        name = fields.StringField(
+            validators=validators.Regex('/^some pattern$/'))
 
-        class Person(models.Base):
+    schema = Person.to_json_schema()
 
-            name = fields.StringField(validators=validators.Length(5))
-            surname = fields.StringField()
-            age = fields.IntField()
+    pattern = get_fixture('schema_pattern.json')
+    assert compare_schemas(pattern, schema)
 
-        schema = Person.to_json_schema()
 
-        pattern = get_fixture('schema_length_min.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+def test_regex_validator_with_flag():
 
-    def test_length_validator(self):
+    class Person(models.Base):
 
-        class Person(models.Base):
+        name = fields.StringField(
+            validators=validators.Regex(
+                '^some pattern$', ignorecase=True))
 
-            name = fields.StringField(validators=validators.Length(5, 20))
-            surname = fields.StringField()
-            age = fields.IntField()
+    schema = Person.to_json_schema()
 
-        schema = Person.to_json_schema()
+    pattern = get_fixture('schema_pattern_flag.json')
+    assert compare_schemas(pattern, schema)
 
-        pattern = get_fixture('schema_length.json')
-        self.assertTrue(compare_schemas(pattern, schema))
+
+def test_length_validator_min():
+
+    class Person(models.Base):
+
+        name = fields.StringField(validators=validators.Length(5))
+        surname = fields.StringField()
+        age = fields.IntField()
+
+    schema = Person.to_json_schema()
+
+    pattern = get_fixture('schema_length_min.json')
+    assert compare_schemas(pattern, schema)
+
+
+def test_length_validator():
+
+    class Person(models.Base):
+
+        name = fields.StringField(validators=validators.Length(5, 20))
+        surname = fields.StringField()
+        age = fields.IntField()
+
+    schema = Person.to_json_schema()
+
+    pattern = get_fixture('schema_length.json')
+    assert compare_schemas(pattern, schema)

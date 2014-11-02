@@ -101,7 +101,7 @@ def test_time_field_parse_value():
     assert datetime.time() == field.parse_value('00:00:00')
     assert (
         datetime.time(2, 34, 45, tzinfo=tzoffset(None, 7200)) ==
-        field.parse_value('2:34:45+02:00'),
+        field.parse_value('2:34:45+02:00')
     )
 
     with pytest.raises(TypeError):

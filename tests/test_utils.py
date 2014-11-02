@@ -161,7 +161,7 @@ def test_convert_python_regex_to_ecma():
 
     assert (
         '/ecma pattern$/m' ==
-        utils.convert_python_regex_to_ecma('/ecma pattern$/m'), [re.M]
+        utils.convert_python_regex_to_ecma('/ecma pattern$/m', [re.M])
     )
 
 

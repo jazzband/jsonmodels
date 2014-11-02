@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Setup."""
 
 import os
 import sys
@@ -17,11 +16,12 @@ if sys.argv[-1] == 'publish':
 
 
 class PyTest(TestCommand):
+
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.pytest_args = []
+        self.pytest_args = ['--cov', '.']
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
@@ -33,7 +33,7 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
-# Hacking unittest.
+# Hacking tests.
 try:
     import tests
     if 'test' in sys.argv and '--quick' in sys.argv:
@@ -79,9 +79,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
-    ],
-    tests_require=[
-        'pytest',
     ],
     cmdclass = {
         'test': PyTest,

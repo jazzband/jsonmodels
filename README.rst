@@ -11,6 +11,10 @@ JSON models
 .. image:: https://pypip.in/d/jsonmodels/badge.png
     :target: https://crate.io/packages/jsonmodels?version=latest
 
+.. image:: https://coveralls.io/repos/beregond/jsonmodels/badge.png
+    :target: https://coveralls.io/r/beregond/jsonmodels
+
+
 `jsonmodels` is library to make it easier for you to deal with structures that
 are converted to, or read from JSON.
 

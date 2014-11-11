@@ -88,7 +88,7 @@ or list of validators (so, as you may be expecting, you can't pass object that
 extends `List`).
 
 You can try to use validators shipped with this library. To get more details
-see :module:`jsonmodels.validators`. Shipped validators affect generated schema
+see :mod:`jsonmodels.validators`. Shipped validators affect generated schema
 out of the box, to use full potential JSON schema gives you.
 
 Custom validators

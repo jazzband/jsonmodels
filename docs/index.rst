@@ -9,8 +9,7 @@ Contents:
    readme
    installation
    usage
-   api
-   utils
+   modules
    contributing
    authors
    history

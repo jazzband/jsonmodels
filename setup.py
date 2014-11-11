@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 import os
 import sys
 
 from setuptools.command.test import test as TestCommand
-from jsonmodels import __version__ as version
+from jsonmodels import __version__, __author__, __email__
 
 from setuptools import setup
+
+PROJECT_NAME = 'jsonmodels'
 
 
 if sys.argv[-1] == 'publish':
@@ -21,7 +23,7 @@ class PyTest(TestCommand):
 
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.pytest_args = ['--cov', '.']
+        self.pytest_args = ['--cov', PROJECT_NAME]
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
@@ -50,18 +52,18 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='jsonmodels',
-    version=version,
+    name=PROJECT_NAME,
+    version=__version__,
     description='Models to make easier to deal with structures that'
     ' are converted to, or read from JSON.',
     long_description=readme + '\n\n' + history,
-    author='Szczepan Cieślik',
-    author_email='szczepan.cieslik@gmail.com',
+    author=__author__,
+    author_email=__email__,
     url='https://github.com/beregond/jsonmodels',
     packages=[
-        'jsonmodels',
+    PROJECT_NAME,
     ],
-    package_dir={'jsonmodels': 'jsonmodels'},
+    package_dir={PROJECT_NAME: PROJECT_NAME},
     include_package_data=True,
     install_requires=[
         'python-dateutil',
@@ -69,7 +71,7 @@ setup(
     ],
     license="BSD",
     zip_safe=False,
-    keywords='jsonmodels',
+    keywords=PROJECT_NAME,
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',

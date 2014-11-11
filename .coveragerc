@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = jsonmodels/*
+omit =
+    setup.py
+    tasks.py

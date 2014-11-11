@@ -7,7 +7,7 @@ except ImportError:
     pass
 
 from .errors import ValidationError
-from . import utils
+from . import utilities
 
 
 class Min(object):
@@ -105,8 +105,8 @@ class Regex(object):
             key: value for key, value in flags.items()
             if key in self.FLAGS}
 
-        if utils.is_ecma_regex(pattern):
-            result = utils.convert_ecma_regex_to_python(pattern)
+        if utilities.is_ecma_regex(pattern):
+            result = utilities.convert_ecma_regex_to_python(pattern)
             self.pattern = result.regex
 
             for key, _ in flags.items():
@@ -138,7 +138,7 @@ class Regex(object):
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
-        field_schema['pattern'] = utils.convert_python_regex_to_ecma(
+        field_schema['pattern'] = utilities.convert_python_regex_to_ecma(
             self.pattern, self.flags)
 
 

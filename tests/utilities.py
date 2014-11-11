@@ -1,5 +1,3 @@
-"""Utilities for tests."""
-
 import os
 import json
 

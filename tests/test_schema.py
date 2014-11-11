@@ -1,7 +1,7 @@
 from jsonmodels import models, fields, validators
-from jsonmodels.utils import compare_schemas
+from jsonmodels.utilities import compare_schemas
 
-from .utils import get_fixture
+from .utilities import get_fixture
 
 
 def test_model1():

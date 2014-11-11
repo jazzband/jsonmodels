@@ -44,10 +44,10 @@ jsonmodels.parsers module
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.utils module
------------------------
+jsonmodels.utilities module
+---------------------------
 
-.. automodule:: jsonmodels.utils
+.. automodule:: jsonmodels.utilities
     :members:
     :undoc-members:
     :show-inheritance:

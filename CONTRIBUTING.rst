@@ -3,7 +3,7 @@ Contributing
 ============
 
 Contributions are welcome, and they are greatly appreciated! Every
-little bit helps, and credit will always be given. 
+little bit helps, and credit will always be given.
 
 You can contribute in many ways:
 
@@ -36,14 +36,15 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-JSON models could always use more documentation, whether as part of the 
+JSON models could always use more documentation, whether as part of the
 official JSON models docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/beregond/jsonmodels/issues.
+The best way to send feedback is to file an issue at
+https://github.com/beregond/jsonmodels/issues.
 
 If you are proposing a feature:
 
@@ -76,7 +77,8 @@ Ready to contribute? Here's how to set up `jsonmodels` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass the tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass the tests,
+   including testing other Python versions with tox::
 
     $ python setup.py test
     $ tox
@@ -97,16 +99,18 @@ Pull Request Guidelines
 Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 2.6, 2.7, and 3.4, and for PyPy. Check
-   https://travis-ci.org/beregond/jsonmodels/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+
+2. If the pull request adds functionality, the docs should be updated. Put your
+   new functionality into a function and add the histry entry using
+   `pyhistory`.
+
+3. The pull request should work for Python 2.6, 2.7, and 3.4, and for PyPy.
+   Check https://travis-ci.org/beregond/jsonmodels/pull_requests and make sure
+   that the tests pass for all supported Python versions.
 
 Tips
 ----
 
 To run a subset of tests::
 
-	$ python -m unittest tests.test_jsonmodels
+    $ py.test -k test_jsonmodels

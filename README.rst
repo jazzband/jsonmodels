@@ -31,7 +31,7 @@ Features
 
   .. code-block:: python
 
-    from jsonmodels import models, fields, errors, validators
+    from jsonmodels import models, fields, error, validators
 
 
     class Cat(models.Base):
@@ -226,11 +226,11 @@ Features
   .. code-block:: python
 
     >>> from jsonmodels.utils import compare_schemas
-    >>> first = {'type': 'object'}
-    >>> second = {'type': 'list'}
-    >>> compare_schemas(first, first)
+    >>> schema1 = {'type': 'object'}
+    >>> schema2 = {'type': 'list'}
+    >>> compare_schemas(schema1, schema1)
     True
-    >>> compare_schemas(first, second)
+    >>> compare_schemas(schema1, schema2)
     False
 
 More

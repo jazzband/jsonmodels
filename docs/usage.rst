@@ -12,9 +12,10 @@ Creating models
 ---------------
 
 To create models you need to create class that inherits from
-:class:`jsonmodels.models.Base` and have class attributes which values inherits
-from :class:`jsonmodels.fields.BaseField` (so all other fields classes from
-:mod:`jsonmodels.fields`).
+:class:`jsonmodels.models.Base` (and *NOT* :class:`jsonmodels.models.PreBase`
+to which although refers links in documentation) and have class attributes
+which values inherits from :class:`jsonmodels.fields.BaseField` (so all other
+fields classes from :mod:`jsonmodels.fields`).
 
 .. code-block:: python
 
@@ -48,7 +49,7 @@ Usage
 -----
 
 After that you can use it as normal object. You can pass kwargs in constructor
-or :meth:`jsonmodels.models.Base.populate` method.
+or :meth:`jsonmodels.models.PreBase.populate` method.
 
 .. code-block:: python
 
@@ -67,8 +68,8 @@ Validation
 ----------
 
 You can specify which fields are *required*, if required value is absent during
-:meth:`jsonmodels.models.Base.validate` the
-:class:`jsonmodels.errors.ValidationError` will be raised.
+:meth:`jsonmodels.models.PreBase.validate` the
+:class:`jsonmodels.error.ValidationError` will be raised.
 
 .. code-block:: python
 
@@ -78,7 +79,6 @@ You can specify which fields are *required*, if required value is absent during
     >>> dafty = Person()
     >>> dafty.validate()
     *** ValidationError: Field "name" is required!
-
 
 Validators
 ~~~~~~~~~~
@@ -97,28 +97,28 @@ Custom validators
 You can always specify your own validators. Custom validator can be object with
 `validate` method (which takes precedence) or function (or callable object).
 
-Each validator **must** raise exception to indicate validation didn't pass.
-Returning values like `False` won't have any effect.
+Each validator **must** raise exception to indicate validation
+didn't pass. Returning values like `False` won't have any effect.
 
 .. code-block:: python
 
     >>> class RangeValidator(object):
     ...
     ...   def __init__(self, min, max):
-    ...       # Some logic here.
+    ...     # Some logic here.
     ...
     ...   def validate(self, value):
-    ...       # Some logic here.
+    ...     # Some logic here.
 
     >>> def some_validator(value):
-    ...     # Some logic here.
+    ...   # Some logic here.
 
     >>> class Person(models.Base):
     ...
     ...   name = fields.StringField(required=True, validators=some_validator)
     ...   surname = fields.StringField(required=True)
     ...   age = fields.IntField(
-    ...       Car, validators=[some_validator, RangeValidator(0, 100)])
+    ...     Car, validators=[some_validator, RangeValidator(0, 100)])
 
 If your validator have method `modify_schema` you can use it to affect
 generated schema in any way. Given argument is schema for single field. For
@@ -142,7 +142,7 @@ Casting to Python struct (and JSON)
 -----------------------------------
 
 Instance of model can be easy casted to Python struct (and thanks to that,
-later to JSON). See :meth:`jsonmodels.models.Base.to_struct`.
+later to JSON). See :meth:`jsonmodels.models.PreBase.to_struct`.
 
 .. code-block:: python
 

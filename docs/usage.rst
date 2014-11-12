@@ -78,7 +78,27 @@ You can specify which fields are *required*, if required value is absent during
 
     >>> dafty = Person()
     >>> dafty.validate()
-    *** ValidationError: Field "name" is required!
+    *** ValidationError: Field is required!
+
+Note that required fields are not raising error if no value was assigned
+during initialization, but first try of accessing will raise it.
+
+.. code-block:: python
+
+    >>> dafty = Person()
+    >>> dafty.name
+    *** ValidationError: Field is required!
+
+Also validation is made every time new value is assigned, so trying assign
+`int` to `StringField` will also raise an error:
+
+.. code-block:: python
+
+    >>> dafty.name = 3
+    *** ValidationError: ('Value is wrong, expected type "basestring"', 3)
+
+During castig model to JSON or JSONSchema explicite validation is always
+called.
 
 Validators
 ~~~~~~~~~~

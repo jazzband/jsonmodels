@@ -81,8 +81,7 @@ def test_value_validation():
 
     validator = validators.Value(['a','b','c'])
     assert 'a' in validator.allowed_values
-
-    validator.validate('d')
+    
     validator.validate('a')
 
     with pytest.raises(errors.ValidationError):

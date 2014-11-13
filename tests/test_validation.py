@@ -77,6 +77,16 @@ def test_min_validation():
     with pytest.raises(errors.ValidationError):
         validator.validate(-2)
 
+def test_value_validation():
+
+    validator = validators.Value(['a','b','c'])
+    assert 'a' in validator.allowed_values
+
+    validator.validate('d')
+    validator.validate('a')
+
+    with pytest.raises(errors.ValidationError):
+        validator.validate('d')
 
 def test_exclusive_validation():
 

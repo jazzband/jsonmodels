@@ -207,9 +207,9 @@ class Value(object):
 
         if value not in self.allowed_values:
             raise ValidationError(
-                ( "Value '%s' is not an allowed value. It should be equal " +
-                "to one of the following values: '%s'." ) 
-                %( value, ', '.join(self.allowed_values) ) )
+                ("Value '%s' is not an allowed value. It should be equal " +
+                 "to one of the following values: '%s'.") 
+                 % (value, ', '.join(self.allowed_values)))
 
     def modify_schema(self, field_schema):
         """Modify field schema."""

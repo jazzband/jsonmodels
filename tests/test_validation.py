@@ -80,7 +80,7 @@ def test_min_validation():
 
 def test_value_validation():
 
-    validator = validators.Value(['a','b','c'])
+    validator = validators.Value(['a', 'b', 'c'])
     assert 'a' in validator.allowed_values
 
     validator.validate('a')

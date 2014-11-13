@@ -188,14 +188,14 @@ class Length(object):
 
 
 class Value(object):
-    
+
     """Validator for allowed values."""
 
     def __init__(self, allowed_values=None):
         """Init.
         :param list allowed_values: List of all allowed values (required).
         """
-    
+
         if allowed_values is None:
             raise ValueError(
                 "'allowed_values' must be specified.")
@@ -207,9 +207,9 @@ class Value(object):
 
         if value not in self.allowed_values:
             raise ValidationError(
-                ("Value '%s' is not an allowed value. It should be equal " +
-                "to one of the following values: '%s'.") 
-                %( value, ', '.join(self.allowed_values) ))
+                ( "Value '%s' is not an allowed value. It should be equal " +
+                "to one of the following values: '%s'." ) 
+                %( value, ', '.join(self.allowed_values) ) )
 
     def modify_schema(self, field_schema):
         """Modify field schema."""

@@ -186,17 +186,16 @@ class Length(object):
         if self.maximum_value:
             field_schema['maxLength'] = self.maximum_value
 
-class Value(object):
 
+class Value(object):
+    
     """Validator for allowed values."""
 
     def __init__(self, allowed_values=None):
         """Init.
-        
         :param list allowed_values: List of all allowed values (required).
-
         """
-        
+    
         if allowed_values is None:
             raise ValueError(
                 "'allowed_values' must be specified.")
@@ -205,13 +204,12 @@ class Value(object):
 
     def validate(self, value):
         """Validate value."""
-        
-        
+
         if value not in self.allowed_values:
             raise ValidationError(
                 ("Value '%s' is not an allowed value. It should be equal " +
-                "to one of the following values: '%s'.") %( value, ', '.join(self.allowed_values) ))
-
+                "to one of the following values: '%s'.") 
+                %( value, ', '.join(self.allowed_values) ))
 
     def modify_schema(self, field_schema):
         """Modify field schema."""

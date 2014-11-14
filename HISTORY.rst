@@ -3,6 +3,23 @@
 History
 -------
 
+2.0 (2014-11-14)
+++++++++++++++++
+
+* Fields now are descriptors.
+* Empty required fields are still validated only during explicite validations.
+
+Backward compatibility breaks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Renamed _types to types in fields.
+* Renamed _items_types to items_types in ListField.
+* Removed data transformers.
+* Renamed module `error` to `errors`.
+* Removed explicit validation - validation occurs at assign time.
+* Renamed `get_value_replacement` to `get_default_value`.
+* Renamed modules `utils` to `utilities`.
+
 1.4 (2014-07-22)
 ++++++++++++++++
 

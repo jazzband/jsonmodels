@@ -1,5 +1,7 @@
 """Parsers to change model structure into different ones."""
 
+import six
+
 from . import fields
 
 
@@ -82,16 +84,25 @@ def _parse_list(field):
         items = None
     if types_len == 1:
         cls = types[0]
-        items = cls.to_json_schema()
+        items = _parse_item(cls)
     elif types_len > 1:
         items = {
-            'oneOf': [cls.to_json_schema() for cls in types]}
+            'oneOf': [_parse_item(item) for item in types]}
 
     result = {'type': 'list'}
     if items:
         result['items'] = items
 
     return result
+
+
+def _parse_item(item):
+    from .models import Base
+
+    if issubclass(item, Base):
+        return item.to_json_schema()
+    else:
+        return _specify_field_type_for_primitive(item)
 
 
 def _specify_field_type(field):
@@ -102,6 +113,17 @@ def _specify_field_type(field):
     elif isinstance(field, fields.FloatField):
         return {'type': 'float'}
     elif isinstance(field, fields.BoolField):
+        return {'type': 'boolean'}
+
+
+def _specify_field_type_for_primitive(value):
+    if issubclass(value, six.string_types):
+        return {'type': 'string'}
+    elif issubclass(value, int):
+        return {'type': 'integer'}
+    elif issubclass(value, float):
+        return {'type': 'float'}
+    elif issubclass(value, bool):
         return {'type': 'boolean'}
 
 

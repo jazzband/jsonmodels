@@ -311,3 +311,21 @@ def test_length_validator():
 
     pattern = get_fixture('schema_length.json')
     assert compare_schemas(pattern, schema)
+
+
+def test_schema_for_list_and_primitives():
+
+    class Event(models.Base):
+
+        time = fields.TimeField()
+        date = fields.DateField()
+        end = fields.DateTimeField()
+
+    class Person(models.Base):
+
+        names = fields.ListField([str, int, Event])
+
+    schema = Person.to_json_schema()
+
+    pattern = get_fixture('schema_with_list.json')
+    assert compare_schemas(pattern, schema)

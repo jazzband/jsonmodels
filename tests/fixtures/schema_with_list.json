@@ -1,0 +1,34 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "names": {
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "integer"
+                    },
+                    {
+                        "additionalProperties": false,
+                        "properties": {
+                            "date": {
+                                "type": "string"
+                            },
+                            "end": {
+                                "type": "string"
+                            },
+                            "time": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "type": "list"
+        }
+    },
+    "type": "object"
+}

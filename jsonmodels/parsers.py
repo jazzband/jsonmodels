@@ -1,5 +1,7 @@
 """Parsers to change model structure into different one."""
 
+import six
+
 from . import fields
 
 
@@ -52,26 +54,6 @@ def _parse_embedded(field):
         return {'oneOf': [cls.to_json_schema() for cls in types]}
 
 
-def _parse_list(field):
-    types = field.items_types
-    types_len = len(types)
-
-    if types_len == 0:
-        items = None
-    if types_len == 1:
-        cls = types[0]
-        items = cls.to_json_schema()
-    elif types_len > 1:
-        items = {
-            'oneOf': [cls.to_json_schema() for cls in types]}
-
-    result = {'type': 'list'}
-    if items:
-        result['items'] = items
-
-    return result
-
-
 def to_json_schema(cls):
     """Generate JSON schema for given class.
 
@@ -109,8 +91,48 @@ def to_json_schema(cls):
 
 
 def _apply_validators_modifications(field_schema, field):
-        for validator in field.validators:
-            try:
-                validator.modify_schema(field_schema)
-            except AttributeError:
-                pass
+    for validator in field.validators:
+        try:
+            validator.modify_schema(field_schema)
+        except AttributeError:
+            pass
+
+
+def _parse_list(field):
+    types = field.items_types
+    types_len = len(types)
+
+    if types_len == 0:
+        items = None
+    if types_len == 1:
+        cls = types[0]
+        items = _parse_item(cls)
+    elif types_len > 1:
+        items = {
+            'oneOf': [_parse_item(item) for item in types]}
+
+    result = {'type': 'list'}
+    if items:
+        result['items'] = items
+
+    return result
+
+
+def _parse_item(item):
+    from .models import Base
+
+    if issubclass(item, Base):
+        return item.to_json_schema()
+    else:
+        return _specify_field_type_for_primitive(item)
+
+
+def _specify_field_type_for_primitive(value):
+    if issubclass(value, six.string_types):
+        return {'type': 'string'}
+    elif issubclass(value, int):
+        return {'type': 'integer'}
+    elif issubclass(value, float):
+        return {'type': 'float'}
+    elif issubclass(value, bool):
+        return {'type': 'boolean'}

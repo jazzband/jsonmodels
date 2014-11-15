@@ -302,3 +302,20 @@ class TestJsonmodels(unittest.TestCase):
 
         pattern = get_fixture('schema_length.json')
         self.assertTrue(compare_schemas(pattern, schema))
+
+    def test_schema_for_list_and_primitives(self):
+
+        class Event(models.Base):
+
+            time = fields.TimeField()
+            date = fields.DateField()
+            end = fields.DateTimeField()
+
+        class Person(models.Base):
+
+            names = fields.ListField([str, int, Event])
+
+        schema = Person.to_json_schema()
+
+        pattern = get_fixture('schema_with_list.json')
+        self.assertTrue(compare_schemas(pattern, schema))

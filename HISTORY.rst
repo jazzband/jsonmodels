@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.1 (2014-11-15)
+++++++++++++++++++
+
+* Fixed schema generation for primitives.
+
 2.0 (2014-11-14)
 ++++++++++++++++
 

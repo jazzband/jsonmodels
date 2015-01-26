@@ -28,9 +28,10 @@ class BaseField(object):
             validators = [validators]
         self.validators = validators or []
 
-    def __set__(self, obj, value):
+    def __set__(self, obj, value, validate_on_set=True):
         value = self.parse_value(value)
-        self.validate(value)
+        if validate_on_set:
+            self.validate(value)
         self._memory[obj] = value
 
     def __get__(self, obj, owner=None):

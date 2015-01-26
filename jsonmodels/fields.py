@@ -12,6 +12,7 @@ class BaseField(object):
     """Base class for all fields."""
 
     types = None
+    autovalidate = True
 
     def __init__(
             self,
@@ -30,7 +31,7 @@ class BaseField(object):
 
     def __set__(self, obj, value, validate_on_set=True):
         value = self.parse_value(value)
-        if validate_on_set:
+        if validate_on_set and self.autovalidate:
             self.validate(value)
         self._memory[obj] = value
 

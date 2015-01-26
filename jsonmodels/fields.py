@@ -54,8 +54,17 @@ class BaseField(object):
         self._check_against_required(value)
         self._validate_with_custom_validators(value)
 
+    def _nullcleaner(self, x):
+        if x in ['', None, [''], '""']:
+            return None
+        else:
+            return x
+
+    def _nothing(self, x):
+        return self._nullcleaner(x) is None
+
     def _check_against_required(self, value):
-        if value is None and self.required:
+        if self._nothing(value) and self.required:
             raise ValidationError('Field is required!')
 
     def _validate_against_types(self, value):

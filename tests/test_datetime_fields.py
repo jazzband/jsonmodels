@@ -92,7 +92,6 @@ class TimeFieldTestCase(unittest.TestCase):
     def test_time_field_format_has_precedence(self):
 
         field = fields.TimeField(str_format='%H:%M')
-
         tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
         self.assertEqual('12:34', field.to_struct(tt))
 
@@ -106,7 +105,7 @@ class TimeFieldTestCase(unittest.TestCase):
             field.parse_value('2:34:45+02:00'),
         )
 
-        self.assertRaises(TypeError, field.parse_value, 'not a time')
+        self.assertRaises(ValueError, field.parse_value, 'not a time')
 
 
 class DateFieldTestCase(unittest.TestCase):
@@ -148,7 +147,6 @@ class DateFieldTestCase(unittest.TestCase):
         self.assertEqual('2244/05/07', field.to_struct(tt))
 
     def test_date_field_parse_value(self):
-
         field = fields.DateField()
 
         self.assertEqual(
@@ -160,7 +158,7 @@ class DateFieldTestCase(unittest.TestCase):
             field.parse_value('2014-04-21'),
         )
 
-        self.assertRaises(TypeError, field.parse_value, 'not a date')
+        self.assertRaises(ValueError, field.parse_value, 'not a date')
 
 
 class DateTimeFieldTestCase(unittest.TestCase):
@@ -229,4 +227,4 @@ class DateTimeFieldTestCase(unittest.TestCase):
             field.parse_value('2014-04-21T12:45:56+02:00'),
         )
 
-        self.assertRaises(TypeError, field.parse_value, 'not a datetime')
+        self.assertRaises(ValueError, field.parse_value, 'not a datetime')

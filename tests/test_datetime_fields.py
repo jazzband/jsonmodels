@@ -104,7 +104,7 @@ def test_time_field_parse_value():
         field.parse_value('2:34:45+02:00')
     )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         field.parse_value('not a time')
 
 
@@ -157,7 +157,7 @@ def test_date_field_parse_value():
         field.parse_value('2014-04-21')
     )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         field.parse_value('not a date')
 
 
@@ -227,5 +227,5 @@ def test_datetime_field_parse_value():
         field.parse_value('2014-04-21T12:45:56+02:00')
     )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         field.parse_value('not a datetime')

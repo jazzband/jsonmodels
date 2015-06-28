@@ -7,15 +7,21 @@ from .fields import BaseField
 class Base(object):
 
     """Base class for all models."""
+    validateInstantly = True
 
     def __init__(self, **kwargs):
         self.populate(**kwargs)
+
+    def _disable_autovalidation_of_fields(self):
+        for name, field in self:
+            if isinstance(field, BaseField):
+                field.autovalidate = False
 
     def populate(self, **kw):
         """Populate values to fields. Skip non-existing."""
         for name, field in self:
             if name in kw:
-                field.__set__(self, kw[name])
+                field.__set__(self, kw[name], self.validateInstantly)
 
     def get_field(self, field_name):
         """Get field associated with given attribute."""

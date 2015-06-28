@@ -12,6 +12,7 @@ class BaseField(object):
     """Base class for all fields."""
 
     types = None
+    autovalidate = True
 
     def __init__(
             self,
@@ -28,9 +29,10 @@ class BaseField(object):
             validators = [validators]
         self.validators = validators or []
 
-    def __set__(self, obj, value):
+    def __set__(self, obj, value, validate_on_set=True):
         value = self.parse_value(value)
-        self.validate(value)
+        if validate_on_set and self.autovalidate:
+            self.validate(value)
         self._memory[obj] = value
 
     def __get__(self, obj, owner=None):
@@ -54,8 +56,17 @@ class BaseField(object):
         self._check_against_required(value)
         self._validate_with_custom_validators(value)
 
+    def _nullcleaner(self, x):
+        if x in ['', None, [''], '""']:
+            return None
+        else:
+            return x
+
+    def _nothing(self, x):
+        return self._nullcleaner(x) is None
+
     def _check_against_required(self, value):
-        if value is None and self.required:
+        if self._nothing(value) and self.required:
             raise ValidationError('Field is required!')
 
     def _validate_against_types(self, value):

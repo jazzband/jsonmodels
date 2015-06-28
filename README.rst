@@ -8,7 +8,7 @@ JSON models
 .. image:: https://travis-ci.org/beregond/jsonmodels.png?branch=master
     :target: https://travis-ci.org/beregond/jsonmodels
 
-.. image:: https://pypip.in/d/jsonmodels/badge.png
+.. image:: https://img.shields.io/pypi/dm/jsonmodels.svg
     :target: https://crate.io/packages/jsonmodels?version=latest
 
 Models to make easier to deal with structures that are converted to, or read

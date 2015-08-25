@@ -9,7 +9,7 @@ JSON models
     :target: https://travis-ci.org/beregond/jsonmodels
 
 .. image:: https://img.shields.io/pypi/dm/jsonmodels.svg
-    :target: https://crate.io/packages/jsonmodels?version=latest
+    :target: https://pypi.python.org/pypi/jsonmodels
 
 .. image:: https://coveralls.io/repos/beregond/jsonmodels/badge.png
     :target: https://coveralls.io/r/beregond/jsonmodels

@@ -244,11 +244,23 @@ class EmbeddedField(BaseField):
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
     def _assign_model_types(self, model_types):
-        try:
-            iter(model_types)
-            self.types = tuple(model_types)
-        except TypeError:
-            self.types = (model_types,)
+        if not isinstance(model_types, tuple):
+            model_types = (model_types,)
+
+        self.types = tuple(_LazyType(type) for type in model_types)
+
+    def _evaluate_model_types(self, obj):
+        types = []
+        for type in self.types:
+            if isinstance(type, _LazyType):
+                types.append(type.evaluate(obj))
+            else:
+                types.append(type)
+        self.types = tuple(types)
+
+    def __set__(self, obj, value):
+        self._evaluate_model_types(obj)
+        return super(EmbeddedField, self).__set__(obj, value)
 
     def validate(self, value):
         super(EmbeddedField, self).validate(value)
@@ -273,6 +285,19 @@ class EmbeddedField(BaseField):
                 )
             )
         return self.types[0]
+
+
+class _LazyType(object):
+
+    def __init__(self, type):
+        self.type = type
+
+    def evaluate(self, obj):
+        if type(self.type) is type:
+            return self.type
+        else:
+            module = __import__(obj.__module__, fromlist=[self.type])
+            return getattr(module, self.type)
 
 
 class TimeField(StringField):

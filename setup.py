@@ -38,6 +38,9 @@ class PyTest(TestCommand):
 # Hacking tests.
 try:
     import tests
+except ImportError:
+    pass
+else:
     if 'test' in sys.argv and '--quick' in sys.argv:
         tests.QUICK_TESTS = True
         del sys.argv[sys.argv.index('--quick')]
@@ -45,8 +48,6 @@ try:
     if 'test' in sys.argv and '--spelling' in sys.argv:
         tests.CHECK_SPELLING = True
         del sys.argv[sys.argv.index('--spelling')]
-except ImportError:
-    pass
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')

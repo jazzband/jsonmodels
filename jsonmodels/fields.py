@@ -28,17 +28,24 @@ class BaseField(object):
             validators = [validators]
         self.validators = validators or []
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
+        self._finish_initialization(type(instance))
         value = self.parse_value(value)
         self.validate(value)
-        self._memory[obj] = value
+        self._memory[instance] = value
 
-    def __get__(self, obj, owner=None):
-        if obj is None:
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            self._finish_initialization(owner)
             return self
 
-        self._check_value(obj)
-        return self._memory[obj]
+        self._finish_initialization(type(instance))
+
+        self._check_value(instance)
+        return self._memory[instance]
+
+    def _finish_initialization(self, owner):
+        pass
 
     def _check_value(self, obj):
         if obj not in self._memory:
@@ -244,23 +251,27 @@ class EmbeddedField(BaseField):
         super(EmbeddedField, self).__init__(*args, **kwargs)
 
     def _assign_model_types(self, model_types):
-        if not isinstance(model_types, tuple):
+        if not isinstance(model_types, (list, tuple)):
             model_types = (model_types,)
 
-        self.types = tuple(_LazyType(type) for type in model_types)
+        types = []
+        for type_ in model_types:
+            if type(type_) is type:
+                types.append(type_)
+            else:
+                types.append(_LazyType(type_))
+        self.types = tuple(types)
 
-    def _evaluate_model_types(self, obj):
+    def _finish_initialization(self, owner):
+        super(EmbeddedField, self)._finish_initialization(owner)
+
         types = []
         for type in self.types:
             if isinstance(type, _LazyType):
-                types.append(type.evaluate(obj))
+                types.append(type.evaluate(owner))
             else:
                 types.append(type)
         self.types = tuple(types)
-
-    def __set__(self, obj, value):
-        self._evaluate_model_types(obj)
-        return super(EmbeddedField, self).__set__(obj, value)
 
     def validate(self, value):
         super(EmbeddedField, self).validate(value)
@@ -292,11 +303,11 @@ class _LazyType(object):
     def __init__(self, type):
         self.type = type
 
-    def evaluate(self, obj):
+    def evaluate(self, cls):
         if type(self.type) is type:
             return self.type
         else:
-            module = __import__(obj.__module__, fromlist=[self.type])
+            module = __import__(cls.__module__, fromlist=[self.type])
             return getattr(module, self.type)
 
 

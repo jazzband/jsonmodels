@@ -306,6 +306,12 @@ class _LazyType(object):
     def evaluate(self, cls):
         if type(self.type) is type:
             return self.type
+        elif '.' in self.type:
+            chunks = self.type.split('.')
+            type_name = chunks.pop()
+            module = '.'.join(chunks)
+            module = __import__(module, fromlist=[type_name])
+            return getattr(module, type_name)
         else:
             module = __import__(cls.__module__, fromlist=[self.type])
             return getattr(module, self.type)

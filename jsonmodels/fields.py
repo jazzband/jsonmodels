@@ -307,9 +307,24 @@ class _LazyType(object):
         if type(self.type) is type:
             return self.type
         elif '.' in self.type:
-            chunks = self.type.split('.')
+            type_path = self.type
+            if type_path.startswith('.'):
+                tmp_type = type_path.lstrip('.')
+                parents_amount = len(type_path) - len(tmp_type)
+                type_path = tmp_type
+                current_chunks = cls.__module__.split('.')
+                if parents_amount > 0:
+                    parents_amount -= 1
+                parents_amount *= -1
+                base = current_chunks[:parents_amount]
+            else:
+                base = []
+            type_chunks = type_path.split('.') or [type_path]
+            chunks = base + type_chunks
             type_name = chunks.pop()
             module = '.'.join(chunks)
+            if not module:
+                module = cls.__module__
             module = __import__(module, fromlist=[type_name])
             return getattr(module, type_name)
         else:

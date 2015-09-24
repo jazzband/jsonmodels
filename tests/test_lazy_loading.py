@@ -33,6 +33,18 @@ class Sixth(models.Base):
     secondary = fields.EmbeddedField('...tests.test_lazy_loading.Secondary')
 
 
+class Seventh(models.Base):
+
+    name = fields.StringField()
+    secondary = fields.EmbeddedField('....tests.test_lazy_loading.Secondary')
+
+
+class Eighth(models.Base):
+
+    name = fields.StringField()
+    secondary = fields.EmbeddedField('.SomeWrongEntity')
+
+
 class Secondary(models.Base):
 
     data = fields.IntField()
@@ -61,3 +73,13 @@ def test_embedded_model(model):
         entity.secondary = 'something different'
 
     entity.secondary = None
+
+
+def test_relative_too_much():
+    with pytest.raises(ValueError):
+        Seventh()
+
+
+def test_wrong_entity():
+    with pytest.raises(ValueError):
+        Eighth()

@@ -315,6 +315,10 @@ class _LazyType(object):
                 current_chunks = cls.__module__.split('.')
                 if parents_amount > 0:
                     parents_amount -= 1
+                    if parents_amount > len(current_chunks):
+                        raise ValueError(
+                            "Can't evaluate path '{}'".format(
+                                self.type))
                 parents_amount *= -1
                 base = current_chunks[:parents_amount]
             else:
@@ -325,11 +329,17 @@ class _LazyType(object):
             module = '.'.join(chunks)
             if not module:
                 module = cls.__module__
-            module = __import__(module, fromlist=[type_name])
-            return getattr(module, type_name)
+            return _import(module, type_name)
         else:
-            module = __import__(cls.__module__, fromlist=[self.type])
-            return getattr(module, self.type)
+            return _import(cls.__module__, self.type)
+
+def _import(module_name, type_name):
+    module = __import__(module_name, fromlist=[type_name])
+    try:
+        return getattr(module, type_name)
+    except AttributeError:
+        raise ValueError(
+            "Can't find type '{}.{}'.".format(module_name, type_name))
 
 
 class TimeField(StringField):

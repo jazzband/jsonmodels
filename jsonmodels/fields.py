@@ -303,35 +303,40 @@ class _LazyType(object):
     def __init__(self, type):
         self.type = type
 
-    def evaluate(self, cls):
+    def evaluate(self, base_cls):
         if type(self.type) is type:
             return self.type
-        elif '.' in self.type:
-            type_path = self.type
-            if type_path.startswith('.'):
-                tmp_type = type_path.lstrip('.')
-                parents_amount = len(type_path) - len(tmp_type)
-                type_path = tmp_type
-                current_chunks = cls.__module__.split('.')
-                if parents_amount > 0:
-                    parents_amount -= 1
-                    if parents_amount > len(current_chunks):
-                        raise ValueError(
-                            "Can't evaluate path '{}'".format(
-                                self.type))
-                parents_amount *= -1
-                base = current_chunks[:parents_amount]
-            else:
-                base = []
-            type_chunks = type_path.split('.') or [type_path]
-            chunks = base + type_chunks
-            type_name = chunks.pop()
-            module = '.'.join(chunks)
-            if not module:
-                module = cls.__module__
-            return _import(module, type_name)
         else:
-            return _import(cls.__module__, self.type)
+            module, type_name = _evaluate_path(self.type, base_cls)
+            return _import(module, type_name)
+
+
+def _evaluate_path(relative_path, base_cls):
+    base_module = base_cls.__module__
+
+    modules = _get_modules(relative_path, base_module)
+
+    type_name = modules.pop()
+    module = '.'.join(modules)
+    if not module:
+        module = base_module
+    return module, type_name
+
+
+def _get_modules(relative_path, base_module):
+    canonical_path = relative_path.lstrip('.')
+    canonical_modules = canonical_path.split('.')
+
+    if not relative_path.startswith('.'):
+        return canonical_modules
+
+    parents_amount = len(relative_path) - len(canonical_path)
+    parent_modules = base_module.split('.')
+    parents_amount = max(0, parents_amount - 1)
+    if parents_amount > len(parent_modules):
+        raise ValueError("Can't evaluate path '{}'".format(relative_path))
+    return parent_modules[:parents_amount * -1] + canonical_modules
+
 
 def _import(module_name, type_name):
     module = __import__(module_name, fromlist=[type_name])

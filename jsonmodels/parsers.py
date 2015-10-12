@@ -1,4 +1,5 @@
 """Parsers to change model structure into different ones."""
+import inspect
 
 import six
 
@@ -32,13 +33,16 @@ def to_struct(model):
     return resp
 
 
-def to_json_schema(cls):
+def to_json_schema(cls, counter=None):
     """Generate JSON schema for given class.
 
     :param cls: Class to be casted.
+    :param counter: Builder like object to keep state between recursive calls.
     :rtype: ``dict``
 
     """
+    cls = cls if inspect.isclass(cls) else cls.__class__
+
     resp = {
         'type': 'object',
         'additionalProperties': False,
@@ -48,7 +52,6 @@ def to_json_schema(cls):
     required = []
 
     for name, field in cls.iterate_over_fields():
-
         if field.required:
             required.append(name)
 
@@ -100,7 +103,7 @@ def _parse_item(item):
     from .models import Base
 
     if issubclass(item, Base):
-        return item.to_json_schema()
+        return to_json_schema(item)
     else:
         return _specify_field_type_for_primitive(item)
 
@@ -131,6 +134,6 @@ def _parse_embedded(field):
     types = field.types
     if len(types) == 1:
         cls = types[0]
-        return cls.to_json_schema()
+        return to_json_schema(cls)
     else:
-        return {'oneOf': [cls.to_json_schema() for cls in types]}
+        return {'oneOf': [to_json_schema(cls) for cls in types]}

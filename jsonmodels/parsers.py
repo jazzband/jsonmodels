@@ -45,9 +45,17 @@ def to_json_schema(cls, counter=None):
     return builder.build()
 
 
-def build_json_schema(cls):
-    cls = cls if inspect.isclass(cls) else cls.__class__
+def build_json_schema(value):
+    from .models import Base
 
+    cls = value if inspect.isclass(value) else value.__class__
+    if issubclass(cls, Base):
+        return build_json_schema_object(cls)
+    else:
+        return build_json_schema_primitive(cls)
+
+
+def build_json_schema_object(cls):
     builder = ObjectBuilder()
     for name, field in cls.iterate_over_fields():
         if isinstance(field, fields.EmbeddedField):
@@ -56,11 +64,19 @@ def build_json_schema(cls):
             builder.add_field(name, field, _parse_list(field))
         else:
             builder.add_field(name, field, _specify_field_type(field))
+    return builder
 
+
+def build_json_schema_primitive(cls):
+    builder = PrimitiveBuilder()
+    builder.set_type(cls)
     return builder
 
 
 class Builder(object):
+
+    def __init__(self):
+        self.parent = None
 
     @classmethod
     def maybe_build(cls, value):
@@ -70,6 +86,7 @@ class Builder(object):
 class ObjectBuilder(Builder):
 
     def __init__(self):
+        super(ObjectBuilder, self).__init__()
         self.properties = {}
         self.required = []
 
@@ -95,6 +112,28 @@ class ObjectBuilder(Builder):
         return schema
 
 
+class PrimitiveBuilder(Builder):
+
+    def __init__(self):
+        super(PrimitiveBuilder, self).__init__()
+        self.type = None
+
+    def set_type(self, type):
+        self.type = type
+
+    def build(self):
+        if issubclass(self.type, six.string_types):
+            return {'type': 'string'}
+        elif issubclass(self.type, int):
+            return {'type': 'integer'}
+        elif issubclass(self.type, float):
+            return {'type': 'float'}
+        elif issubclass(self.type, bool):
+            return {'type': 'boolean'}
+
+        raise ValueError("Can't specify value schema!", self.type)
+
+
 def _apply_validators_modifications(field_schema, field):
     for validator in field.validators:
         try:
@@ -106,13 +145,14 @@ def _apply_validators_modifications(field_schema, field):
 def _parse_list(field):
     builder = ListBuilder()
     for type in field.items_types:
-        builder.add_type_schema(_parse_item(type))
+        builder.add_type_schema(build_json_schema(type))
     return builder
 
 
 class ListBuilder(Builder):
 
     def __init__(self):
+        super(ListBuilder, self).__init__()
         self.schemas = []
 
     def add_type_schema(self, schema):
@@ -132,15 +172,6 @@ class ListBuilder(Builder):
         return result
 
 
-def _parse_item(item):
-    from .models import Base
-
-    if issubclass(item, Base):
-        return build_json_schema(item)
-    else:
-        return _specify_field_type_for_primitive(item)
-
-
 def _specify_field_type(field):
     if isinstance(field, fields.StringField):
         return {'type': 'string'}
@@ -149,17 +180,6 @@ def _specify_field_type(field):
     elif isinstance(field, fields.FloatField):
         return {'type': 'float'}
     elif isinstance(field, fields.BoolField):
-        return {'type': 'boolean'}
-
-
-def _specify_field_type_for_primitive(value):
-    if issubclass(value, six.string_types):
-        return {'type': 'string'}
-    elif issubclass(value, int):
-        return {'type': 'integer'}
-    elif issubclass(value, float):
-        return {'type': 'float'}
-    elif issubclass(value, bool):
         return {'type': 'boolean'}
 
 
@@ -173,6 +193,7 @@ def _parse_embedded(field):
 class EmbeddedBuilder(Builder):
 
     def __init__(self):
+        super(EmbeddedBuilder, self).__init__()
         self.schemas = []
 
     def add_type_schema(self, schema):

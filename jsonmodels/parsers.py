@@ -41,34 +41,58 @@ def to_json_schema(cls, counter=None):
     :rtype: ``dict``
 
     """
+    builder = build_json_schema(cls)
+    return builder.build()
+
+
+def build_json_schema(cls):
     cls = cls if inspect.isclass(cls) else cls.__class__
 
-    resp = {
-        'type': 'object',
-        'additionalProperties': False,
-    }
-
-    prop = {}
-    required = []
-
+    builder = ObjectBuilder()
     for name, field in cls.iterate_over_fields():
-        if field.required:
-            required.append(name)
-
         if isinstance(field, fields.EmbeddedField):
-            prop[name] = _parse_embedded(field)
+            builder.add_field(name, field, _parse_embedded(field))
         elif isinstance(field, fields.ListField):
-            prop[name] = _parse_list(field)
+            builder.add_field(name, field, _parse_list(field))
         else:
-            prop[name] = _specify_field_type(field)
+            builder.add_field(name, field, _specify_field_type(field))
 
-        _apply_validators_modifications(prop[name], field)
+    return builder
 
-    resp['properties'] = prop
-    if required:
-        resp['required'] = required
 
-    return resp
+class Builder(object):
+
+    @classmethod
+    def maybe_build(cls, value):
+        return value.build() if isinstance(value, Builder) else value
+
+
+class ObjectBuilder(Builder):
+
+    def __init__(self):
+        self.properties = {}
+        self.required = []
+
+    def add_field(self, name, field, schema):
+        _apply_validators_modifications(schema, field)
+        self.properties[name] = schema
+        if field.required:
+            self.required.append(name)
+
+    def build(self):
+        properties = {
+            name: self.maybe_build(value)
+            for name, value
+            in self.properties.items()
+        }
+        schema = {
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': properties,
+        }
+        if self.required:
+            schema['required'] = self.required
+        return schema
 
 
 def _apply_validators_modifications(field_schema, field):
@@ -80,30 +104,39 @@ def _apply_validators_modifications(field_schema, field):
 
 
 def _parse_list(field):
-    types = field.items_types
-    types_len = len(types)
+    builder = ListBuilder()
+    for type in field.items_types:
+        builder.add_type_schema(_parse_item(type))
+    return builder
 
-    if types_len == 0:
-        items = None
-    if types_len == 1:
-        cls = types[0]
-        items = _parse_item(cls)
-    elif types_len > 1:
-        items = {
-            'oneOf': [_parse_item(item) for item in types]}
 
-    result = {'type': 'list'}
-    if items:
-        result['items'] = items
+class ListBuilder(Builder):
 
-    return result
+    def __init__(self):
+        self.schemas = []
+
+    def add_type_schema(self, schema):
+        self.schemas.append(schema)
+
+    def build(self):
+        result = {'type': 'list'}
+
+        schemas = [self.maybe_build(schema) for schema in self.schemas]
+        if len(schemas) == 1:
+            items = schemas[0]
+        elif len(schemas) > 1:
+            items = {'oneOf': schemas}
+
+        if items:
+            result['items'] = items
+        return result
 
 
 def _parse_item(item):
     from .models import Base
 
     if issubclass(item, Base):
-        return to_json_schema(item)
+        return build_json_schema(item)
     else:
         return _specify_field_type_for_primitive(item)
 
@@ -131,9 +164,23 @@ def _specify_field_type_for_primitive(value):
 
 
 def _parse_embedded(field):
-    types = field.types
-    if len(types) == 1:
-        cls = types[0]
-        return to_json_schema(cls)
-    else:
-        return {'oneOf': [to_json_schema(cls) for cls in types]}
+    builder = EmbeddedBuilder()
+    for type in field.types:
+        builder.add_type_schema(build_json_schema(type))
+    return builder
+
+
+class EmbeddedBuilder(Builder):
+
+    def __init__(self):
+        self.schemas = []
+
+    def add_type_schema(self, schema):
+        self.schemas.append(schema)
+
+    def build(self):
+        schemas = [self.maybe_build(schema) for schema in self.schemas]
+        if len(schemas) == 1:
+            return schemas[0]
+        else:
+            return {'oneOf': schemas}

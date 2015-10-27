@@ -1,5 +1,8 @@
 """Parsers to change model structure into different ones."""
+from __future__ import absolute_import
+
 import inspect
+from collections import defaultdict
 
 import six
 
@@ -33,11 +36,10 @@ def to_struct(model):
     return resp
 
 
-def to_json_schema(cls, counter=None):
+def to_json_schema(cls):
     """Generate JSON schema for given class.
 
     :param cls: Class to be casted.
-    :param counter: Builder like object to keep state between recursive calls.
     :rtype: ``dict``
 
     """
@@ -45,50 +47,89 @@ def to_json_schema(cls, counter=None):
     return builder.build()
 
 
-def build_json_schema(value):
+def build_json_schema(value, parent_builder=None):
     from .models import Base
 
     cls = value if inspect.isclass(value) else value.__class__
     if issubclass(cls, Base):
-        return build_json_schema_object(cls)
+        return build_json_schema_object(cls, parent_builder)
     else:
-        return build_json_schema_primitive(cls)
+        return build_json_schema_primitive(cls, parent_builder)
 
 
-def build_json_schema_object(cls):
-    builder = ObjectBuilder()
+def build_json_schema_object(cls, parent_builder=None):
+    builder = ObjectBuilder(cls, parent_builder)
+    if builder.is_definition:
+        return builder
     for name, field in cls.iterate_over_fields():
         if isinstance(field, fields.EmbeddedField):
-            builder.add_field(name, field, _parse_embedded(field))
+            builder.add_field(name, field, _parse_embedded(field, builder))
         elif isinstance(field, fields.ListField):
-            builder.add_field(name, field, _parse_list(field))
+            builder.add_field(name, field, _parse_list(field, builder))
         else:
             builder.add_field(name, field, _specify_field_type(field))
     return builder
 
 
-def build_json_schema_primitive(cls):
-    builder = PrimitiveBuilder()
+def _parse_list(field, parent_builder):
+    builder = ListBuilder(parent_builder)
+    for type in field.items_types:
+        builder.add_type_schema(build_json_schema(type, builder))
+    return builder
+
+
+def _parse_embedded(field, parent_builder):
+    builder = EmbeddedBuilder(parent_builder)
+    for type in field.types:
+        builder.add_type_schema(build_json_schema(type, builder))
+    return builder
+
+
+def build_json_schema_primitive(cls, parent_builder):
+    builder = PrimitiveBuilder(parent_builder)
     builder.set_type(cls)
     return builder
 
 
 class Builder(object):
 
-    def __init__(self):
-        self.parent = None
+    def __init__(self, parent=None):
+        self.parent = parent
+        self.types_registry = defaultdict(int)
+        self.definitions = []
 
-    @classmethod
-    def maybe_build(cls, value):
+    def register_type(self, type):
+        if self.parent:
+            return self.parent.register_type(type)
+
+        self.types_registry[type] += 1
+
+    def type_count(self, type):
+        if self.parent:
+            return self.parent.type_count(type)
+
+        return self.types_registry[type]
+
+    @staticmethod
+    def maybe_build(value):
         return value.build() if isinstance(value, Builder) else value
+
+    def add_definition(self, builder):
+        if self.parent:
+            return self.parent.add_definition(builder)
+
+        self.definitions.append(builder)
 
 
 class ObjectBuilder(Builder):
 
-    def __init__(self):
-        super(ObjectBuilder, self).__init__()
+    def __init__(self, model_type, *args, **kwargs):
+        super(ObjectBuilder, self).__init__(*args, **kwargs)
         self.properties = {}
         self.required = []
+        self.type = model_type
+
+        self.register_type(self.type)
 
     def add_field(self, name, field, schema):
         _apply_validators_modifications(schema, field)
@@ -97,6 +138,18 @@ class ObjectBuilder(Builder):
             self.required.append(name)
 
     def build(self):
+        if self.is_definition and not self.is_root:
+            self.add_definition(self)
+            return '#/definitions/{}'.format(self.type_name)
+        else:
+            return self.build_definition()
+
+    @property
+    def type_name(self):
+        module_name = '{}.{}'.format(self.type.__module__, self.type.__name__)
+        return module_name.replace('.', '_').lower()
+
+    def build_definition(self):
         properties = {
             name: self.maybe_build(value)
             for name, value
@@ -109,13 +162,29 @@ class ObjectBuilder(Builder):
         }
         if self.required:
             schema['required'] = self.required
+        if self.definitions:
+            schema['definitions'] = {
+                builder.type_name: builder.build_definition()
+                for builder in self.definitions
+            }
         return schema
+
+    @property
+    def is_definition(self):
+        conditions = [self.type_count(self.type) > 1]
+        if self.parent:
+            conditions.append(self.parent.is_definition)
+        return any(conditions)
+
+    @property
+    def is_root(self):
+        return not bool(self.parent)
 
 
 class PrimitiveBuilder(Builder):
 
-    def __init__(self):
-        super(PrimitiveBuilder, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(PrimitiveBuilder, self).__init__(*args, **kwargs)
         self.type = None
 
     def set_type(self, type):
@@ -142,17 +211,10 @@ def _apply_validators_modifications(field_schema, field):
             pass
 
 
-def _parse_list(field):
-    builder = ListBuilder()
-    for type in field.items_types:
-        builder.add_type_schema(build_json_schema(type))
-    return builder
-
-
 class ListBuilder(Builder):
 
-    def __init__(self):
-        super(ListBuilder, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(ListBuilder, self).__init__(*args, **kwargs)
         self.schemas = []
 
     def add_type_schema(self, schema):
@@ -171,6 +233,10 @@ class ListBuilder(Builder):
             result['items'] = items
         return result
 
+    @property
+    def is_definition(self):
+        return self.parent.is_definition
+
 
 def _specify_field_type(field):
     if isinstance(field, fields.StringField):
@@ -183,17 +249,10 @@ def _specify_field_type(field):
         return {'type': 'boolean'}
 
 
-def _parse_embedded(field):
-    builder = EmbeddedBuilder()
-    for type in field.types:
-        builder.add_type_schema(build_json_schema(type))
-    return builder
-
-
 class EmbeddedBuilder(Builder):
 
-    def __init__(self):
-        super(EmbeddedBuilder, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(EmbeddedBuilder, self).__init__(*args, **kwargs)
         self.schemas = []
 
     def add_type_schema(self, schema):
@@ -205,3 +264,7 @@ class EmbeddedBuilder(Builder):
             return schemas[0]
         else:
             return {'oneOf': schemas}
+
+    @property
+    def is_definition(self):
+        return self.parent.is_definition

@@ -1,5 +1,3 @@
-import pytest
-
 from jsonmodels import models, fields
 
 
@@ -15,6 +13,5 @@ class Secondary(models.Base):
     first = fields.EmbeddedField('Primary')
 
 
-@pytest.mark.xfail
 def test_generate_circular_schema():
     Primary.to_json_schema()

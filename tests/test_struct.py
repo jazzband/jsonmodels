@@ -155,3 +155,33 @@ def test_to_struct_with_multi_non_models_types():
     person.mix.append('different')
     pattern['mix'].append('different')
     assert pattern == person.to_struct()
+
+
+def test_list_to_struct():
+
+    class Cat(models.Base):
+        name = fields.StringField(required=True)
+        breed = fields.StringField()
+
+    class Dog(models.Base):
+        name = fields.StringField(required=True)
+        age = fields.IntField()
+
+    class Person(models.Base):
+        name = fields.StringField(required=True)
+        surname = fields.StringField(required=True)
+        pets = fields.ListField(items_types=[Cat, Dog])
+
+    cat = Cat(name='Garfield')
+    dog = Dog(name='Dogmeat', age=9)
+
+    person = Person(name='Johny', surname='Bravo', pets=[cat, dog])
+    pattern = {
+        'surname': 'Bravo',
+        'name': 'Johny',
+        'pets': [
+            {'name': 'Garfield'},
+            {'age': 9, 'name': 'Dogmeat'}
+        ]
+    }
+    assert pattern == person.to_struct()

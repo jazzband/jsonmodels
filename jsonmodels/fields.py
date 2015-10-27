@@ -210,36 +210,19 @@ class ListField(BaseField):
         if not isinstance(values, list):
             return values
 
-        embed_type = self.items_types[0]
+        return [self._cast_value(value) for value in values]
 
-        if not hasattr(getattr(embed_type, 'populate', None), '__call__'):
-            return values
-
-        self._check_items_types_count()
-        self._parse_values_to_result(values, embed_type, result)
-
-        return result
-
-    def _check_items_types_count(self):
-        if len(self.items_types) != 1:
-            raise ValidationError(
-                'Cannot decide which type to choose from "{}".'.format(
-                    ', '.join([t.__name__ for t in self.items_types])
-                )
-            )
-
-    def _parse_values_to_result(self, values, embed_type, result):
-        try:
-            for value in values:
-                self._append_value_to_result(value, result, embed_type)
-        except TypeError:
-            raise ValidationError('Given value for field is not iterable.')
-
-    def _append_value_to_result(self, value, result, embed_type):
+    def _cast_value(self, value):
         if isinstance(value, self.items_types):
-            result.append(value)
+            return value
         else:
-            result.append(embed_type(**value))
+            if len(self.items_types) != 1:
+                raise ValidationError(
+                    'Cannot decide which type to choose from "{}".'.format(
+                        ', '.join([t.__name__ for t in self.items_types])
+                    )
+                )
+            return self.items_types[0](**value)
 
 
 class EmbeddedField(BaseField):

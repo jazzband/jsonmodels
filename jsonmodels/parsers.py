@@ -150,6 +150,7 @@ class ObjectBuilder(Builder):
         if self.is_definition and not self.is_root:
             builder = self.get_builder(self.type)
             self.add_definition(builder)
+            [self.maybe_build(value) for _, value in self.properties.items()]
             return '#/definitions/{}'.format(self.type_name)
         else:
             builder = self.get_builder(self.type)
@@ -182,14 +183,12 @@ class ObjectBuilder(Builder):
 
     @property
     def is_definition(self):
-        builder = self.get_builder(self.type)
-        if builder is not self:
+        if self.count_type(self.type) > 1:
             return True
-
-        if self.parent:
+        elif self.parent:
             return self.parent.is_definition
-
-        return False
+        else:
+            return False
 
     @property
     def is_root(self):

@@ -1,4 +1,7 @@
 from jsonmodels import models, fields
+from jsonmodels.utilities import compare_schemas
+
+from .utilities import get_fixture
 
 
 class Primary(models.Base):
@@ -14,4 +17,7 @@ class Secondary(models.Base):
 
 
 def test_generate_circular_schema():
-    Primary.to_json_schema()
+    schema = Primary.to_json_schema()
+
+    pattern = get_fixture('schema_circular.json')
+    assert compare_schemas(pattern, schema) is True

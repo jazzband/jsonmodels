@@ -95,20 +95,29 @@ class Builder(object):
 
     def __init__(self, parent=None):
         self.parent = parent
-        self.types_registry = defaultdict(int)
-        self.definitions = []
+        self.types_builders = {}
+        self.types_count = defaultdict(int)
+        self.definitions = set()
 
-    def register_type(self, type):
+    def register_type(self, type, builder):
         if self.parent:
-            return self.parent.register_type(type)
+            return self.parent.register_type(type, builder)
 
-        self.types_registry[type] += 1
+        self.types_count[type] += 1
+        if type not in self.types_builders:
+            self.types_builders[type] = builder
 
-    def type_count(self, type):
+    def get_builder(self, type):
         if self.parent:
-            return self.parent.type_count(type)
+            return self.parent.get_builder(type)
 
-        return self.types_registry[type]
+        return self.types_builders[type]
+
+    def count_type(self, type):
+        if self.parent:
+            return self.parent.count_type(type)
+
+        return self.types_count[type]
 
     @staticmethod
     def maybe_build(value):
@@ -118,7 +127,7 @@ class Builder(object):
         if self.parent:
             return self.parent.add_definition(builder)
 
-        self.definitions.append(builder)
+        self.definitions.add(builder)
 
 
 class ObjectBuilder(Builder):
@@ -129,7 +138,7 @@ class ObjectBuilder(Builder):
         self.required = []
         self.type = model_type
 
-        self.register_type(self.type)
+        self.register_type(self.type, self)
 
     def add_field(self, name, field, schema):
         _apply_validators_modifications(schema, field)
@@ -139,17 +148,19 @@ class ObjectBuilder(Builder):
 
     def build(self):
         if self.is_definition and not self.is_root:
-            self.add_definition(self)
+            builder = self.get_builder(self.type)
+            self.add_definition(builder)
             return '#/definitions/{}'.format(self.type_name)
         else:
-            return self.build_definition()
+            builder = self.get_builder(self.type)
+            return builder.build_definition()
 
     @property
     def type_name(self):
         module_name = '{}.{}'.format(self.type.__module__, self.type.__name__)
         return module_name.replace('.', '_').lower()
 
-    def build_definition(self):
+    def build_definition(self, add_defintitions=True):
         properties = {
             name: self.maybe_build(value)
             for name, value
@@ -162,19 +173,23 @@ class ObjectBuilder(Builder):
         }
         if self.required:
             schema['required'] = self.required
-        if self.definitions:
+        if self.definitions and add_defintitions:
             schema['definitions'] = {
-                builder.type_name: builder.build_definition()
+                builder.type_name: builder.build_definition(False)
                 for builder in self.definitions
             }
         return schema
 
     @property
     def is_definition(self):
-        conditions = [self.type_count(self.type) > 1]
+        builder = self.get_builder(self.type)
+        if builder is not self:
+            return True
+
         if self.parent:
-            conditions.append(self.parent.is_definition)
-        return any(conditions)
+            return self.parent.is_definition
+
+        return False
 
     @property
     def is_root(self):

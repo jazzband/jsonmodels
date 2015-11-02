@@ -1,0 +1,50 @@
+{
+    "additionalProperties": false,
+    "definitions": {
+        "tests_test_circular_references_directory": {
+            "additionalProperties": false,
+            "properties": {
+                "children": {
+                    "items": {
+                        "oneOf": [
+                            "#/definitions/tests_test_circular_references_directory",
+                            "#/definitions/tests_test_circular_references_file"
+                        ]
+                    },
+                    "type": "list"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "tests_test_circular_references_file": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "float"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "children": {
+            "items": {
+                "oneOf": [
+                    "#/definitions/tests_test_circular_references_directory",
+                    "#/definitions/tests_test_circular_references_file"
+                ]
+            },
+            "type": "list"
+        },
+        "name": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

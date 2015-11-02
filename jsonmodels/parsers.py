@@ -59,7 +59,7 @@ def build_json_schema(value, parent_builder=None):
 
 def build_json_schema_object(cls, parent_builder=None):
     builder = ObjectBuilder(cls, parent_builder)
-    if builder.is_definition:
+    if builder.count_type(builder.type) > 1:
         return builder
     for name, field in cls.iterate_over_fields():
         if isinstance(field, fields.EmbeddedField):

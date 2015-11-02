@@ -1,5 +1,3 @@
-import pytest
-
 from jsonmodels import models, fields
 from jsonmodels.utilities import compare_schemas
 
@@ -43,6 +41,8 @@ class Filesystem(models.Base):
     children = fields.ListField([Directory, File])
 
 
-@pytest.mark.xfail
 def test_generate_circular_schema2():
-    Filesystem.to_json_schema()
+    schema = Filesystem.to_json_schema()
+
+    pattern = get_fixture('schema_circular2.json')
+    assert compare_schemas(pattern, schema) is True

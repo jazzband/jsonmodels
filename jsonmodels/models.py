@@ -2,6 +2,7 @@ import six
 
 from . import parsers, errors
 from .fields import BaseField
+from .errors import ValidationError
 
 
 class Base(object):
@@ -32,8 +33,14 @@ class Base(object):
 
     def validate(self):
         """Explicitly validate all the fields."""
-        for _, field in self:
-            field.validate_for_object(self)
+        for name, field in self:
+            try:
+                field.validate_for_object(self)
+            except ValidationError as error:
+                raise ValidationError(
+                    "Error for field '{}'.".format(name),
+                    error,
+                )
 
     @classmethod
     def iterate_over_fields(cls):
@@ -61,3 +68,9 @@ class Base(object):
 
     def __str__(self):
         return '{} object'.format(self.__class__.__name__)
+
+    def __setattr__(self, name, value):
+        try:
+            return super(Base, self).__setattr__(name, value)
+        except ValidationError as error:
+            raise ValidationError("Error for field '{}'.".format(name), error)

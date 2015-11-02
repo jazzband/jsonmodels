@@ -12,7 +12,7 @@ pep8==1.5.7
 py==1.4.26
 pyenchant==1.6.6
 pyflakes==0.8.1
-pyhistory==1.2
+pyhistory==2.0
 pytest==2.6.4
 pytest-cov==1.8.0
 sphinxcontrib-spelling==2.1.1

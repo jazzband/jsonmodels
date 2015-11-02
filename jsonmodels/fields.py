@@ -169,6 +169,14 @@ class ListField(BaseField):
         else:
             self.items_types = tuple()
 
+        types = []
+        for type_ in self.items_types:
+            if type(type_) is type:
+                types.append(type_)
+            else:
+                types.append(_LazyType(type_))
+        self.items_types = tuple(types)
+
     def validate(self, value):
         super(ListField, self).validate(value)
 
@@ -223,6 +231,17 @@ class ListField(BaseField):
                     )
                 )
             return self.items_types[0](**value)
+
+    def _finish_initialization(self, owner):
+        super(ListField, self)._finish_initialization(owner)
+
+        types = []
+        for type in self.items_types:
+            if isinstance(type, _LazyType):
+                types.append(type.evaluate(owner))
+            else:
+                types.append(type)
+        self.items_types = tuple(types)
 
 
 class EmbeddedField(BaseField):

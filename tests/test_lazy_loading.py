@@ -83,3 +83,25 @@ def test_relative_too_much():
 def test_wrong_entity():
     with pytest.raises(ValueError):
         Eighth()
+
+
+class File(models.Base):
+
+    name = fields.StringField()
+    size = fields.FloatField()
+
+
+class Directory(models.Base):
+
+    name = fields.StringField()
+    children = fields.ListField(['Directory', File])
+
+
+def test_list_field():
+    directory = Directory()
+    some_file = File()
+    directory.children.append(some_file)
+    sub_dir = Directory()
+    directory.children.append(sub_dir)
+    with pytest.raises(errors.ValidationError):
+        directory.children.append('some string')

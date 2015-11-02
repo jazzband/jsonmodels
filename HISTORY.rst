@@ -3,6 +3,14 @@
 History
 -------
 
+2.1 (2015-11-02)
+++++++++++++++++
+
+* Added lazy loading of types.
+* Added schema generation for circular models.
+* Improved readability of validation error.
+* Fixed structure generation for list field.
+
 2.0.1 (2014-11-15)
 ++++++++++++++++++
 

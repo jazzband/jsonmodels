@@ -221,6 +221,89 @@ Features
 
   For more information, please see topic about validation in documentation.
 
+* Lazy loading, best for circular references:
+
+  ..code-block:: python
+
+    class Primary(models.Base):
+
+        name = fields.StringField()
+        secondary = fields.EmbeddedField('Secondary')
+
+
+    class Secondary(models.Base):
+
+        data = fields.IntField()
+        first = fields.EmbeddedField('Primary')
+
+  You can use either `Model`, full path `path.to.Model` or relative imports
+  `.Model` or `...Model`.
+
+* Using definitions to generate schema for circular references:
+
+  ..code-block:: python
+
+    class File(models.Base):
+
+        name = fields.StringField()
+        size = fields.FloatField()
+
+
+    class Directory(models.Base):
+
+        name = fields.StringField()
+        children = fields.ListField(['Directory', File])
+
+
+    class Filesystem(models.Base):
+
+        name = fields.StringField()
+        children = fields.ListField([Directory, File])
+
+    >>> Filesystem.to_json_schema()
+    {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"}
+            "children": {
+                "items": {
+                    "oneOf": [
+                        "#/definitions/directory",
+                        "#/definitions/file"
+                    ]
+                },
+                "type": "list"
+            }
+        },
+        "additionalProperties": false,
+        "definitions": {
+            "directory": {
+                "additionalProperties": false,
+                "properties": {
+                    "children": {
+                        "items": {
+                            "oneOf": [
+                                "#/definitions/directory",
+                                "#/definitions/file"
+                            ]
+                        },
+                        "type": "list"
+                    },
+                    "name": {"type": "string"}
+                },
+                "type": "object"
+            },
+            "file": {
+                "additionalProperties": false,
+                "properties": {
+                    "name": {"type": "string"},
+                    "size": {"type": "float"}
+                },
+                "type": "object"
+            }
+        }
+    }
+
 * Compare JSON schemas:
 
   .. code-block:: python

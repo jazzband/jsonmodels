@@ -68,17 +68,17 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{}"'.format(
-                    ', '.join([t.__name__ for t in self.types])
+                'Value is wrong, expected type "{types}"'.format(
+                    types=', '.join([t.__name__ for t in self.types])
                 ),
-                value
+                value,
             )
 
     def _check_types(self):
         if self.types is None:
             raise ValidationError(
-                'Field "{}" is not usable, try '
-                'different field type.'.format(type(self).__name__))
+                'Field "{type}" is not usable, try '
+                'different field type.'.format(type=type(self).__name__))
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -196,9 +196,9 @@ class ListField(BaseField):
         if not isinstance(item, self.items_types):
             raise ValidationError(
                 'All items must be instances '
-                'of "{}", and not "{}".'.format(
-                    ', '.join([t.__name__ for t in self.items_types]),
-                    type(item).__name__
+                'of "{types}", and not "{type}".'.format(
+                    types=', '.join([t.__name__ for t in self.items_types]),
+                    type=type(item).__name__,
                 ))
 
     def to_struct(self, value):
@@ -225,9 +225,10 @@ class ListField(BaseField):
             return value
         else:
             if len(self.items_types) != 1:
+                tpl = 'Cannot decide which type to choose from "{types}".'
                 raise ValidationError(
-                    'Cannot decide which type to choose from "{}".'.format(
-                        ', '.join([t.__name__ for t in self.items_types])
+                    tpl.format(
+                        types=', '.join([t.__name__ for t in self.items_types])
                     )
                 )
             return self.items_types[0](**value)
@@ -293,8 +294,8 @@ class EmbeddedField(BaseField):
     def _get_embed_type(self):
         if len(self.types) != 1:
             raise ValidationError(
-                'Cannot decide which type to choose from "{}".'.format(
-                    ', '.join([t.__name__ for t in self.types])
+                'Cannot decide which type to choose from "{types}".'.format(
+                    types=', '.join([t.__name__ for t in self.types])
                 )
             )
         return self.types[0]

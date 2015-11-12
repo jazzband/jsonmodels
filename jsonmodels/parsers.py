@@ -151,22 +151,25 @@ class ObjectBuilder(Builder):
             builder = self.get_builder(self.type)
             self.add_definition(builder)
             [self.maybe_build(value) for _, value in self.properties.items()]
-            return '#/definitions/{}'.format(self.type_name)
+            return '#/definitions/{name}'.format(name=self.type_name)
         else:
             builder = self.get_builder(self.type)
             return builder.build_definition()
 
     @property
     def type_name(self):
-        module_name = '{}.{}'.format(self.type.__module__, self.type.__name__)
+        module_name = '{module}.{name}'.format(
+            module=self.type.__module__,
+            name=self.type.__name__,
+        )
         return module_name.replace('.', '_').lower()
 
     def build_definition(self, add_defintitions=True):
-        properties = {
-            name: self.maybe_build(value)
+        properties = dict(
+            (name, self.maybe_build(value))
             for name, value
             in self.properties.items()
-        }
+        )
         schema = {
             'type': 'object',
             'additionalProperties': False,
@@ -175,10 +178,10 @@ class ObjectBuilder(Builder):
         if self.required:
             schema['required'] = self.required
         if self.definitions and add_defintitions:
-            schema['definitions'] = {
-                builder.type_name: builder.build_definition(False)
+            schema['definitions'] = dict(
+                (builder.type_name, builder.build_definition(False))
                 for builder in self.definitions
-            }
+            )
         return schema
 
     @property

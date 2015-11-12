@@ -11,8 +11,9 @@ ECMA_TO_PYTHON_FLAGS = {
     'm': re.M,
 }
 
-PYTHON_TO_ECMA_FLAGS = {
-    value: key for key, value in ECMA_TO_PYTHON_FLAGS.items()}
+PYTHON_TO_ECMA_FLAGS = dict(
+    (value, key) for key, value in ECMA_TO_PYTHON_FLAGS.items()
+)
 
 PythonRegex = namedtuple('PythonRegex', ['regex', 'flags'])
 
@@ -54,8 +55,8 @@ def _compare_lists(one, two):
 
 def _assert_same_types(one, two):
     if not isinstance(one, type(two)) or not isinstance(two, type(one)):
-        raise RuntimeError('Types mismatch! "{}" and "{}".'.format(
-            type(one).__name__, type(two).__name__))
+        raise RuntimeError('Types mismatch! "{type1}" and "{type2}".'.format(
+            type1=type(one).__name__, type2=type(two).__name__))
 
 
 def compare_schemas(one, two):
@@ -85,7 +86,8 @@ def compare_schemas(one, two):
     elif isinstance(one, SCALAR_TYPES):
         return one == two
     else:
-        raise RuntimeError('Not allowed type "{}"'.format(type(one).__name__))
+        raise RuntimeError('Not allowed type "{type}"'.format(
+            type=type(one).__name__))
 
 
 def is_ecma_regex(regex):
@@ -151,4 +153,4 @@ def convert_python_regex_to_ecma(value, flags=[]):
     result_flags = [PYTHON_TO_ECMA_FLAGS[f] for f in flags]
     result_flags = ''.join(result_flags)
 
-    return '/{}/{}'.format(value, result_flags)
+    return '/{value}/{flags}'.format(value=value, flags=result_flags)

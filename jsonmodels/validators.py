@@ -29,14 +29,14 @@ class Min(object):
         """Validate value."""
         if self.exclusive:
             if value <= self.minimum_value:
+                tpl = "'{value}' is lower or equal than minimum ('{min}')."
                 raise ValidationError(
-                    "'{}' is lower or equal than minimum ('{}').".format(
-                        value, self.minimum_value))
+                    tpl.format(value=value, min=self.minimum_value))
         else:
             if value < self.minimum_value:
                 raise ValidationError(
-                    "'{}' is lower than minimum ('{}').".format(
-                        value, self.minimum_value))
+                    "'{value}' is lower than minimum ('{min}').".format(
+                        value=value, min=self.minimum_value))
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
@@ -64,14 +64,14 @@ class Max(object):
         """Validate value."""
         if self.exclusive:
             if value >= self.maximum_value:
+                tpl = "'{val}' is bigger or equal than maximum ('{max}')."
                 raise ValidationError(
-                    "'{}' is bigger or equal than maximum ('{}').".format(
-                        value, self.maximum_value))
+                    tpl.format(val=value, max=self.maximum_value))
         else:
             if value > self.maximum_value:
                 raise ValidationError(
-                    "'{}' is bigger than maximum ('{}').".format(
-                        value, self.maximum_value))
+                    "'{value}' is bigger than maximum ('{max}').".format(
+                        value=value, max=self.maximum_value))
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
@@ -101,9 +101,10 @@ class Regex(object):
             `ATTRIBUTES_TO_FLAGS`. Invalid flags will be ignored.
 
         """
-        flags = {
-            key: value for key, value in flags.items()
-            if key in self.FLAGS}
+        flags = dict(
+            (key, value) for key, value in flags.items()
+            if key in self.FLAGS
+        )
 
         if utilities.is_ecma_regex(pattern):
             result = utilities.convert_ecma_regex_to_python(pattern)
@@ -130,8 +131,9 @@ class Regex(object):
 
         if not result:
             raise ValidationError(
-                'Value "{}" did not match pattern "{}".'.format(
-                    value, self.pattern))
+                'Value "{value}" did not match pattern "{pattern}".'.format(
+                    value=value, pattern=self.pattern
+                ))
 
     def _calculate_flags(self):
         return reduce(lambda x, y: x | y, self.flags, 0)
@@ -168,15 +170,18 @@ class Length(object):
         len_ = len(value)
 
         if self.minimum_value is not None and len_ < self.minimum_value:
-            raise ValidationError(
-                "Value '{}' length is lower than allowed minimum '{}'.".format(
-                    value, self.minimum_value))
+            tpl = "Value '{val}' length is lower than allowed minimum '{min}'."
+            raise ValidationError(tpl.format(
+                val=value, min=self.minimum_value
+            ))
 
         if self.minimum_value is not None and len_ > self.maximum_value:
             raise ValidationError(
-                "Value '{}' length is bigger than "
-                "allowed maximum '{}'.".format(
-                    value, self.maximum_value))
+                "Value '{val}' length is bigger than "
+                "allowed maximum '{max}'.".format(
+                    val=value,
+                    max=self.maximum_value,
+                ))
 
     def modify_schema(self, field_schema):
         """Modify field schema."""

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 import os
 import sys
 
@@ -9,8 +8,8 @@ from jsonmodels import __version__, __author__, __email__
 
 from setuptools import setup
 
-PROJECT_NAME = 'jsonmodels'
 
+PROJECT_NAME = 'jsonmodels'
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')

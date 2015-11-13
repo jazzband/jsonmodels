@@ -4,3 +4,4 @@ source = jsonmodels/*
 omit =
     setup.py
     tasks.py
+    jsonmodels/__init__.py

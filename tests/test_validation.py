@@ -64,6 +64,18 @@ def test_validators_are_always_iterable():
     assert isinstance(alan.get_field('children').validators, list)
 
 
+def test_get_field_not_found():
+
+    class Person(models.Base):
+
+        children = fields.ListField()
+
+    alan = Person()
+
+    with pytest.raises(errors.FieldNotFound):
+        alan.get_field('bazinga')
+
+
 def test_min_validation():
 
     validator = validators.Min(3)

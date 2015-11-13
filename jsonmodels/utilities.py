@@ -42,15 +42,13 @@ def _compare_lists(one, two):
     if len(one) != len(two):
         return False
 
+    they_match = False
     for first_item in one:
-        result = False
         for second_item in two:
-            if result:
+            if they_match:
                 continue
-            result = compare_schemas(first_item, second_item)
-        if not result:
-            return False
-    return True
+            they_match = compare_schemas(first_item, second_item)
+    return they_match
 
 
 def _assert_same_types(one, two):

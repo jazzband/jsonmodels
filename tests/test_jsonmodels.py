@@ -130,6 +130,7 @@ def test_list_field_types_when_assigning():
     viper = Car()
 
     viper.wheels.append(Wheel())
+    viper.wheels[0] = Wheel()
 
     with pytest.raises(errors.ValidationError):
         viper.wheels[1] = Wheel2

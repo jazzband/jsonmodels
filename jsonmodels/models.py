@@ -38,7 +38,7 @@ class Base(object):
                 field.validate_for_object(self)
             except ValidationError as error:
                 raise ValidationError(
-                    "Error for field '{}'.".format(name),
+                    "Error for field '{name}'.".format(name=name),
                     error,
                 )
 
@@ -64,13 +64,19 @@ class Base(object):
             txt = six.text_type(self)
         except TypeError:
             txt = ''
-        return '<{}: {}>'.format(self.__class__.__name__, txt)
+        return '<{name}: {text}>'.format(
+            name=self.__class__.__name__,
+            text=txt,
+        )
 
     def __str__(self):
-        return '{} object'.format(self.__class__.__name__)
+        return '{name} object'.format(name=self.__class__.__name__)
 
     def __setattr__(self, name, value):
         try:
             return super(Base, self).__setattr__(name, value)
         except ValidationError as error:
-            raise ValidationError("Error for field '{}'.".format(name), error)
+            raise ValidationError(
+                "Error for field '{name}'.".format(name=name),
+                error
+            )

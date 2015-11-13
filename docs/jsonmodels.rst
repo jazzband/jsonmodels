@@ -44,6 +44,14 @@ jsonmodels.parsers module
     :undoc-members:
     :show-inheritance:
 
+jsonmodels.builders module
+--------------------------
+
+.. automodule:: jsonmodels.builders
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 jsonmodels.utilities module
 ---------------------------
 

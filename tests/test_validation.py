@@ -144,6 +144,15 @@ def test_regex_validation():
         validator.validate('trololo')
 
 
+def test_regex_validation_for_wrong_type():
+
+    validator = validators.Regex('some')
+    assert 'some' == validator.pattern
+
+    with pytest.raises(errors.ValidationError):
+        validator.validate(1)
+
+
 def test_validation_2():
 
     validator = validators.Regex('^some[0-9]$')

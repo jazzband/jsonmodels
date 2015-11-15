@@ -1,4 +1,6 @@
-from jsonmodels import models, fields, validators
+import pytest
+
+from jsonmodels import models, fields, validators, errors
 from jsonmodels.utilities import compare_schemas
 
 from .utilities import get_fixture
@@ -164,6 +166,20 @@ def test_bool_field():
     assert compare_schemas(pattern, schema) is True
 
 
+def test_unsupported_field():
+
+    class NewField(fields.BaseField):
+
+        pass
+
+    class Person(models.Base):
+
+        some_property = NewField()
+
+    with pytest.raises(errors.FieldNotSupported):
+        Person.to_json_schema()
+
+
 def test_validators_can_modify_schema():
 
     class ClassBasedValidator(object):
@@ -313,6 +329,22 @@ def test_length_validator():
     assert compare_schemas(pattern, schema)
 
 
+def test_max_only_validator():
+
+    class Person(models.Base):
+
+        name = fields.StringField(
+            validators=validators.Length(maximum_value=20)
+        )
+        surname = fields.StringField()
+        age = fields.IntField()
+
+    schema = Person.to_json_schema()
+
+    pattern = get_fixture('schema_length_max.json')
+    assert compare_schemas(pattern, schema)
+
+
 def test_schema_for_list_and_primitives():
 
     class Event(models.Base):
@@ -323,9 +355,19 @@ def test_schema_for_list_and_primitives():
 
     class Person(models.Base):
 
-        names = fields.ListField([str, int, Event])
+        names = fields.ListField([str, int, float, bool, Event])
 
     schema = Person.to_json_schema()
 
     pattern = get_fixture('schema_with_list.json')
     assert compare_schemas(pattern, schema)
+
+
+def test_schema_for_unsupported_primitive():
+
+    class Person(models.Base):
+
+        names = fields.ListField([str, object])
+
+    with pytest.raises(errors.FieldNotSupported):
+        schema = Person.to_json_schema()

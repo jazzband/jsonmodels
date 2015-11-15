@@ -1,10 +1,7 @@
 """Predefined validators."""
-
 import re
-try:
-    from functools import reduce
-except ImportError:
-    pass
+
+from six.moves import reduce
 
 from .errors import ValidationError
 from . import utilities

@@ -183,11 +183,8 @@ class ListField(BaseField):
         if len(self.items_types) == 0:
             return
 
-        try:
-            for item in value:
-                self.validate_single_value(item)
-        except TypeError:
-            pass
+        for item in value:
+            self.validate_single_value(item)
 
     def validate_single_value(self, item):
         if len(self.items_types) == 0:
@@ -200,10 +197,6 @@ class ListField(BaseField):
                     types=', '.join([t.__name__ for t in self.items_types]),
                     type=type(item).__name__,
                 ))
-
-    def to_struct(self, value):
-        """Cast value to list."""
-        return [item.to_struct() for item in value]
 
     def get_default_value(self):
         return ModelCollection(self)
@@ -307,11 +300,8 @@ class _LazyType(object):
         self.type = type
 
     def evaluate(self, base_cls):
-        if type(self.type) is type:
-            return self.type
-        else:
-            module, type_name = _evaluate_path(self.type, base_cls)
-            return _import(module, type_name)
+        module, type_name = _evaluate_path(self.type, base_cls)
+        return _import(module, type_name)
 
 
 def _evaluate_path(relative_path, base_cls):

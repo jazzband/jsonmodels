@@ -11,6 +11,12 @@
                         "type": "integer"
                     },
                     {
+                        "type": "float"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
                         "additionalProperties": false,
                         "properties": {
                             "date": {

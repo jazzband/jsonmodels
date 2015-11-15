@@ -8,3 +8,8 @@ class ValidationError(RuntimeError):
 class FieldNotFound(RuntimeError):
 
     pass
+
+
+class FieldNotSupported(ValueError):
+
+    pass

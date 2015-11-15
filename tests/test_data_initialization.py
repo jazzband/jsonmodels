@@ -252,6 +252,21 @@ def test_initialization_with_multi_non_models_types():
         assert 'weird' in person.mix
 
 
+def test_initialization_with_wrong_types():
+
+    class Person(models.Base):
+
+        name = fields.StringField()
+        mix = fields.ListField((str, float))
+
+    data = {
+        'name': 'Chuck',
+        'mix': ['something', 42.0, 'weird']
+    }
+
+    Person(**data)
+
+
 def test_deep_initialization_for_embed_field():
 
     class Car(models.Base):

@@ -56,6 +56,15 @@ def test_time_field_to_struct():
     assert '12:34:56' == field.to_struct(tt)
 
 
+def test_base_field_to_struct():
+
+    field = fields.BaseField()
+    assert field.to_struct(True) is True
+    assert field.to_struct(False) is False
+    assert field.to_struct('chuck') == 'chuck'
+    assert field.to_struct(1) == 1
+
+
 def test_time_field_to_struct_with_format():
 
     field = fields.TimeField(str_format='%H:%M')

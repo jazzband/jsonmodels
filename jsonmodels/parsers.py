@@ -1,7 +1,7 @@
 """Parsers to change model structure into different ones."""
 import inspect
 
-from . import fields, builders
+from . import fields, builders, errors
 
 
 def to_struct(model):
@@ -95,3 +95,7 @@ def _specify_field_type(field):
         return {'type': 'float'}
     elif isinstance(field, fields.BoolField):
         return {'type': 'boolean'}
+
+    raise errors.FieldNotSupported(
+        'Field {field} is not supported!'.format(
+            field=type(field).__class__.__name__))

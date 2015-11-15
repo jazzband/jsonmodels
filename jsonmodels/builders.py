@@ -1,9 +1,11 @@
 """Builders to generate in memory representation of model and fields tree."""
 from __future__ import absolute_import
 
+from collections import defaultdict
+
 import six
 
-from collections import defaultdict
+from . import errors
 
 
 class Builder(object):
@@ -133,14 +135,14 @@ class PrimitiveBuilder(Builder):
     def build(self):
         if issubclass(self.type, six.string_types):
             return {'type': 'string'}
+        elif issubclass(self.type, bool):
+            return {'type': 'boolean'}
         elif issubclass(self.type, int):
             return {'type': 'integer'}
         elif issubclass(self.type, float):
             return {'type': 'float'}
-        elif issubclass(self.type, bool):
-            return {'type': 'boolean'}
 
-        raise ValueError("Can't specify value schema!", self.type)
+        raise errors.FieldNotSupported("Can't specify value schema!", self.type)
 
 
 class ListBuilder(Builder):
@@ -158,11 +160,10 @@ class ListBuilder(Builder):
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
             items = schemas[0]
-        elif len(schemas) > 1:
+        else:
             items = {'oneOf': schemas}
 
-        if items:
-            result['items'] = items
+        result['items'] = items
         return result
 
     @property

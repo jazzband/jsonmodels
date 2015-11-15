@@ -51,6 +51,13 @@ def test_comparison_of_list_with_items_with_different_keys():
     )
 
 
+def test_failed_comparison_of_two_dicts():
+    assert not utilities.compare_schemas(
+        {'one': 1, 'two': 2},
+        {'one': 1, 'two': 3},
+    )
+
+
 def test_is_ecma_regex():
     assert utilities.is_ecma_regex('some regex') is False
     assert utilities.is_ecma_regex('^some regex$') is False

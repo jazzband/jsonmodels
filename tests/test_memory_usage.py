@@ -1,3 +1,7 @@
+import platform
+
+from pytest import mark
+
 from jsonmodels.fields import StringField
 from jsonmodels.models import Base
 
@@ -7,6 +11,10 @@ class User(Base):
     name = StringField()
 
 
+@mark.skipif(
+    platform.python_implementation() == 'PyPy',
+    reason="PyPy's weakref implementation is not stable."
+)
 def test_garbage_collecting():
     first = len(User.name.memory)
     instance = User(name='Bob')

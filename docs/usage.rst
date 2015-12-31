@@ -97,7 +97,7 @@ Also validation is made every time new value is assigned, so trying assign
     >>> dafty.name = 3
     *** ValidationError: ('Value is wrong, expected type "basestring"', 3)
 
-During castig model to JSON or JSONSchema explicite validation is always
+During casting model to JSON or JSONSchema explicite validation is always
 called.
 
 Validators

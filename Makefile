@@ -34,8 +34,7 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source jsonmodels setup.py test
-	coverage report -m
+	python setup.py test
 	coverage html
 	open htmlcov/index.html
 

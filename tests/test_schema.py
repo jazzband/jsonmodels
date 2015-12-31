@@ -370,4 +370,4 @@ def test_schema_for_unsupported_primitive():
         names = fields.ListField([str, object])
 
     with pytest.raises(errors.FieldNotSupported):
-        schema = Person.to_json_schema()
+        Person.to_json_schema()

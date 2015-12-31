@@ -1,4 +1,5 @@
 """Builders to generate in memory representation of model and fields tree."""
+
 from __future__ import absolute_import
 
 from collections import defaultdict
@@ -142,7 +143,9 @@ class PrimitiveBuilder(Builder):
         elif issubclass(self.type, float):
             return {'type': 'float'}
 
-        raise errors.FieldNotSupported("Can't specify value schema!", self.type)
+        raise errors.FieldNotSupported(
+            "Can't specify value schema!", self.type
+        )
 
 
 class ListBuilder(Builder):

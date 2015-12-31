@@ -40,9 +40,9 @@ try:
 except ImportError:
     pass
 else:
-    if 'test' in sys.argv and '--quick' in sys.argv:
-        tests.QUICK_TESTS = True
-        del sys.argv[sys.argv.index('--quick')]
+    if 'test' in sys.argv and '--no-lint' in sys.argv:
+        tests.LINT = False
+        del sys.argv[sys.argv.index('--no-lint')]
 
     if 'test' in sys.argv and '--spelling' in sys.argv:
         tests.CHECK_SPELLING = True
@@ -61,7 +61,7 @@ setup(
     author_email=__email__,
     url='https://github.com/beregond/jsonmodels',
     packages=[
-    PROJECT_NAME,
+        PROJECT_NAME,
     ],
     package_dir={PROJECT_NAME: PROJECT_NAME},
     include_package_data=True,
@@ -84,7 +84,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    cmdclass = {
+    cmdclass={
         'test': PyTest,
     },
 )

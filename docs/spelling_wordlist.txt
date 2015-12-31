@@ -1,10 +1,12 @@
 bool
 cieślik
 datetime
+explicite
 django
 docstring
 docstrings
 indices
+jsonmodels
 kwargs
 metaclass
 namedtuple

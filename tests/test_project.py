@@ -12,7 +12,7 @@ source_dir = os.path.join(root_dir, 'jsonmodels')
 tests_dir = os.path.join(root_dir, 'tests')
 
 
-@pytest.mark.skipif(not tests.QUICK_TESTS, reason="Quick tests.")
+@pytest.mark.skipif(not tests.LINT, reason="No lint tests.")
 def test_pep8_and_complexity():
     result = []
     for filename in _collect_static([source_dir, tests_dir]):
@@ -24,8 +24,8 @@ def test_pep8_and_complexity():
 
 
 @pytest.mark.skipif(
-    not tests.QUICK_TESTS
-    and not tests.CHECK_SPELLING, reason="No spelling check."
+    not tests.LINT and
+    not tests.CHECK_SPELLING, reason="No spelling check."
 )
 def test_docs():
     run(

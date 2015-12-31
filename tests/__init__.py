@@ -1,4 +1,2 @@
-"""Tests."""
-
-QUICK_TESTS = False
+LINT = True
 CHECK_SPELLING = False

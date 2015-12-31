@@ -25,7 +25,9 @@ are converted to, or read from JSON.
 Features
 --------
 
-* Fully tested with Python 2.6, 2.7, 3.2, 3.3, 3.4, 3.5 and PyPy.
+* Fully tested with Python 2.6, 2.7, 3.2, 3.3, 3.4, 3.5.
+
+* Support for PyPy (see implementation notes in docs for more details).
 
 * Create Django-like models:
 

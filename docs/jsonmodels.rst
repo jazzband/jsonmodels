@@ -4,6 +4,14 @@ jsonmodels package
 Submodules
 ----------
 
+jsonmodels.builders module
+--------------------------
+
+.. automodule:: jsonmodels.builders
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 jsonmodels.collections module
 -----------------------------
 
@@ -40,14 +48,6 @@ jsonmodels.parsers module
 -------------------------
 
 .. automodule:: jsonmodels.parsers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-jsonmodels.builders module
---------------------------
-
-.. automodule:: jsonmodels.builders
     :members:
     :undoc-members:
     :show-inheritance:

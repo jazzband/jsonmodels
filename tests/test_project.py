@@ -24,8 +24,7 @@ def test_pep8_and_complexity():
 
 
 @pytest.mark.skipif(
-    not tests.LINT and
-    not tests.CHECK_SPELLING, reason="No spelling check."
+    not tests.LINT or not tests.CHECK_SPELLING, reason="No spelling check."
 )
 def test_docs():
     run(

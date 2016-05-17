@@ -9,7 +9,6 @@ from .collections import ModelCollection
 
 
 class BaseField(object):
-
     """Base class for all fields."""
 
     types = None
@@ -69,17 +68,17 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{types}"'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                ),
-                value,
+                    'Value is wrong, expected type "{types}"'.format(
+                            types=', '.join([t.__name__ for t in self.types])
+                    ),
+                    value,
             )
 
     def _check_types(self):
         if self.types is None:
             raise ValidationError(
-                'Field "{type}" is not usable, try '
-                'different field type.'.format(type=type(self).__name__))
+                    'Field "{type}" is not usable, try '
+                    'different field type.'.format(type=type(self).__name__))
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -112,28 +111,24 @@ class BaseField(object):
 
 
 class StringField(BaseField):
-
     """String field."""
 
     types = six.string_types
 
 
 class IntField(BaseField):
-
     """Integer field."""
 
     types = (int,)
 
 
 class FloatField(BaseField):
-
     """Float field."""
 
     types = (float, int)
 
 
 class BoolField(BaseField):
-
     """Bool field."""
 
     types = (bool,)
@@ -145,7 +140,6 @@ class BoolField(BaseField):
 
 
 class ListField(BaseField):
-
     """List field."""
 
     types = (list,)
@@ -193,11 +187,11 @@ class ListField(BaseField):
 
         if not isinstance(item, self.items_types):
             raise ValidationError(
-                'All items must be instances '
-                'of "{types}", and not "{type}".'.format(
-                    types=', '.join([t.__name__ for t in self.items_types]),
-                    type=type(item).__name__,
-                ))
+                    'All items must be instances '
+                    'of "{types}", and not "{type}".'.format(
+                            types=', '.join([t.__name__ for t in self.items_types]),
+                            type=type(item).__name__,
+                    ))
 
     def get_default_value(self):
         return ModelCollection(self)
@@ -221,9 +215,9 @@ class ListField(BaseField):
             if len(self.items_types) != 1:
                 tpl = 'Cannot decide which type to choose from "{types}".'
                 raise ValidationError(
-                    tpl.format(
-                        types=', '.join([t.__name__ for t in self.items_types])
-                    )
+                        tpl.format(
+                                types=', '.join([t.__name__ for t in self.items_types])
+                        )
                 )
             return self.items_types[0](**value)
 
@@ -240,7 +234,6 @@ class ListField(BaseField):
 
 
 class EmbeddedField(BaseField):
-
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
@@ -288,15 +281,14 @@ class EmbeddedField(BaseField):
     def _get_embed_type(self):
         if len(self.types) != 1:
             raise ValidationError(
-                'Cannot decide which type to choose from "{types}".'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                )
+                    'Cannot decide which type to choose from "{types}".'.format(
+                            types=', '.join([t.__name__ for t in self.types])
+                    )
             )
         return self.types[0]
 
 
 class _LazyType(object):
-
     def __init__(self, type):
         self.type = type
 
@@ -338,11 +330,10 @@ def _import(module_name, type_name):
         return getattr(module, type_name)
     except AttributeError:
         raise ValueError(
-            "Can't find type '{}.{}'.".format(module_name, type_name))
+                "Can't find type '{}.{}'.".format(module_name, type_name))
 
 
 class TimeField(StringField):
-
     """Time field."""
 
     types = (datetime.time,)
@@ -371,7 +362,6 @@ class TimeField(StringField):
 
 
 class DateField(StringField):
-
     """Date field."""
 
     types = (datetime.date,)
@@ -401,7 +391,6 @@ class DateField(StringField):
 
 
 class DateTimeField(StringField):
-
     """Datetime field."""
 
     types = (datetime.datetime,)
@@ -426,4 +415,7 @@ class DateTimeField(StringField):
         """Parse string into instance of `datetime`."""
         if isinstance(value, datetime.datetime):
             return value
-        return parse(value)
+        if value:
+            return parse(value)
+        else:
+            return None

@@ -158,7 +158,7 @@ class ListBuilder(Builder):
         self.schemas.append(schema)
 
     def build(self):
-        result = {'type': 'list'}
+        result = {'type': 'array'}
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:

@@ -141,7 +141,7 @@ class PrimitiveBuilder(Builder):
         elif issubclass(self.type, int):
             return {'type': 'integer'}
         elif issubclass(self.type, float):
-            return {'type': 'float'}
+            return {'type': 'number'}
 
         raise errors.FieldNotSupported(
             "Can't specify value schema!", self.type

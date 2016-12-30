@@ -185,3 +185,45 @@ def test_list_to_struct():
         ]
     }
     assert pattern == person.to_struct()
+
+
+def test_to_struct_time():
+
+    class Clock(models.Base):
+        time = fields.TimeField()
+
+    clock = Clock()
+    clock.time = '12:03:34'
+
+    pattern = {
+        'time': '12:03:34'
+    }
+    assert pattern == clock.to_struct()
+
+
+def test_to_struct_date():
+
+    class Event(models.Base):
+        start = fields.DateField()
+
+    event = Event()
+    event.start = '2014-04-21'
+
+    pattern = {
+        'start': '2014-04-21'
+    }
+    assert pattern == event.to_struct()
+
+
+def test_to_struct_datetime():
+
+    class Event(models.Base):
+        start = fields.DateTimeField()
+
+    event = Event()
+    event.start = '2013-05-06 12:03:34'
+
+    pattern = {
+        'start': '2013-05-06T12:03:34'
+    }
+    assert pattern == event.to_struct()

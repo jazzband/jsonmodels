@@ -11,11 +11,6 @@ def to_struct(model):
     :rtype: ``dict``
 
     """
-    from .models import Base
-
-    if not isinstance(model, Base):
-        return model
-
     model.validate()
 
     resp = {}
@@ -24,12 +19,8 @@ def to_struct(model):
         if value is None:
             continue
 
-        if isinstance(field, fields.ListField):
-            resp[name] = [to_struct(item) for item in value]
-        elif isinstance(field, fields.EmbeddedField):
-            resp[name] = to_struct(value)
-        else:
-            resp[name] = field.to_struct(value)
+        value = field.to_struct(value)
+        resp[name] = value
     return resp
 
 

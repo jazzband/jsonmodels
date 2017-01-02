@@ -1,7 +1,7 @@
 {
     "type": "object",
     "properties": {
-        "age": {"type": "integer"},
+        "age": {"type": "number"},
         "name": {"type": "string"},
         "surname": {"type": "string"},
         "car": {
@@ -17,11 +17,11 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "age": {"type": "integer"},
+                    "age": {"type": "number"},
                     "name": {"type": "string"},
                     "surname": {"type": "string"},
                     "toys": {
-                        "type": "list",
+                        "type": "array",
                         "items": {
                             "additionalProperties": false,
                             "properties": {
@@ -35,7 +35,7 @@
                 "required": ["surname", "name"],
                 "additionalProperties": false
             },
-            "type": "list"
+            "type": "array"
         }
     },
     "required": ["surname", "name"],

@@ -3,7 +3,7 @@
     "properties": {
         "name": {"type": "string"},
         "surname": {"type": "string"},
-        "age": {"type": "integer"}
+        "age": {"type": "number"}
     },
     "required": ["name", "surname"],
     "additionalProperties": false

@@ -139,7 +139,7 @@ class PrimitiveBuilder(Builder):
         elif issubclass(self.type, bool):
             return {'type': 'boolean'}
         elif issubclass(self.type, int):
-            return {'type': 'integer'}
+            return {'type': 'number'}
         elif issubclass(self.type, float):
             return {'type': 'number'}
 

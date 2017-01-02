@@ -92,7 +92,7 @@ def _specify_field_type(field):
     if isinstance(field, fields.StringField):
         return {'type': 'string'}
     elif isinstance(field, fields.IntField):
-        return {'type': 'integer'}
+        return {'type': 'number'}
     elif isinstance(field, fields.FloatField):
         return {'type': 'float'}
     elif isinstance(field, fields.BoolField):

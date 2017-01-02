@@ -8,10 +8,10 @@
                         "type": "string"
                     },
                     {
-                        "type": "integer"
+                        "type": "number"
                     },
                     {
-                        "type": "float"
+                        "type": "number"
                     },
                     {
                         "type": "boolean"
@@ -33,7 +33,7 @@
                     }
                 ]
             },
-            "type": "list"
+            "type": "array"
         }
     },
     "type": "object"

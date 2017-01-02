@@ -129,7 +129,7 @@ Features
                 'type': 'object',
                 'properties': {
                     'color': {'type': 'string'},
-                    'engine_capacity': {'type': 'float'},
+                    'engine_capacity': {'type': ''},
                     'registration_number': {'type': 'string'}
                 }
             },
@@ -152,13 +152,13 @@ Features
                             'required': ['name'],
                             'type': 'object',
                             'properties': {
-                                'age': {'type': 'integer'},
+                                'age': {'type': 'number'},
                                 'name': {'type': 'string'}
                             }
                         }
                     ]
                 },
-                'type': 'list'
+                'type': 'array'
             }
         }
     }
@@ -205,7 +205,7 @@ Features
             "age": {
                 "maximum": 101,
                 "minimum": 18,
-                "type": "integer"
+                "type": "number"
             },
             "name": {
                 "maxLength": 25,
@@ -271,7 +271,7 @@ Features
                         "#/definitions/file"
                     ]
                 },
-                "type": "list"
+                "type": "array"
             }
         },
         "additionalProperties": false,
@@ -286,7 +286,7 @@ Features
                                 "#/definitions/file"
                             ]
                         },
-                        "type": "list"
+                        "type": "array"
                     },
                     "name": {"type": "string"}
                 },
@@ -296,7 +296,7 @@ Features
                 "additionalProperties": false,
                 "properties": {
                     "name": {"type": "string"},
-                    "size": {"type": "float"}
+                    "size": {"type": "number"}
                 },
                 "type": "object"
             }
@@ -309,7 +309,7 @@ Features
 
     >>> from jsonmodels.utils import compare_schemas
     >>> schema1 = {'type': 'object'}
-    >>> schema2 = {'type': 'list'}
+    >>> schema2 = {'type': 'array'}
     >>> compare_schemas(schema1, schema1)
     True
     >>> compare_schemas(schema1, schema2)

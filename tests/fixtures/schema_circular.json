@@ -15,7 +15,7 @@
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "first": "#/definitions/tests_test_circular_references_primary"
             },

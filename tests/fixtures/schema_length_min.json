@@ -2,7 +2,7 @@
     "additionalProperties": false,
     "properties": {
         "age": {
-            "type": "integer"
+            "type": "number"
         },
         "name": {
             "type": "string",

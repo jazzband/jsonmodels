@@ -2,7 +2,7 @@
     "additionalProperties": false,
     "properties": {
         "age": {
-            "type": "integer"
+            "type": "number"
         },
         "car": {
             "oneOf": [
@@ -73,7 +73,7 @@
                     }
                 ]
             },
-            "type": "list"
+            "type": "array"
         },
         "name": {
             "type": "string"

@@ -2,7 +2,7 @@
     "additionalProperties": false,
     "properties": {
         "age": {
-            "type": "integer",
+            "type": "number",
             "minimum": 18,
             "exclusiveMinimum": true
         },

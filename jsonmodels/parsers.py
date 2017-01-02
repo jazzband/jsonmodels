@@ -24,10 +24,12 @@ def to_struct(model):
         if value is None:
             continue
 
-        if isinstance(value, list):
+        if isinstance(field, fields.ListField):
             resp[name] = [to_struct(item) for item in value]
-        else:
+        elif isinstance(field, fields.EmbeddedField):
             resp[name] = to_struct(value)
+        else:
+            resp[name] = field.to_struct(value)
     return resp
 
 

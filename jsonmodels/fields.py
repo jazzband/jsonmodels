@@ -238,6 +238,15 @@ class ListField(BaseField):
                 types.append(type)
         self.items_types = tuple(types)
 
+    def _elem_to_struct(self, value):
+        try:
+            return value.to_struct()
+        except AttributeError:
+            return value
+
+    def to_struct(self, values):
+        return [self._elem_to_struct(v) for v in values]
+
 
 class EmbeddedField(BaseField):
 
@@ -293,6 +302,9 @@ class EmbeddedField(BaseField):
                 )
             )
         return self.types[0]
+
+    def to_struct(self, value):
+        return value.to_struct()
 
 
 class _LazyType(object):

@@ -3,6 +3,12 @@
 History
 -------
 
+2.1.3 (2017-01-16)
+++++++++++++++++++
+
+* Fixed generated schema.
+* Improved JSON serialization.
+
 2.1.2 (2016-01-06)
 ++++++++++++++++++
 

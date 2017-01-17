@@ -469,3 +469,98 @@ def test_assignation_of_list_of_models():
     viper = Car()
     viper.wheels = None
     viper.wheels = [Wheel()]
+
+
+def test_equality_of_different_types():
+    class A(models.Base):
+        pass
+
+    class B(A):
+        pass
+
+    class C(models.Base):
+        pass
+
+    assert A() == A()
+    assert A() != B()
+    assert B() != A()
+    assert A() != C()
+
+
+def test_equality_of_simple_models():
+    class Person(models.Base):
+        name = fields.StringField()
+        age = fields.IntField()
+
+    p1 = Person(name='Jack')
+    p2 = Person(name='Jack')
+
+    assert p1 == p2
+    assert p2 == p1
+
+    p3 = Person(name='Jack', age=100)
+    assert p1 != p3
+    assert p3 != p1
+
+    p4 = Person(name='Jill')
+    assert p1 != p4
+    assert p4 != p1
+
+
+def test_equality_embedded_objects():
+    class Person(models.Base):
+        name = fields.StringField()
+
+    class Company(models.Base):
+        chairman = fields.EmbeddedField(Person)
+
+    c1 = Company(chairman=Person(name='Pete'))
+    c2 = Company(chairman=Person(name='Pete'))
+
+    assert c1 == c2
+    assert c2 == c1
+
+    c3 = Company(chairman=Person(name='Joshua'))
+
+    assert c1 != c3
+    assert c3 != c1
+
+
+def test_equality_list_fields():
+
+    class Wheel(models.Base):
+        pressure = fields.FloatField()
+
+    class Car(models.Base):
+
+        wheels = fields.ListField(items_types=[Wheel])
+
+    car = Car(
+        wheels=[
+            Wheel(pressure=1),
+            Wheel(pressure=2),
+            Wheel(pressure=3),
+            Wheel(pressure=4),
+        ],
+    )
+
+    another_car = Car(
+        wheels=[
+            Wheel(pressure=1),
+            Wheel(pressure=2),
+            Wheel(pressure=3),
+            Wheel(pressure=4),
+        ],
+    )
+
+    assert car == another_car
+
+    different_car = Car(
+        wheels=[
+            Wheel(pressure=4),
+            Wheel(pressure=3),
+            Wheel(pressure=2),
+            Wheel(pressure=1),
+        ],
+    )
+    assert car != different_car

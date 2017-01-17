@@ -33,7 +33,7 @@ class BaseField(object):
         self._finish_initialization(type(instance))
         value = self.parse_value(value)
         self.validate(value)
-        self.memory[instance] = value
+        self.memory[instance._cache_key] = value
 
     def __get__(self, instance, owner=None):
         if instance is None:
@@ -43,13 +43,13 @@ class BaseField(object):
         self._finish_initialization(type(instance))
 
         self._check_value(instance)
-        return self.memory[instance]
+        return self.memory[instance._cache_key]
 
     def _finish_initialization(self, owner):
         pass
 
     def _check_value(self, obj):
-        if obj not in self.memory:
+        if obj._cache_key not in self.memory:
             self.__set__(obj, self.get_default_value())
 
     def validate_for_object(self, obj):

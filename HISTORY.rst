@@ -3,6 +3,12 @@
 History
 -------
 
+2.1.4 (2017-01-24)
+++++++++++++++++++
+
+* Allow to compare models based on their type and fields (rather than their
+  reference).
+
 2.1.3 (2017-01-16)
 ++++++++++++++++++
 

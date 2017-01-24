@@ -5,11 +5,16 @@ from .fields import BaseField
 from .errors import ValidationError
 
 
+class _CacheKey(object):
+    pass
+
+
 class Base(object):
 
     """Base class for all models."""
 
     def __init__(self, **kwargs):
+        self._cache_key = _CacheKey()
         self.populate(**kwargs)
 
     def populate(self, **kw):
@@ -80,3 +85,19 @@ class Base(object):
                 "Error for field '{name}'.".format(name=name),
                 error
             )
+
+    def __eq__(self, other):
+        if type(other) is not type(self):
+            return False
+
+        for name, _ in self.iterate_over_fields():
+            our = getattr(self, name)
+            their = getattr(other, name)
+
+            if our != their:
+                return False
+
+        return True
+
+    def __ne__(self, other):
+        return not (self == other)

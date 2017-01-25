@@ -438,4 +438,7 @@ class DateTimeField(StringField):
         """Parse string into instance of `datetime`."""
         if isinstance(value, datetime.datetime):
             return value
-        return parse(value)
+        if value:
+            return parse(value)
+        else:
+            return None

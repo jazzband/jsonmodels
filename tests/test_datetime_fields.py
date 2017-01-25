@@ -238,3 +238,9 @@ def test_datetime_field_parse_value():
 
     with pytest.raises(ValueError):
         field.parse_value('not a datetime')
+
+
+def test_datetime_field_is_none():
+    datetime_field = fields.DateTimeField()
+
+    assert datetime_field.parse_value(None) is None

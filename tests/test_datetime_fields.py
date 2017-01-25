@@ -241,6 +241,8 @@ def test_datetime_field_parse_value():
 
 
 def test_datetime_field_is_none():
+    """If field nullable, dateutil raises error"""
+
     datetime_field = fields.DateTimeField()
 
     assert datetime_field.parse_value(None) is None

@@ -17,11 +17,13 @@ class BaseField(object):
     def __init__(
             self,
             required=False,
+            nullable=False,
             help_text=None,
             validators=None):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
+        self.nullable = nullable
         self._assign_validators(validators)
 
     def _assign_validators(self, validators):
@@ -95,6 +97,9 @@ class BaseField(object):
         return value
 
     def _validate_with_custom_validators(self, value):
+        if value is None and self.nullable:
+            return
+
         for validator in self.validators:
             try:
                 validator.validate(value)
@@ -215,6 +220,9 @@ class ListField(BaseField):
         return [self._cast_value(value) for value in values]
 
     def _cast_value(self, value):
+        if value is None and self.nullable:
+            return value
+
         if isinstance(value, self.items_types):
             return value
         else:

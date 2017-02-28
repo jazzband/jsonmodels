@@ -11,11 +11,12 @@ from . import errors
 
 class Builder(object):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, nullable=False):
         self.parent = parent
         self.types_builders = {}
         self.types_count = defaultdict(int)
         self.definitions = set()
+        self.nullable = nullable
 
     def register_type(self, type, builder):
         if self.parent:
@@ -38,7 +39,9 @@ class Builder(object):
         return self.types_count[type]
 
     @staticmethod
-    def maybe_build(value):
+    def maybe_build(value, nullable=None):
+        if nullable is not None:
+            value.nullable = nullable
         return value.build() if isinstance(value, Builder) else value
 
     def add_definition(self, builder):
@@ -72,7 +75,7 @@ class ObjectBuilder(Builder):
             return '#/definitions/{name}'.format(name=self.type_name)
         else:
             builder = self.get_builder(self.type)
-            return builder.build_definition()
+            return builder.build_definition(nullable=self.nullable)
 
     @property
     def type_name(self):
@@ -82,7 +85,7 @@ class ObjectBuilder(Builder):
         )
         return module_name.replace('.', '_').lower()
 
-    def build_definition(self, add_defintitions=True):
+    def build_definition(self, add_defintitions=True, nullable=False):
         properties = dict(
             (name, self.maybe_build(value))
             for name, value
@@ -93,11 +96,14 @@ class ObjectBuilder(Builder):
             'additionalProperties': False,
             'properties': properties,
         }
+        if self.nullable or nullable:
+            schema['type'] = [schema['type'], 'null']
+
         if self.required:
             schema['required'] = self.required
         if self.definitions and add_defintitions:
             schema['definitions'] = dict(
-                (builder.type_name, builder.build_definition(False))
+                (builder.type_name, builder.build_definition(False, False))
                 for builder in self.definitions
             )
         return schema
@@ -135,17 +141,19 @@ class PrimitiveBuilder(Builder):
 
     def build(self):
         if issubclass(self.type, six.string_types):
-            return {'type': 'string'}
+            obj = {'type': 'string'}
         elif issubclass(self.type, bool):
-            return {'type': 'boolean'}
+            obj = {'type': 'boolean'}
         elif issubclass(self.type, int):
-            return {'type': 'number'}
+            obj = {'type': 'number'}
         elif issubclass(self.type, float):
-            return {'type': 'number'}
+            obj = {'type': 'number'}
+        else:
+            raise errors.FieldNotSupported(
+                "Can't specify value schema!", self.type
+            )
 
-        raise errors.FieldNotSupported(
-            "Can't specify value schema!", self.type
-        )
+        return obj if not self.nullable else {'type': [obj['type'], 'null']}
 
 
 class ListBuilder(Builder):
@@ -159,6 +167,8 @@ class ListBuilder(Builder):
 
     def build(self):
         result = {'type': 'array'}
+        if self.nullable:
+            result['type'] = [result['type'], 'null']
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
@@ -184,6 +194,9 @@ class EmbeddedBuilder(Builder):
         self.schemas.append(schema)
 
     def build(self):
+        if len(self.schemas) == 1:
+            return self.maybe_build(self.schemas[0], self.nullable)
+
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
             return schemas[0]

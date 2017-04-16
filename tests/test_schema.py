@@ -371,3 +371,15 @@ def test_schema_for_unsupported_primitive():
 
     with pytest.raises(errors.FieldNotSupported):
         Person.to_json_schema()
+
+
+def test_enum_validator():
+    class Person(models.Base):
+        handness = fields.StringField(
+            validators=validators.Enum('left', 'right')
+        )
+
+    schema = Person.to_json_schema()
+    pattern = get_fixture('schema_enum.json')
+
+    assert compare_schemas(pattern, schema)

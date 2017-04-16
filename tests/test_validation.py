@@ -249,3 +249,14 @@ def test_length_validation():
         validator.validate('')
     with pytest.raises(errors.ValidationError):
         validator.validate('na' * 10)
+
+
+def test_enum_validation():
+    validator = validators.Enum('cat', 'dog', 'fish')
+
+    validator.validate('cat')
+    validator.validate('dog')
+    validator.validate('fish')
+
+    with pytest.raises(errors.ValidationError):
+        validator.validate('horse')

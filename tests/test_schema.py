@@ -371,3 +371,19 @@ def test_schema_for_unsupported_primitive():
 
     with pytest.raises(errors.FieldNotSupported):
         Person.to_json_schema()
+
+
+def test_schema_empty_object():
+    class Structured(models.Base):
+        key = fields.StringField()
+        value = fields.StringField()
+
+    class DataContainer(models.Base):
+        arbitrary = fields.EmbeddedField(dict)
+        structured = fields.EmbeddedField(Structured)
+        type_choices = fields.EmbeddedField([Structured, dict])
+
+    schema = DataContainer.to_json_schema()
+
+    pattern = get_fixture('schema_empty_object.json')
+    assert compare_schemas(pattern, schema)

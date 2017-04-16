@@ -304,7 +304,14 @@ class EmbeddedField(BaseField):
         return self.types[0]
 
     def to_struct(self, value):
-        return value.to_struct()
+        try:
+            return value.to_struct()
+        except AttributeError:
+            # Only when we specify `dict` as a type should
+            # we return the raw value.
+            if dict not in self.types:
+                raise
+            return value.copy()
 
 
 class _LazyType(object):

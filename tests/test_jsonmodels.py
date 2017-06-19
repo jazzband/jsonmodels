@@ -574,3 +574,21 @@ def test_equality_missing_required_field():
     assert Model(age=1) == Model(age=1)
     assert Model(age=1) != Model(age=2)
     assert Model(name='William', age=1) != Model(age=1)
+
+
+def test_empty_object():
+    class Model(models.Base):
+        data = fields.EmbeddedField(dict)
+
+    inst = Model(data={'wiz': 'boing'})
+
+    assert inst.data == {'wiz': 'boing'}
+
+
+def test_empty_object_to_struct():
+    class Model(models.Base):
+        data = fields.EmbeddedField(dict)
+
+    inst = Model(data={'wiz': 'boing'})
+
+    assert inst.to_struct() == {'data': {'wiz': 'boing'}}

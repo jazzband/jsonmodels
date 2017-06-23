@@ -39,9 +39,7 @@ class Builder(object):
         return self.types_count[type]
 
     @staticmethod
-    def maybe_build(value, nullable=None):
-        if nullable is not None:
-            value.nullable = nullable
+    def maybe_build(value):
         return value.build() if isinstance(value, Builder) else value
 
     def add_definition(self, builder):
@@ -96,9 +94,6 @@ class ObjectBuilder(Builder):
             'additionalProperties': False,
             'properties': properties,
         }
-        if self.nullable or nullable:
-            schema['type'] = [schema['type'], 'null']
-
         if self.required:
             schema['required'] = self.required
         if self.definitions and add_defintitions:
@@ -168,7 +163,7 @@ class ListBuilder(Builder):
     def build(self):
         result = {'type': 'array'}
         if self.nullable:
-            result['type'] = [result['type'], 'null']
+            self.add_type_schema({'type': 'null'})
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
@@ -194,8 +189,8 @@ class EmbeddedBuilder(Builder):
         self.schemas.append(schema)
 
     def build(self):
-        if len(self.schemas) == 1:
-            return self.maybe_build(self.schemas[0], self.nullable)
+        if self.nullable:
+            self.add_type_schema({'type': 'null'})
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:

@@ -220,9 +220,6 @@ class ListField(BaseField):
         return [self._cast_value(value) for value in values]
 
     def _cast_value(self, value):
-        if value is None and self.nullable:
-            return value
-
         if isinstance(value, self.items_types):
             return value
         else:

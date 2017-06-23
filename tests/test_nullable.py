@@ -22,15 +22,29 @@ def test_nullable_simple_field():
 
 def test_nullable_list_field():
     result = NullableListField.to_json_schema()
-
-    assert result['properties']['field']['type'] == ['array', 'null']
+    items = result['properties']['field']['items']
+    assert items.get('oneOf')
+    assert items['oneOf'] == [{'type': 'string'}, {'type': 'null'}]
 
 
 def test_nullable_embedded_field():
     result = NullableEmbedded.to_json_schema()
 
-    assert result['properties']['field']['type'] == ['object', 'null']
-
-    field = result['properties']['field']
-
-    assert field['properties']['field']['type'] == ['string', 'null']
+    expected = [
+        {
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'field': {
+                    'type': [
+                        'string',
+                        'null'
+                    ]
+                }
+            }
+        },
+        {
+            'type': 'null'
+        }
+    ]
+    assert result['properties']['field']['oneOf'] == expected

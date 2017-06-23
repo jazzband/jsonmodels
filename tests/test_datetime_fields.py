@@ -43,6 +43,18 @@ def test_time_field():
     event.time = datetime.time()
 
 
+def test_time_field_not_required():
+
+    class Event(models.Base):
+
+        time = fields.TimeField(required=False)
+
+    event = Event()
+
+    event.time = None
+    assert event.time is None
+
+
 def test_time_field_to_struct():
 
     field = fields.TimeField()
@@ -130,6 +142,18 @@ def test_date_field():
     event.date = datetime.date(2014, 4, 21)
 
 
+def test_date_field_not_required():
+
+    class Event(models.Base):
+
+        date = fields.DateField(required=False)
+
+    event = Event()
+
+    event.date = None
+    assert event.date is None
+
+
 def test_date_field_to_struct():
 
     field = fields.DateField()
@@ -181,6 +205,17 @@ def test_datetime_field():
 
     assert isinstance(event.date, datetime.datetime)
     event.date = datetime.datetime.now()
+
+
+def test_datetime_field_not_required():
+
+    class Event(models.Base):
+
+        date = fields.DateTimeField()
+
+    event = Event()
+    event.date = None
+    assert event.date is None
 
 
 def test_datetime_field_to_struct():

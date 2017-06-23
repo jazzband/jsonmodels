@@ -91,8 +91,15 @@ class Base(object):
             return False
 
         for name, _ in self.iterate_over_fields():
-            our = getattr(self, name)
-            their = getattr(other, name)
+            try:
+                our = getattr(self, name)
+            except errors.ValidationError:
+                our = None
+
+            try:
+                their = getattr(other, name)
+            except errors.ValidationError:
+                their = None
 
             if our != their:
                 return False

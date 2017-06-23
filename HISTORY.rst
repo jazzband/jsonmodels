@@ -3,6 +3,12 @@
 History
 -------
 
+2.1.5 (2017-02-01)
+++++++++++++++++++
+
+* Fixed DateTimefield error when value is None.
+* Fixed comparing models without required values.
+
 2.1.4 (2017-01-24)
 ++++++++++++++++++
 

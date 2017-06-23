@@ -564,3 +564,13 @@ def test_equality_list_fields():
         ],
     )
     assert car != different_car
+
+
+def test_equality_missing_required_field():
+    class Model(models.Base):
+        name = fields.StringField(required=True)
+        age = fields.IntField()
+
+    assert Model(age=1) == Model(age=1)
+    assert Model(age=1) != Model(age=2)
+    assert Model(name='William', age=1) != Model(age=1)

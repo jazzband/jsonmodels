@@ -249,3 +249,16 @@ def test_length_validation():
         validator.validate('')
     with pytest.raises(errors.ValidationError):
         validator.validate('na' * 10)
+
+
+def test_validation_nullable():
+    class Emb(models.Base):
+        name = fields.StringField(nullable=True)
+
+    class User(models.Base):
+        name = fields.StringField(nullable=True)
+        props = fields.ListField([str, int, float], nullable=True)
+        embedded = fields.EmbeddedField(Emb, nullable=True)
+
+    user = User(name=None, props=None)
+    user.validate()

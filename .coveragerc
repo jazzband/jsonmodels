@@ -5,3 +5,5 @@ omit =
     setup.py
     tasks.py
     jsonmodels/__init__.py
+[report]
+show_missing = true

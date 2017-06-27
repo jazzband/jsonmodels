@@ -60,14 +60,14 @@ def build_json_schema_object(cls, parent_builder=None):
 
 
 def _parse_list(field, parent_builder):
-    builder = builders.ListBuilder(parent_builder)
+    builder = builders.ListBuilder(parent_builder, field.nullable)
     for type in field.items_types:
         builder.add_type_schema(build_json_schema(type, builder))
     return builder
 
 
 def _parse_embedded(field, parent_builder):
-    builder = builders.EmbeddedBuilder(parent_builder)
+    builder = builders.EmbeddedBuilder(parent_builder, field.nullable)
     for type in field.types:
         builder.add_type_schema(build_json_schema(type, builder))
     return builder
@@ -81,14 +81,19 @@ def build_json_schema_primitive(cls, parent_builder):
 
 def _specify_field_type(field):
     if isinstance(field, fields.StringField):
-        return {'type': 'string'}
+        obj = {'type': 'string'}
     elif isinstance(field, fields.IntField):
-        return {'type': 'number'}
+        obj = {'type': 'number'}
     elif isinstance(field, fields.FloatField):
-        return {'type': 'float'}
+        obj = {'type': 'float'}
     elif isinstance(field, fields.BoolField):
-        return {'type': 'boolean'}
+        obj = {'type': 'boolean'}
+    else:
+        raise errors.FieldNotSupported(
+            'Field {field} is not supported!'.format(
+                field=type(field).__class__.__name__))
 
-    raise errors.FieldNotSupported(
-        'Field {field} is not supported!'.format(
-            field=type(field).__class__.__name__))
+    if field.nullable:
+        obj['type'] = [obj['type'], 'null']
+
+    return obj

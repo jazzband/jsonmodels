@@ -40,6 +40,7 @@ Features
 
         name = fields.StringField(required=True)
         breed = fields.StringField()
+        love_humans = fields.IntField(nullable=True)
 
 
     class Dog(models.Base):
@@ -59,8 +60,9 @@ Features
 
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
+        nickname = fields.StringField(nullable=True)
         car = fields.EmbeddedField(Car)
-        pets = fields.ListField([Cat, Dog])
+        pets = fields.ListField([Cat, Dog], nullable=True)
 
 * Access to values through attributes:
 
@@ -103,6 +105,7 @@ Features
         },
         'surname': 'Bravo',
         'name': 'Johny',
+        'nickname': None,
         'pets': [
             {'name': 'Garfield'},
             {'age': 9, 'name': 'Dogmeat'}
@@ -135,6 +138,7 @@ Features
             },
             'surname': {'type': 'string'},
             'name': {'type': 'string'},
+            'nickname': {'type': ['string', 'null']}
             'pets': {
                 'items': {
                     'oneOf': [
@@ -155,6 +159,9 @@ Features
                                 'age': {'type': 'number'},
                                 'name': {'type': 'string'}
                             }
+                        },
+                        {
+                            'type': 'null'
                         }
                     ]
                 },
@@ -177,17 +184,25 @@ Features
     ...         ],
     ...     )
     ...     age = fields.IntField(
-    ...         required=True,
+    ...         nullable=True,
     ...         validators=[
     ...             validators.Min(18),
     ...             validators.Max(101),
     ...         ]
     ...     )
+    ...     nickname = fields.StringField(
+    ...         required=True,
+    ...         nullable=True
+    ...     )
+    ...
 
     >>> person = Person()
     >>> person.age = 11
     >>> person.validate()
     *** ValidationError: '11' is lower than minimum ('18').
+    >>> person.age = None
+    >>> person.validate()
+    None
 
     >>> person.age = 19
     >>> person.name = 'Scott_'
@@ -198,6 +213,10 @@ Features
     >>> person.validate()
     None
 
+    >>> person.nickname = None
+    >>> person.validate()
+    *** ValidationError: Field is required!
+
     >>> person.to_json_schema()
     {
         "additionalProperties": false,
@@ -205,17 +224,20 @@ Features
             "age": {
                 "maximum": 101,
                 "minimum": 18,
-                "type": "number"
+                "type": ["number", "null"]
             },
             "name": {
                 "maxLength": 25,
                 "minLength": 3,
                 "pattern": "/^[A-Za-z]+$/",
                 "type": "string"
+            },
+            "nickname": {,
+                "type": ["string", "null"]
             }
         },
         "required": [
-            "age",
+            "nickname",
             "name"
         ],
         "type": "object"

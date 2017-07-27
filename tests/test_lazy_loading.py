@@ -65,11 +65,6 @@ def test_embedded_model(model):
     entity.secondary.data = 42
 
     with pytest.raises(errors.ValidationError):
-        entity.secondary.data = '42'
-
-    entity.secondary.data = 42
-
-    with pytest.raises(errors.ValidationError):
         entity.secondary = 'something different'
 
     entity.secondary = None

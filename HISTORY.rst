@@ -3,6 +3,15 @@
 History
 -------
 
+2.2 (2017-08-21)
+++++++++++++++++
+
+* Fixed time fields, when value is not required.
+* Dropped support for python 2.6
+* Added support for python 3.6
+* Added nullable param for fields.
+* Improved model representation.
+
 2.1.5 (2017-02-01)
 ++++++++++++++++++
 

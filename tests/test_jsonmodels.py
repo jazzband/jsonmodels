@@ -43,9 +43,6 @@ def test_type_validation():
 
     alan = Person()
 
-    with pytest.raises(errors.ValidationError):
-        alan.age = '42'
-
     alan.age = 42
 
 
@@ -195,11 +192,6 @@ def test_embedded_model():
     assert entity.secondary is None
     entity.name = 'chuck'
     entity.secondary = Secondary()
-    entity.secondary.data = 42
-
-    with pytest.raises(errors.ValidationError):
-        entity.secondary.data = '42'
-
     entity.secondary.data = 42
 
     with pytest.raises(errors.ValidationError):

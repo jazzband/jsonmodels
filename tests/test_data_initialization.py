@@ -1,4 +1,5 @@
 import pytest
+import six
 
 from jsonmodels import models, fields, errors
 
@@ -296,3 +297,22 @@ def test_deep_initialization_for_embed_field():
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
+
+
+def test_int_field_parsing():
+
+    class Counter(models.Base):
+        value = fields.IntField()
+
+    counter0 = Counter(value=None)
+    assert counter0.value is None
+    counter1 = Counter(value=1)
+    assert isinstance(counter1.value, int)
+    assert counter1.value == 1
+    counter2 = Counter(value='2')
+    assert isinstance(counter2.value, int)
+    assert counter2.value == 2
+    if not six.PY3:
+        counter3 = Counter(value=long(3))  # noqa
+        assert isinstance(counter3.value, int)
+        assert counter3.value == 3

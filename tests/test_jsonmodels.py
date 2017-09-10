@@ -330,7 +330,7 @@ def test_repr():
 
     chuck = Person()
 
-    assert chuck.__repr__() == '<Person: Person object>'
+    assert chuck.__repr__() == 'Person()'
     assert chuck.__str__() == 'Person object'
 
     class Person2(models.Base):
@@ -344,14 +344,15 @@ def test_repr():
 
     chuck = Person2()
 
-    assert chuck.__repr__() == '<Person2: >'
+    assert chuck.__repr__() == 'Person2()'
 
     chuck.name = 'Chuck'
-    assert chuck.__repr__() == '<Person2: Chuck>'
+    assert chuck.__repr__() == "Person2(name='Chuck')"
     assert chuck.__str__() == 'Chuck'
 
     chuck.name = 'Testa'
-    assert chuck.__repr__() == '<Person2: Testa>'
+    chuck.age = 42
+    assert chuck.__repr__() == "Person2(age=42, name='Testa')"
     assert chuck.__str__() == 'Testa'
 
 

@@ -1,5 +1,3 @@
-import six
-
 from . import parsers, errors
 from .fields import BaseField
 from .errors import ValidationError
@@ -65,13 +63,20 @@ class Base(object):
         return parsers.to_json_schema(cls)
 
     def __repr__(self):
-        try:
-            txt = six.text_type(self)
-        except TypeError:
-            txt = ''
-        return '<{name}: {text}>'.format(
-            name=self.__class__.__name__,
-            text=txt,
+        attrs = {}
+        for name, _ in self:
+            try:
+                attr = getattr(self, name)
+                if attr is not None:
+                    attrs[name] = repr(attr)
+            except ValidationError:
+                pass
+
+        return '{class_name}({fields})'.format(
+            class_name=self.__class__.__name__,
+            fields=', '.join(
+                '{0[0]}={0[1]}'.format(x) for x in sorted(attrs.items())
+            ),
         )
 
     def __str__(self):

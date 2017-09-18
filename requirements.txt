@@ -12,7 +12,6 @@ mock
 pep8
 py
 pyflakes
-pyhistory
 pytest
 pytest-cov
 sphinxcontrib-spelling

@@ -190,7 +190,9 @@ class Length(object):
 
 
 class Enum(object):
+
     """Validator for enums."""
+
     def __init__(self, *choices):
         """Init.
 

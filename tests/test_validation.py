@@ -262,3 +262,14 @@ def test_validation_nullable():
 
     user = User(name=None, props=None)
     user.validate()
+
+
+def test_enum_validation():
+    validator = validators.Enum('cat', 'dog', 'fish')
+
+    validator.validate('cat')
+    validator.validate('dog')
+    validator.validate('fish')
+
+    with pytest.raises(errors.ValidationError):
+        validator.validate('horse')

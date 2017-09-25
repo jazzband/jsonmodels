@@ -1,0 +1,10 @@
+{
+    "additionalProperties": false,
+    "properties": {
+        "handness": {
+            "type": "string",
+            "enum": ["left", "right"]
+        }
+    },
+    "type": "object"
+}

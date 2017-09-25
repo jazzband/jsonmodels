@@ -187,3 +187,24 @@ class Length(object):
 
         if self.maximum_value:
             field_schema['maxLength'] = self.maximum_value
+
+
+class Enum(object):
+
+    """Validator for enums."""
+
+    def __init__(self, *choices):
+        """Init.
+
+        :param [] choices: Valid choices for the field.
+        """
+
+        self.choices = list(choices)
+
+    def validate(self, value):
+        if value not in self.choices:
+            tpl = "Value '{val}' is not a valid choice."
+            raise ValidationError(tpl.format(val=value))
+
+    def modify_schema(self, field_schema):
+        field_schema['enum'] = self.choices

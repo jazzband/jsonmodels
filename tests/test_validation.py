@@ -53,22 +53,17 @@ def test_validation():
     assert 33 == arg.pop()
 
 
+class Person(models.Base):
+    children = fields.ListField(["Person"])
+
+
 def test_validators_are_always_iterable():
 
-    class Person(models.Base):
-
-        children = fields.ListField()
-
     alan = Person()
-
     assert isinstance(alan.get_field('children').validators, list)
 
 
 def test_get_field_not_found():
-
-    class Person(models.Base):
-
-        children = fields.ListField()
 
     alan = Person()
 

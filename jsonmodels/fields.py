@@ -458,3 +458,28 @@ class DateTimeField(StringField):
             return parse(value)
         else:
             return None
+
+
+class TimestampField(BaseField):
+
+    """Timestamp field."""
+
+    types = (datetime.datetime,)
+
+    def __init__(self, *args, **kwargs):
+        """Init."""
+        super(TimestampField, self).__init__(*args, **kwargs)
+
+    def to_struct(self, value):
+        """Cast `datetime` object to POSIX timestamp."""
+        if value is None:
+            return value
+        return int(value.strftime('%s'))
+
+    def parse_value(self, value):
+        """Parse POSIC timestamp into instance of `datetime`."""
+        if value is None:
+            return value
+        if isinstance(value, datetime.datetime):
+            return value
+        return datetime.datetime.fromtimestamp(int(value))

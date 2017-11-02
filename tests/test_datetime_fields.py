@@ -281,3 +281,87 @@ def test_datetime_field_is_none():
     datetime_field = fields.DateTimeField()
 
     assert datetime_field.parse_value(None) is None
+
+
+def test_timestamp_field_parse_value():
+    timestamp = 1509289889
+    timestampField = fields.TimestampField()
+
+    dt = timestampField.parse_value(timestamp)
+
+    assert datetime.datetime(2017, 10, 29, 16, 11, 29) == dt
+
+
+def test_timestamp_field_parse_str_value():
+    timestamp = "1509289889"
+    timestampField = fields.TimestampField()
+
+    dt = timestampField.parse_value(timestamp)
+
+    assert datetime.datetime(2017, 10, 29, 16, 11, 29) == dt
+
+
+def test_timestamp_field_parse_none():
+    timestamp = None
+    timestampField = fields.TimestampField()
+
+    dt = timestampField.parse_value(timestamp)
+
+    assert dt is None
+
+
+def test_timestamp_field_parse_timestamp_0():
+    timestamp = 0
+    timestampField = fields.TimestampField()
+
+    dt = timestampField.parse_value(timestamp)
+
+    assert datetime.datetime(1970, 1, 1, 1, 0) == dt
+
+
+def test_timestamp_field_parse_invalid_timestamp():
+    timestamp = "no_timestamp"
+    timestampField = fields.TimestampField()
+
+    with pytest.raises(ValueError):
+        timestampField.parse_value(timestamp)
+
+
+def test_timestamp_field_to_struct():
+    dt = datetime.datetime(2017, 10, 29, 16, 11, 29)
+    timestampField = fields.TimestampField()
+
+    timestamp = timestampField.to_struct(dt)
+
+    assert 1509289889 == timestamp
+
+
+def test_timestamp_field_none_to_struct():
+    dt = None
+    timestampField = fields.TimestampField()
+
+    timestamp = timestampField.to_struct(dt)
+
+    assert timestamp is None
+
+
+def test_timestamp():
+    class Event(models.Base):
+        timestamp = fields.TimestampField()
+
+    event = Event()
+    event.timestamp = 1509289889
+
+    assert datetime.datetime(2017, 10, 29, 16, 11, 29) == event.timestamp
+    assert {'timestamp': 1509289889} == event.to_struct()
+
+
+def test_timestamp_is_none():
+    class Event(models.Base):
+        timestamp = fields.TimestampField()
+
+    event = Event()
+    event.timestamp = None
+
+    assert event.timestamp is None
+    assert {} == event.to_struct()

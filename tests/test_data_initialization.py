@@ -1,5 +1,6 @@
 import pytest
 import six
+import datetime
 
 from jsonmodels import models, fields, errors
 
@@ -316,3 +317,39 @@ def test_int_field_parsing():
         counter3 = Counter(value=long(3))  # noqa
         assert isinstance(counter3.value, int)
         assert counter3.value == 3
+
+
+def test_default_value():
+
+    class Job(models.Base):
+        title = fields.StringField()
+        company = fields.StringField()
+
+    default_job = Job(tile="Unemployed", company="N/A")
+    default_age = 18
+    default_name = "John Doe"
+    default_height = 1.70
+    default_hobbies = ["eating", "reading"]
+    default_last_ate = datetime.time()
+    default_birthday = datetime.date.today()
+    default_time_of_death = datetime.datetime.now()
+
+    class Person(models.Base):
+        name = fields.StringField(default=default_name)
+        age = fields.IntField(default=default_age)
+        height = fields.FloatField(default=default_height)
+        job = fields.EmbeddedField(Job, default=default_job)
+        hobbies = fields.ListField(items_types=str, default=default_hobbies)
+        last_ate = fields.TimeField(default=default_last_ate)
+        birthday = fields.DateField(default=default_birthday)
+        time_of_death = fields.DateTimeField(default=default_time_of_death)
+
+    p = Person()
+    assert p.name == default_name
+    assert p.age == default_age
+    assert p.height == default_height
+    assert p.hobbies == default_hobbies
+    assert p.job == default_job
+    assert p.last_ate == default_last_ate
+    assert p.birthday == default_birthday
+    assert p.time_of_death == default_time_of_death

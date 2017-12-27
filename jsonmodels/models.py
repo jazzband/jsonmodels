@@ -3,10 +3,6 @@ from .fields import BaseField
 from .errors import ValidationError
 
 
-class _CacheKey(object):
-    pass
-
-
 class Base(object):
 
     """Base class for all models."""
@@ -15,11 +11,13 @@ class Base(object):
         self._cache_key = _CacheKey()
         self.populate(**kwargs)
 
-    def populate(self, **kw):
+    def populate(self, **values):
         """Populate values to fields. Skip non-existing."""
-        for name, field in self:
-            if name in kw:
-                field.__set__(self, kw[name])
+        for name, structure_name, field in self.iterate_with_name():
+            if name in values:
+                field.__set__(self, values[name])
+            elif structure_name in values:
+                field.__set__(self, values[structure_name])
 
     def get_field(self, field_name):
         """Get field associated with given attribute."""
@@ -47,11 +45,23 @@ class Base(object):
 
     @classmethod
     def iterate_over_fields(cls):
-        """Iterate through fields and values."""
+        """Iterate through fields as `(attribute_name, field_instance)`."""
         for attr in dir(cls):
             clsattr = getattr(cls, attr)
             if isinstance(clsattr, BaseField):
                 yield attr, clsattr
+
+    @classmethod
+    def iterate_with_name(cls):
+        """Iterate over fields, but also give `structure_name`.
+
+        Format is `(attribute_name, structue_name, field_instance)`.
+        Structure name is name under which value is seen in structure and
+        schema (in primitives) and only there.
+        """
+        for attr_name, field in cls.iterate_over_fields():
+            structure_name = field.name or attr_name
+            yield attr_name, structure_name, field
 
     def to_struct(self):
         """Cast model to Python structure."""
@@ -113,3 +123,7 @@ class Base(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class _CacheKey(object):
+    """Object to identify model in memory."""

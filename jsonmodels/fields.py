@@ -1,4 +1,5 @@
 import datetime
+import re
 from weakref import WeakKeyDictionary
 
 import six
@@ -15,18 +16,16 @@ class BaseField(object):
     types = None
 
     def __init__(
-            self,
-            required=False,
-            nullable=False,
-            help_text=None,
-            validators=None,
-            default=None):
+            self, required=False, nullable=False, help_text=None,
+            validators=None, default=None, name=None):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
         self._default = default
         self._assign_validators(validators)
+        self.name = name
+        self._validate_name()
 
     def _assign_validators(self, validators):
         if validators and not isinstance(validators, list):
@@ -115,6 +114,12 @@ class BaseField(object):
 
         """
         return self._default
+
+    def _validate_name(self):
+        if self.name is None:
+            return
+        if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+            raise ValueError('Wrong name', self.name)
 
 
 class StringField(BaseField):

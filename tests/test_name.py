@@ -39,3 +39,15 @@ def test_load_data_from_structure_names():
     chuck = Human(**data)
     assert chuck.name == 'Chuck'
     assert chuck.surname == 'Testa'
+
+
+def test_names_duplicates_are_invalid():
+
+    with pytest.raises(ValueError):
+        class Human(models.Base):
+            name = fields.StringField(name='surname')
+            surname = fields.StringField()
+
+    class OtherHuman(models.Base):
+        name = fields.StringField(name='surname')
+        surname = fields.StringField(name='name')

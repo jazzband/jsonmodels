@@ -195,10 +195,10 @@ class ListField(BaseField):
 
         types = []
         for type_ in self.items_types:
-            if type(type_) is type:
-                types.append(type_)
-            else:
+            if isinstance(type_, six.string_types):
                 types.append(_LazyType(type_))
+            else:
+                types.append(type_)
         self.items_types = tuple(types)
 
     def validate(self, value):
@@ -282,10 +282,10 @@ class EmbeddedField(BaseField):
 
         types = []
         for type_ in model_types:
-            if type(type_) is type:
-                types.append(type_)
-            else:
+            if isinstance(type_, six.string_types):
                 types.append(_LazyType(type_))
+            else:
+                types.append(type_)
         self.types = tuple(types)
 
     def _finish_initialization(self, owner):
@@ -329,11 +329,11 @@ class EmbeddedField(BaseField):
 
 class _LazyType(object):
 
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, path):
+        self.path = path
 
     def evaluate(self, base_cls):
-        module, type_name = _evaluate_path(self.type, base_cls)
+        module, type_name = _evaluate_path(self.path, base_cls)
         return _import(module, type_name)
 
 

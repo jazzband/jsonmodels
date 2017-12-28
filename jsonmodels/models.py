@@ -1,9 +1,27 @@
+import six
+
 from . import parsers, errors
 from .fields import BaseField
 from .errors import ValidationError
 
 
-class Base(object):
+class JsonmodelMeta(type):
+
+    def __new__(cls, name, bases, attributes):
+        Model = super(cls, cls).__new__(cls, name, bases, attributes)
+        cls.validate_model(Model)
+        return Model
+
+    @staticmethod
+    def validate_model(Model):
+        taken_names = set()
+        for _, name, field in Model.iterate_with_name():
+            if name in taken_names:
+                raise ValueError('Name taken', name)
+            taken_names.add(name)
+
+
+class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     """Base class for all models."""
 

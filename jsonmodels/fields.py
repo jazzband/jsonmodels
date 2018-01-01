@@ -121,6 +121,9 @@ class BaseField(object):
         if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
             raise ValueError('Wrong name', self.name)
 
+    def structue_name(self, default):
+        return self.name if self.name is not None else default
+
 
 class StringField(BaseField):
 

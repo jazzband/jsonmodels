@@ -8,17 +8,21 @@ from .errors import ValidationError
 class JsonmodelMeta(type):
 
     def __new__(cls, name, bases, attributes):
-        Model = super(cls, cls).__new__(cls, name, bases, attributes)
-        cls.validate_model(Model)
-        return Model
+        cls.validate_fields(attributes)
+        return super(cls, cls).__new__(cls, name, bases, attributes)
 
     @staticmethod
-    def validate_model(Model):
+    def validate_fields(attributes):
+        fields = {
+            key: value for key, value in attributes.items()
+            if isinstance(value, BaseField)
+        }
         taken_names = set()
-        for _, name, field in Model.iterate_with_name():
-            if name in taken_names:
-                raise ValueError('Name taken', name)
-            taken_names.add(name)
+        for name, field in fields.items():
+            structue_name = field.structue_name(name)
+            if structue_name in taken_names:
+                raise ValueError('Name taken', structue_name, name)
+            taken_names.add(structue_name)
 
 
 class Base(six.with_metaclass(JsonmodelMeta, object)):
@@ -31,11 +35,14 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def populate(self, **values):
         """Populate values to fields. Skip non-existing."""
-        for name, structure_name, field in self.iterate_with_name():
+        values = values.copy()
+        fields = list(self.iterate_with_name())
+        for _, structure_name, field in fields:
+            if structure_name in values:
+                field.__set__(self, values.pop(structure_name))
+        for name, _, field in fields:
             if name in values:
-                field.__set__(self, values[name])
-            elif structure_name in values:
-                field.__set__(self, values[structure_name])
+                field.__set__(self, values.pop(name))
 
     def get_field(self, field_name):
         """Get field associated with given attribute."""
@@ -78,7 +85,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         schema (in primitives) and only there.
         """
         for attr_name, field in cls.iterate_over_fields():
-            structure_name = field.name or attr_name
+            structure_name = field.structue_name(attr_name)
             yield attr_name, structure_name, field
 
     def to_struct(self):

@@ -91,9 +91,9 @@ def test_to_struct_nested_2():
     pattern['location'] = 'somewhere'
     assert pattern == parking.to_struct()
 
-    v = Viper()
-    v.serial = '12345'
-    parking.cars.append(v)
+    viper = Viper()
+    viper.serial = '12345'
+    parking.cars.append(viper)
     pattern['cars'].append({'serial': '12345'})
     assert pattern == parking.to_struct()
 
@@ -101,9 +101,9 @@ def test_to_struct_nested_2():
     pattern['cars'].append({})
     assert pattern == parking.to_struct()
 
-    l = Lamborghini()
-    l.serial = '54321'
-    parking.cars.append(l)
+    lamborghini = Lamborghini()
+    lamborghini.serial = '54321'
+    parking.cars.append(lamborghini)
     pattern['cars'].append({'serial': '54321'})
     assert pattern == parking.to_struct()
 

@@ -81,12 +81,12 @@ class Regex(object):
 
     """Validator for regular expressions."""
 
-    FLAGS = {
+    ECMA_FLAGS = {
         'ignorecase': re.I,
         'multiline': re.M,
     }
 
-    def __init__(self, pattern, **flags):
+    def __init__(self, pattern, ecma=True, **flags):
         """Init.
 
         Note, that if given pattern is ECMA regex, given flags will be
@@ -94,28 +94,33 @@ class Regex(object):
 
 
         :param string pattern: Pattern of regex.
+        :param boolean ecma: Whether or not use ECMA regex, default True.
         :param dict flags: Allowed flags can be found in attribute
-            `ATTRIBUTES_TO_FLAGS`. Invalid flags will be ignored.
+            `ECMA_FLAGS`. Invalid flags will be ignored. Will be ignored if not
+            ECMA regex.
 
         """
-        flags = dict(
-            (key, value) for key, value in flags.items()
-            if key in self.FLAGS
-        )
+        self.ecma = ecma
+        self.pattern = pattern
+        self.flags = []
 
-        if utilities.is_ecma_regex(pattern):
-            result = utilities.convert_ecma_regex_to_python(pattern)
-            self.pattern = result.regex
+        if ecma:
+            flags = dict(
+                (key, value) for key, value in flags.items()
+                if key in self.ECMA_FLAGS
+            )
 
-            for key, _ in flags.items():
-                flags.update(
-                    {key: self.FLAGS[key] in result.flags})
-        else:
-            self.pattern = pattern
+            if utilities.is_ecma_regex(pattern):
+                result = utilities.convert_ecma_regex_to_python(pattern)
+                self.pattern = result.regex
 
-        self.flags = [
-            self.FLAGS[key] for key, value
-            in flags.items() if value]
+                for key, _ in flags.items():
+                    flags.update(
+                        {key: self.ECMA_FLAGS[key] in result.flags})
+
+            self.flags = [
+                self.ECMA_FLAGS[key] for key, value
+                in flags.items() if value]
 
     def validate(self, value):
         """Validate value."""
@@ -137,8 +142,11 @@ class Regex(object):
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
-        field_schema['pattern'] = utilities.convert_python_regex_to_ecma(
-            self.pattern, self.flags)
+        if self.ecma:
+            field_schema['pattern'] = utilities.convert_python_regex_to_ecma(
+                self.pattern, self.flags)
+        else:
+            field_schema['pattern'] = self.pattern
 
 
 class Length(object):

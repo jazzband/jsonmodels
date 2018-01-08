@@ -221,6 +221,22 @@ def test_regex_validator_when_ecma_regex_given():
     person.name = 'Jimmy'
 
 
+def test_regex_modify_schema():
+    regex = "regex"
+    schema = {}
+    validator = validators.Regex(regex)
+    validator.modify_schema(schema)
+    assert schema["pattern"] == "/{}/".format(regex)
+
+
+def test_regex_modify_schema_no_ecma():
+    regex = "regex"
+    schema = {}
+    validator = validators.Regex(regex, ecma=False)
+    validator.modify_schema(schema)
+    assert schema["pattern"] == regex
+
+
 def test_init():
     validator = validators.Length(0, 10)
     assert 0 == validator.minimum_value

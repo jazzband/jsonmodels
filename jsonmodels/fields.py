@@ -19,11 +19,13 @@ class BaseField(object):
             required=False,
             nullable=False,
             help_text=None,
-            validators=None):
+            validators=None,
+            default=None):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
+        self._default = default
         self._assign_validators(validators)
 
     def _assign_validators(self, validators):
@@ -106,14 +108,13 @@ class BaseField(object):
             except AttributeError:
                 validator(value)
 
-    @staticmethod
-    def get_default_value():
+    def get_default_value(self):
         """Get default value for field.
 
         Each field can specify its default.
 
         """
-        return None
+        return self._default
 
 
 class StringField(BaseField):
@@ -170,7 +171,12 @@ class ListField(BaseField):
 
         """
         self._assign_types(items_types)
+        default = kwargs.pop("default", None)
+        if default is None:
+            default = ModelCollection(self)
         super(ListField, self).__init__(*args, **kwargs)
+        self.validate(default)
+        self._default = default
         self.required = False
 
     def _assign_types(self, items_types):
@@ -210,9 +216,6 @@ class ListField(BaseField):
                     types=', '.join([t.__name__ for t in self.items_types]),
                     type=type(item).__name__,
                 ))
-
-    def get_default_value(self):
-        return ModelCollection(self)
 
     def parse_value(self, values):
         """Cast value to proper collection."""

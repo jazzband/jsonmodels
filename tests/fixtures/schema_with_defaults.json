@@ -1,0 +1,41 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "age": {
+            "type": "number",
+            "default": 18
+        },
+        "name": {
+            "type": "string",
+            "default": "John Doe"
+        },
+        "nicknames": {
+            "type": "array",
+            "default": [
+                "yo",
+                "dawg"
+            ],
+            "items": {
+                "type": "string"
+            }
+        },
+        "pet": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "default": "Dog"
+                }
+            },
+            "default": {
+                "kind": "Cat"
+            }
+        },
+        "profession": {
+            "type": "string",
+            "default": null
+        }
+    }
+}

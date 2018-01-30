@@ -8,6 +8,11 @@ from .errors import ValidationError
 from .collections import ModelCollection
 
 
+# unique marker for "no default value specified". None is not good enough since
+# it is a completely valid default value.
+NO_DEFAULT = object()
+
+
 class BaseField(object):
 
     """Base class for all fields."""
@@ -20,13 +25,17 @@ class BaseField(object):
             nullable=False,
             help_text=None,
             validators=None,
-            default=None):
+            default=NO_DEFAULT):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
-        self._default = default
         self._assign_validators(validators)
+        self.has_default = default is not NO_DEFAULT
+        default = default if self.has_default else None
+        if self.has_default:
+            self.validate(default)
+        self._default = default
 
     def _assign_validators(self, validators):
         if validators and not isinstance(validators, list):
@@ -171,13 +180,13 @@ class ListField(BaseField):
 
         """
         self._assign_types(items_types)
-        default = kwargs.pop("default", None)
-        if default is None:
-            default = ModelCollection(self)
         super(ListField, self).__init__(*args, **kwargs)
-        self.validate(default)
-        self._default = default
         self.required = False
+
+    def get_default_value(self):
+        if self._default is None:
+            return ModelCollection(self)
+        return self._default
 
     def _assign_types(self, items_types):
         if items_types:

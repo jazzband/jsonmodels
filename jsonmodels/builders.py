@@ -11,12 +11,15 @@ from . import errors
 
 class Builder(object):
 
-    def __init__(self, parent=None, nullable=False):
+    def __init__(self, parent=None, nullable=False, has_default=False,
+                 default=None):
         self.parent = parent
         self.types_builders = {}
         self.types_count = defaultdict(int)
         self.definitions = set()
         self.nullable = nullable
+        self.has_default = has_default
+        self.default = default
 
     def register_type(self, type, builder):
         if self.parent:
@@ -66,13 +69,12 @@ class ObjectBuilder(Builder):
             self.required.append(name)
 
     def build(self):
+        builder = self.get_builder(self.type)
         if self.is_definition and not self.is_root:
-            builder = self.get_builder(self.type)
             self.add_definition(builder)
             [self.maybe_build(value) for _, value in self.properties.items()]
             return '#/definitions/{name}'.format(name=self.type_name)
         else:
-            builder = self.get_builder(self.type)
             return builder.build_definition(nullable=self.nullable)
 
     @property
@@ -135,20 +137,28 @@ class PrimitiveBuilder(Builder):
         self.type = type
 
     def build(self):
+        schema = {}
         if issubclass(self.type, six.string_types):
-            obj = {'type': 'string'}
+            obj_type = 'string'
         elif issubclass(self.type, bool):
-            obj = {'type': 'boolean'}
+            obj_type = 'boolean'
         elif issubclass(self.type, int):
-            obj = {'type': 'number'}
+            obj_type = 'number'
         elif issubclass(self.type, float):
-            obj = {'type': 'number'}
+            obj_type = 'number'
         else:
             raise errors.FieldNotSupported(
                 "Can't specify value schema!", self.type
             )
 
-        return obj if not self.nullable else {'type': [obj['type'], 'null']}
+        if self.nullable:
+            obj_type = [obj_type, 'null']
+        schema['type'] = obj_type
+
+        if self.has_default:
+            schema["default"] = self.default
+
+        return schema
 
 
 class ListBuilder(Builder):
@@ -161,9 +171,12 @@ class ListBuilder(Builder):
         self.schemas.append(schema)
 
     def build(self):
-        result = {'type': 'array'}
+        schema = {'type': 'array'}
         if self.nullable:
             self.add_type_schema({'type': 'null'})
+
+        if self.has_default:
+            schema["default"] = [self.to_struct(i) for i in self.default]
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
@@ -171,12 +184,19 @@ class ListBuilder(Builder):
         else:
             items = {'oneOf': schemas}
 
-        result['items'] = items
-        return result
+        schema['items'] = items
+        return schema
 
     @property
     def is_definition(self):
         return self.parent.is_definition
+
+    @staticmethod
+    def to_struct(item):
+        from .models import Base
+        if isinstance(item, Base):
+            return item.to_struct()
+        return item
 
 
 class EmbeddedBuilder(Builder):
@@ -194,9 +214,16 @@ class EmbeddedBuilder(Builder):
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
-            return schemas[0]
+            schema = schemas[0]
         else:
-            return {'oneOf': schemas}
+            schema = {'oneOf': schemas}
+
+        if self.has_default:
+            # The default value of EmbeddedField is expected to be an instance
+            # of a subclass of models.Base, thus have `to_struct`
+            schema["default"] = self.default.to_struct()
+
+        return schema
 
     @property
     def is_definition(self):

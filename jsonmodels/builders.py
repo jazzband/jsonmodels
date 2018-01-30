@@ -178,7 +178,7 @@ class ListBuilder(Builder):
         if self.has_default:
             schema["default"] = [self.to_struct(i) for i in self.default]
 
-        schemas = [self.maybe_build(schema) for schema in self.schemas]
+        schemas = [self.maybe_build(s) for s in self.schemas]
         if len(schemas) == 1:
             items = schemas[0]
         else:

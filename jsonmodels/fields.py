@@ -10,7 +10,7 @@ from .collections import ModelCollection
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
-NO_DEFAULT = object()
+NotSet = object()
 
 
 class BaseField(object):
@@ -25,17 +25,19 @@ class BaseField(object):
             nullable=False,
             help_text=None,
             validators=None,
-            default=NO_DEFAULT):
+            default=NotSet):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
         self._assign_validators(validators)
-        self.has_default = default is not NO_DEFAULT
-        default = default if self.has_default else None
-        if self.has_default:
+        if default is not NotSet:
             self.validate(default)
         self._default = default
+
+    @property
+    def has_default(self):
+        return self._default is not NotSet
 
     def _assign_validators(self, validators):
         if validators and not isinstance(validators, list):

@@ -7,19 +7,22 @@ from collections import defaultdict
 import six
 
 from . import errors
+from .fields import NotSet
 
 
 class Builder(object):
 
-    def __init__(self, parent=None, nullable=False, has_default=False,
-                 default=None):
+    def __init__(self, parent=None, nullable=False, default=None):
         self.parent = parent
         self.types_builders = {}
         self.types_count = defaultdict(int)
         self.definitions = set()
         self.nullable = nullable
-        self.has_default = has_default
         self.default = default
+
+    @property
+    def has_default(self):
+        return self.default is not NotSet
 
     def register_type(self, type, builder):
         if self.parent:

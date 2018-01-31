@@ -144,6 +144,27 @@ def test_regex_validation():
         validator.validate('trololo')
 
 
+def test_regex_validation_flags():
+    # Invalid flags ignored
+    validator = validators.Regex("foo", bla=True, ble=False, ignorecase=True)
+    assert validator.flags == [validators.Regex.FLAGS["ignorecase"]]
+
+    # Flag kwargs must be True-y
+    validator = validators.Regex("foo", ignorecase=False, multiline=True)
+    assert validator.flags == [validators.Regex.FLAGS["multiline"]]
+
+    # ECMA pattern flags recognized
+    validator = validators.Regex("/foo/im")
+    assert sorted(validator.flags) == sorted([
+        validators.Regex.FLAGS["multiline"],
+        validators.Regex.FLAGS["ignorecase"],
+    ])
+
+    # ECMA pattern overrides flags kwargs
+    validator = validators.Regex("/foo/", ignorecase=True, multiline=True)
+    assert validator.flags == []
+
+
 def test_regex_validation_for_wrong_type():
 
     validator = validators.Regex('some')

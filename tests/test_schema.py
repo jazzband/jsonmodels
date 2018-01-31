@@ -1,6 +1,6 @@
 import pytest
 
-from jsonmodels import models, fields, validators, errors
+from jsonmodels import models, fields, validators, errors, builders
 from jsonmodels.utilities import compare_schemas
 
 from .utilities import get_fixture
@@ -386,3 +386,19 @@ def test_default_value():
     pattern = get_fixture('schema_with_defaults.json')
 
     assert compare_schemas(pattern, schema)
+
+
+def test_primitives():
+    cases = (
+        (str, "string"),
+        (bool, "boolean"),
+        (int, "number"),
+        (float, "number")
+    )
+    for pytpe, jstype in cases:
+        b = builders.PrimitiveBuilder(pytpe)
+        assert b.build() == {"type": jstype}
+        b = builders.PrimitiveBuilder(pytpe, nullable=True)
+        assert b.build() == {"type": [jstype, "null"]}
+        b = builders.PrimitiveBuilder(pytpe, nullable=True, default=0)
+        assert b.build() == {"type": [jstype, "null"], "default": 0}

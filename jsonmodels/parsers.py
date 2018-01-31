@@ -77,8 +77,7 @@ def _parse_embedded(field, parent_builder):
 
 
 def build_json_schema_primitive(cls, parent_builder):
-    builder = builders.PrimitiveBuilder(parent_builder)
-    builder.set_type(cls)
+    builder = builders.PrimitiveBuilder(cls, parent_builder)
     return builder
 
 

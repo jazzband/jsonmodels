@@ -132,11 +132,8 @@ def _apply_validators_modifications(field_schema, field):
 
 class PrimitiveBuilder(Builder):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, type, *args, **kwargs):
         super(PrimitiveBuilder, self).__init__(*args, **kwargs)
-        self.type = None
-
-    def set_type(self, type):
         self.type = type
 
     def build(self):

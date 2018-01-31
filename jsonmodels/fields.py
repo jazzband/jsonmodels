@@ -125,7 +125,7 @@ class BaseField(object):
         Each field can specify its default.
 
         """
-        return self._default
+        return self._default if self.has_default else None
 
 
 class StringField(BaseField):
@@ -186,9 +186,10 @@ class ListField(BaseField):
         self.required = False
 
     def get_default_value(self):
-        if self._default is None:
+        default = super(ListField, self).get_default_value()
+        if default is None:
             return ModelCollection(self)
-        return self._default
+        return default
 
     def _assign_types(self, items_types):
         if items_types:

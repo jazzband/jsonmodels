@@ -12,7 +12,7 @@ from .fields import NotSet
 
 class Builder(object):
 
-    def __init__(self, parent=None, nullable=False, default=None):
+    def __init__(self, parent=None, nullable=False, default=NotSet):
         self.parent = parent
         self.types_builders = {}
         self.types_count = defaultdict(int)

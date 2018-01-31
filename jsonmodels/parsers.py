@@ -62,8 +62,7 @@ def build_json_schema_object(cls, parent_builder=None):
 
 def _parse_list(field, parent_builder):
     builder = builders.ListBuilder(
-        parent_builder, field.nullable, has_default=field.has_default,
-        default=field._default)
+        parent_builder, field.nullable, default=field._default)
     for type in field.items_types:
         builder.add_type_schema(build_json_schema(type, builder))
     return builder
@@ -71,8 +70,7 @@ def _parse_list(field, parent_builder):
 
 def _parse_embedded(field, parent_builder):
     builder = builders.EmbeddedBuilder(
-        parent_builder, field.nullable, has_default=field.has_default,
-        default=field._default)
+        parent_builder, field.nullable, default=field._default)
     for type in field.types:
         builder.add_type_schema(build_json_schema(type, builder))
     return builder

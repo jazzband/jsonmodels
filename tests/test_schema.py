@@ -102,8 +102,14 @@ def test_model_with_constructors():
         brand = fields.StringField(required=True)
         registration = fields.StringField(required=True)
 
+        def __init__(self, some_value):
+            pass
+
     class Toy(models.Base):
         name = fields.StringField(required=True)
+
+        def __init__(self, some_value):
+            pass
 
     class Kid(models.Base):
         name = fields.StringField(required=True)
@@ -111,12 +117,18 @@ def test_model_with_constructors():
         age = fields.IntField()
         toys = fields.ListField(Toy)
 
+        def __init__(self, some_value):
+            pass
+
     class Person(models.Base):
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
         kids = fields.ListField(Kid)
         car = fields.EmbeddedField(Car)
+
+        def __init__(self, some_value):
+            pass
 
     schema = Person.to_json_schema()
 

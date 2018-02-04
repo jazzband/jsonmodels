@@ -12,6 +12,7 @@ Contributors
 
 (In alphabetical order)
 
+* Avraham Shukron <avraham.shukron@gmail.com>
 * Chris Targett <chris.targett@xlevus.net>
 * Dima Kuznetsov <dima.kuznetsov@toganetworks.com>
 * Johannes Garimort <johannes.garimort@gmx.net>

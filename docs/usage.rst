@@ -158,6 +158,60 @@ example:
     ...     if self.maximum_value:
     ...         field_schema['maxLength'] = self.maximum_value
 
+Default values
+--------------
+
+You can specify default value for each of field (and this default value will be
+shown in generated schema). Currently only scalars are accepted and model
+instances for `EmbeddedField`, like in example below:
+
+.. code-block:: python
+
+    class Pet(models.Base):
+        kind = fields.StringField(default="Dog")
+
+    class Person(models.Base):
+        name = fields.StringField(default="John Doe")
+        age = fields.IntField(default=18)
+        pet = fields.EmbeddedField(Pet, default=Pet(kind="Cat"))
+        profession = fields.StringField(default=None)
+
+With this schema generated look like this:
+
+.. code-block:: json
+
+    {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "age": {
+                "type": "number",
+                "default": 18
+            },
+        "name": {
+                "type": "string",
+                "default": "John Doe"
+            },
+            "pet": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "default": "Dog"
+                    }
+                },
+                "default": {
+                    "kind": "Cat"
+                }
+            },
+            "profession": {
+                "type": "string",
+                "default": null
+            }
+        }
+    }
+
 Casting to Python struct (and JSON)
 -----------------------------------
 
@@ -196,3 +250,49 @@ is possible to you to operate just on models.
 
 And thats it! You can serve then this schema through your API or use it for
 validation incoming data.
+
+Different names in structure and objects
+----------------------------------------
+
+In case you want (or you must) use different names in generated/consumed data
+and its schema you can use `name=` param for your fields:
+
+.. code-block:: python
+
+    class Human(models.Base):
+
+        name = fields.StringField()
+        surname = fields.StringField(name='second-name')
+
+The `name` value will be usable as `surname` in all places where you are using
+**objects** and will be seen as `second-name` in all structures - so in dict
+representation and jsonschema.
+
+.. code-block:: python
+
+    >>> john = Human(name='John', surname='Doe')
+    >>> john.surname
+    'Doe'
+    >>> john.to_struct()
+    {'name': 'John', 'second-name': 'Doe'}
+
+Remember that your models must not have conflicting names in a way that it
+cannot be resolved by model. You can use cross references though, like this:
+
+.. code-block:: python
+
+    class Foo(models.Base):
+
+        one = fields.IntField(name='two')
+        two = fields.IntField(name='one')
+
+But remember that **structure name has priority** so with `Foo` model above you
+could run into wrong assumptions:
+
+.. code-block:: python
+
+    >>> foo = Foo(one=1, two=2)
+    >>> foo.one
+    2  # Not 1, like expected
+    >>> foo.two
+    1  # Not 2, like expected

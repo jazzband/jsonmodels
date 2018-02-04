@@ -77,7 +77,7 @@ class Max(object):
             field_schema['exclusiveMaximum'] = True
 
 
-class Regex(object):
+class ECMA262Regex(object):
 
     """Validator for regular expressions."""
 
@@ -131,6 +131,45 @@ class Regex(object):
         """Modify field schema."""
         field_schema['pattern'] = utilities.convert_python_regex_to_ecma(
             self.pattern, self.flags)
+
+
+class Regex(ECMA262Regex):
+    """
+    Deprecated. Use the more explicit `ECMA262Regex`
+    """
+    pass
+
+
+class PythonRegex(object):
+
+    def __init__(self, pattern, flags=0):
+        """
+        Initialize a new `PythonRegex` validator.
+
+        :param pattern: The regex pattern to validate against.
+        :param flags: Bitwise OR of valid `re` flags.
+            Notice that these flags WILL NOT be written to a schema generated
+            by this validator.
+        """
+        self.regex = re.compile(pattern, flags=flags)
+
+    def validate(self, value):
+        try:
+            match = self.regex.search(value)
+        except TypeError as e:
+            raise ValidationError(*e.args)
+        if match is None:
+            raise ValidationError(
+                'Value "{value}" did not match pattern "{pattern}".'.format(
+                    value=value, pattern=self.regex.pattern
+                ))
+
+    def modify_schema(self, schema):
+        """
+        Adds the "pattern" keyword to the given schema.
+        Note that all `re` flags are discarded and are not added to the schema.
+        """
+        schema["pattern"] = self.regex.pattern
 
 
 class Length(object):

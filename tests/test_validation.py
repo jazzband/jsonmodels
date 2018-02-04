@@ -133,18 +133,22 @@ def test_max_exclusive_validation():
 
 def test_regex_validation():
 
-    validator = validators.Regex('some')
-    assert 'some' == validator.pattern
+    v1 = validators.Regex('some')
+    v2 = validators.PythonRegex('some')
+    assert 'some' == v1.pattern == v2.regex.pattern
 
-    validator.validate('some string')
-    validator.validate('get some chips')
-    with pytest.raises(errors.ValidationError):
-        validator.validate('asdf')
-    with pytest.raises(errors.ValidationError):
-        validator.validate('trololo')
+    for s in ('some string', 'get some chips'):
+        v1.validate(s)
+        v2.validate(s)
+
+    for v in (v1, v2):
+        with pytest.raises(errors.ValidationError):
+            v.validate('asdf')
+        with pytest.raises(errors.ValidationError):
+            v.validate('trololo')
 
 
-def test_regex_validation_flags():
+def test_ecma_regex_validation_flags():
     # Invalid flags ignored
     validator = validators.Regex("foo", bla=True, ble=False, ignorecase=True)
     assert validator.flags == [validators.Regex.FLAGS["ignorecase"]]
@@ -167,11 +171,13 @@ def test_regex_validation_flags():
 
 def test_regex_validation_for_wrong_type():
 
-    validator = validators.Regex('some')
-    assert 'some' == validator.pattern
+    v1 = validators.Regex('some')
+    v2 = validators.PythonRegex('some')
+    assert 'some' == v1.pattern == v2.regex.pattern
 
-    with pytest.raises(errors.ValidationError):
-        validator.validate(1)
+    for v in (v1, v2):
+        with pytest.raises(errors.ValidationError):
+            v.validate(1)
 
 
 def test_validation_2():

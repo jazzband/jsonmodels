@@ -9,6 +9,11 @@ from .errors import ValidationError
 from .collections import ModelCollection
 
 
+# unique marker for "no default value specified". None is not good enough since
+# it is a completely valid default value.
+NotSet = object()
+
+
 class BaseField(object):
 
     """Base class for all fields."""
@@ -16,16 +21,27 @@ class BaseField(object):
     types = None
 
     def __init__(
-            self, required=False, nullable=False, help_text=None,
-            validators=None, default=None, name=None):
+            self,
+            required=False,
+            nullable=False,
+            help_text=None,
+            validators=None,
+            default=NotSet,
+            name=None):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
-        self._default = default
         self._assign_validators(validators)
         self.name = name
         self._validate_name()
+        if default is not NotSet:
+            self.validate(default)
+        self._default = default
+
+    @property
+    def has_default(self):
+        return self._default is not NotSet
 
     def _assign_validators(self, validators):
         if validators and not isinstance(validators, list):
@@ -113,7 +129,7 @@ class BaseField(object):
         Each field can specify its default.
 
         """
-        return self._default
+        return self._default if self.has_default else None
 
     def _validate_name(self):
         if self.name is None:
@@ -179,13 +195,14 @@ class ListField(BaseField):
 
         """
         self._assign_types(items_types)
-        default = kwargs.pop("default", None)
-        if default is None:
-            default = ModelCollection(self)
         super(ListField, self).__init__(*args, **kwargs)
-        self.validate(default)
-        self._default = default
         self.required = False
+
+    def get_default_value(self):
+        default = super(ListField, self).get_default_value()
+        if default is None:
+            return ModelCollection(self)
+        return default
 
     def _assign_types(self, items_types):
         if items_types:

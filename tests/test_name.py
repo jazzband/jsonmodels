@@ -72,3 +72,20 @@ def test_data_assignation():
     product = Product(description='foo')
     assert product.brand == 'foo'
     assert product.description is None
+
+
+def test_nested_data():
+
+    class Pet(models.Base):
+
+        name = fields.StringField(required=True, name='pets_name')
+        age = fields.IntField()
+
+    class Human(models.Base):
+
+        name = fields.StringField()
+        pet = fields.EmbeddedField(Pet, name='owned-pet')
+
+    data = {'name': 'John', 'owned-pet': {'pets_name': 'Pinky', 'age': 2}}
+    human = Human(**data)
+    assert human.pet.name == 'Pinky'

@@ -89,3 +89,15 @@ def test_nested_data():
     data = {'name': 'John', 'owned-pet': {'pets_name': 'Pinky', 'age': 2}}
     human = Human(**data)
     assert human.pet.name == 'Pinky'
+
+
+def test_cross_names():
+
+    class Foo(models.Base):
+
+        one = fields.IntField(name='two')
+        two = fields.IntField(name='one')
+
+    foo = Foo(one=1, two=2)
+    assert foo.one == 2
+    assert foo.two == 1

@@ -4,64 +4,64 @@ jsonmodels package
 Submodules
 ----------
 
-jsonmodels.builders module
---------------------------
+jsonmodels\.builders module
+---------------------------
 
 .. automodule:: jsonmodels.builders
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.collections module
------------------------------
+jsonmodels\.collections module
+------------------------------
 
 .. automodule:: jsonmodels.collections
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.errors module
-------------------------
+jsonmodels\.errors module
+-------------------------
 
 .. automodule:: jsonmodels.errors
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.fields module
-------------------------
+jsonmodels\.fields module
+-------------------------
 
 .. automodule:: jsonmodels.fields
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.models module
-------------------------
+jsonmodels\.models module
+-------------------------
 
 .. automodule:: jsonmodels.models
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.parsers module
--------------------------
+jsonmodels\.parsers module
+--------------------------
 
 .. automodule:: jsonmodels.parsers
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.utilities module
----------------------------
+jsonmodels\.utilities module
+----------------------------
 
 .. automodule:: jsonmodels.utilities
     :members:
     :undoc-members:
     :show-inheritance:
 
-jsonmodels.validators module
-----------------------------
+jsonmodels\.validators module
+-----------------------------
 
 .. automodule:: jsonmodels.validators
     :members:

@@ -1,4 +1,5 @@
 import datetime
+import re
 from weakref import WeakKeyDictionary
 
 import six
@@ -25,12 +26,15 @@ class BaseField(object):
             nullable=False,
             help_text=None,
             validators=None,
-            default=NotSet):
+            default=NotSet,
+            name=None):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
         self.nullable = nullable
         self._assign_validators(validators)
+        self.name = name
+        self._validate_name()
         if default is not NotSet:
             self.validate(default)
         self._default = default
@@ -127,6 +131,15 @@ class BaseField(object):
         """
         return self._default if self.has_default else None
 
+    def _validate_name(self):
+        if self.name is None:
+            return
+        if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+            raise ValueError('Wrong name', self.name)
+
+    def structue_name(self, default):
+        return self.name if self.name is not None else default
+
 
 class StringField(BaseField):
 
@@ -202,10 +215,10 @@ class ListField(BaseField):
 
         types = []
         for type_ in self.items_types:
-            if type(type_) is type:
-                types.append(type_)
-            else:
+            if isinstance(type_, six.string_types):
                 types.append(_LazyType(type_))
+            else:
+                types.append(type_)
         self.items_types = tuple(types)
 
     def validate(self, value):
@@ -289,10 +302,10 @@ class EmbeddedField(BaseField):
 
         types = []
         for type_ in model_types:
-            if type(type_) is type:
-                types.append(type_)
-            else:
+            if isinstance(type_, six.string_types):
                 types.append(_LazyType(type_))
+            else:
+                types.append(type_)
         self.types = tuple(types)
 
     def _finish_initialization(self, owner):
@@ -336,11 +349,11 @@ class EmbeddedField(BaseField):
 
 class _LazyType(object):
 
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, path):
+        self.path = path
 
     def evaluate(self, base_cls):
-        module, type_name = _evaluate_path(self.type, base_cls)
+        module, type_name = _evaluate_path(self.path, base_cls)
         return _import(module, type_name)
 
 

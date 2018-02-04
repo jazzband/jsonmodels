@@ -14,7 +14,7 @@ def to_struct(model):
     model.validate()
 
     resp = {}
-    for name, field in model:
+    for _, name, field in model.iterate_with_name():
         value = field.__get__(model)
         if value is None:
             continue
@@ -49,7 +49,7 @@ def build_json_schema_object(cls, parent_builder=None):
     builder = builders.ObjectBuilder(cls, parent_builder)
     if builder.count_type(builder.type) > 1:
         return builder
-    for name, field in cls.iterate_over_fields():
+    for _, name, field in cls.iterate_with_name():
         if isinstance(field, fields.EmbeddedField):
             builder.add_field(name, field, _parse_embedded(field, builder))
         elif isinstance(field, fields.ListField):

@@ -1,13 +1,31 @@
+import six
+
 from . import parsers, errors
 from .fields import BaseField
 from .errors import ValidationError
 
 
-class _CacheKey(object):
-    pass
+class JsonmodelMeta(type):
+
+    def __new__(cls, name, bases, attributes):
+        cls.validate_fields(attributes)
+        return super(cls, cls).__new__(cls, name, bases, attributes)
+
+    @staticmethod
+    def validate_fields(attributes):
+        fields = {
+            key: value for key, value in attributes.items()
+            if isinstance(value, BaseField)
+        }
+        taken_names = set()
+        for name, field in fields.items():
+            structue_name = field.structue_name(name)
+            if structue_name in taken_names:
+                raise ValueError('Name taken', structue_name, name)
+            taken_names.add(structue_name)
 
 
-class Base(object):
+class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     """Base class for all models."""
 
@@ -15,11 +33,16 @@ class Base(object):
         self._cache_key = _CacheKey()
         self.populate(**kwargs)
 
-    def populate(self, **kw):
+    def populate(self, **values):
         """Populate values to fields. Skip non-existing."""
-        for name, field in self:
-            if name in kw:
-                field.__set__(self, kw[name])
+        values = values.copy()
+        fields = list(self.iterate_with_name())
+        for _, structure_name, field in fields:
+            if structure_name in values:
+                field.__set__(self, values.pop(structure_name))
+        for name, _, field in fields:
+            if name in values:
+                field.__set__(self, values.pop(name))
 
     def get_field(self, field_name):
         """Get field associated with given attribute."""
@@ -47,11 +70,23 @@ class Base(object):
 
     @classmethod
     def iterate_over_fields(cls):
-        """Iterate through fields and values."""
+        """Iterate through fields as `(attribute_name, field_instance)`."""
         for attr in dir(cls):
             clsattr = getattr(cls, attr)
             if isinstance(clsattr, BaseField):
                 yield attr, clsattr
+
+    @classmethod
+    def iterate_with_name(cls):
+        """Iterate over fields, but also give `structure_name`.
+
+        Format is `(attribute_name, structue_name, field_instance)`.
+        Structure name is name under which value is seen in structure and
+        schema (in primitives) and only there.
+        """
+        for attr_name, field in cls.iterate_over_fields():
+            structure_name = field.structue_name(attr_name)
+            yield attr_name, structure_name, field
 
     def to_struct(self):
         """Cast model to Python structure."""
@@ -113,3 +148,7 @@ class Base(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+
+class _CacheKey(object):
+    """Object to identify model in memory."""

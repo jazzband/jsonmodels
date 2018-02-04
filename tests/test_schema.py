@@ -1,6 +1,6 @@
 import pytest
 
-from jsonmodels import models, fields, validators, errors
+from jsonmodels import models, fields, validators, errors, builders
 from jsonmodels.utilities import compare_schemas
 
 from .utilities import get_fixture
@@ -99,40 +99,36 @@ def test_model3():
 def test_model_with_constructors():
 
     class Car(models.Base):
-
-        def __init__(self, some_value):
-            pass
-
         brand = fields.StringField(required=True)
         registration = fields.StringField(required=True)
 
-    class Toy(models.Base):
-
         def __init__(self, some_value):
             pass
 
+    class Toy(models.Base):
         name = fields.StringField(required=True)
 
-    class Kid(models.Base):
-
         def __init__(self, some_value):
             pass
 
+    class Kid(models.Base):
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
         toys = fields.ListField(Toy)
 
-    class Person(models.Base):
-
         def __init__(self, some_value):
             pass
 
+    class Person(models.Base):
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
         kids = fields.ListField(Kid)
         car = fields.EmbeddedField(Car)
+
+        def __init__(self, some_value):
+            pass
 
     schema = Person.to_json_schema()
 
@@ -383,3 +379,38 @@ def test_enum_validator():
     pattern = get_fixture('schema_enum.json')
 
     assert compare_schemas(pattern, schema)
+
+
+def test_default_value():
+
+    class Pet(models.Base):
+        kind = fields.StringField(default="Dog")
+
+    class Person(models.Base):
+        name = fields.StringField(default="John Doe")
+        age = fields.IntField(default=18)
+        pet = fields.EmbeddedField(Pet, default=Pet(kind="Cat"))
+        nicknames = fields.ListField(
+            items_types=(str,), default=["yo", "dawg"])
+        profession = fields.StringField(default=None)
+
+    schema = Person.to_json_schema()
+    pattern = get_fixture('schema_with_defaults.json')
+
+    assert compare_schemas(pattern, schema)
+
+
+def test_primitives():
+    cases = (
+        (str, "string"),
+        (bool, "boolean"),
+        (int, "number"),
+        (float, "number")
+    )
+    for pytpe, jstype in cases:
+        b = builders.PrimitiveBuilder(pytpe)
+        assert b.build() == {"type": jstype}
+        b = builders.PrimitiveBuilder(pytpe, nullable=True)
+        assert b.build() == {"type": [jstype, "null"]}
+        b = builders.PrimitiveBuilder(pytpe, nullable=True, default=0)
+        assert b.build() == {"type": [jstype, "null"], "default": 0}

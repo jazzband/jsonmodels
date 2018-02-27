@@ -164,7 +164,7 @@ class Length(object):
                 val=value, min=self.minimum_value
             ))
 
-        if self.minimum_value is not None and len_ > self.maximum_value:
+        if self.maximum_value is not None and len_ > self.maximum_value:
             raise ValidationError(
                 "Value '{val}' length is bigger than "
                 "allowed maximum '{max}'.".format(

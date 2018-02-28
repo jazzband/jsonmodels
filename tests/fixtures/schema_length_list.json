@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "names": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 2,
+            "maxItems": 4
+        },
+        "surname": {
+            "type": "string"
+        }
+    }
+}

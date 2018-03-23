@@ -1,8 +1,6 @@
 #!groovy
 node('docker')
 {
-    def imageTag = "stardust-193112/jsonmodels:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
-
     stage('Checkout')
     {
         checkout scm
@@ -10,6 +8,6 @@ node('docker')
 
     stage('Build')
     {
-        sh "docker build --tag ${imageTag} ."
+        sh "docker build --tag jsonmodels:${env.BRANCH_NAME}.${env.BUILD_NUMBER} ."
     }
 }

@@ -325,6 +325,28 @@ def test_length_validator():
     assert compare_schemas(pattern, schema)
 
 
+def test_length_validator_list():
+
+    class People(models.Base):
+        min_max_len = fields.ListField(str, validators=validators.Length(2, 4))
+        min_len = fields.ListField(str, validators=validators.Length(2))
+        max_len = fields.ListField(str, validators=validators.Length(4))
+        item_validator_int = fields.ListField(
+            int, item_validators=[validators.Min(10), validators.Max(20)]
+        )
+        item_validator_str = fields.ListField(
+            str, item_validators=[validators.Length(10, 20),
+                                  validators.Regex(r"\w+")],
+            validators=[validators.Length(1, 2)],
+        )
+        surname = fields.StringField()
+
+    schema = People.to_json_schema()
+
+    pattern = get_fixture('schema_length_list.json')
+    assert compare_schemas(pattern, schema)
+
+
 def test_max_only_validator():
 
     class Person(models.Base):

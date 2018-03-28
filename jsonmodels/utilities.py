@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import sre_constants
+
 import six
 import re
 from collections import namedtuple
@@ -96,19 +98,14 @@ def is_ecma_regex(regex):
     :rtype: bool
 
     """
-    parts = regex.split('/')
-
-    if len(parts) == 1:
-        return False
-
-    if len(parts) < 3:
-        raise ValueError('Given regex isn\'t ECMA regex nor Python regex.')
-    parts.pop()
-    parts.append('')
-
-    raw_regex = '/'.join(parts)
-    if raw_regex.startswith('/') and raw_regex.endswith('/'):
+    if re.match(r"/[^/]+/[gimuy]*", regex):
         return True
+
+    try:
+        re.compile(regex)
+    except sre_constants.error as err:
+        raise ValueError("Given regex {} isn't ECMA regex nor "
+                         "Python regex: {}.".format(regex, err))
     return False
 
 

@@ -53,6 +53,7 @@ def test_validation():
     assert 33 == arg.pop()
 
 
+
 def test_validators_are_always_iterable():
 
     class Person(models.Base):
@@ -259,30 +260,62 @@ def test_init():
         validators.Length()
 
 
-def test_length_validation():
+def test_length_validation_string_min_max():
     validator = validators.Length(1, 10)
     validator.validate('word')
     validator.validate('w' * 10)
     validator.validate('w')
-    validator.validate([1, 2, 3])
 
     with pytest.raises(errors.ValidationError):
         validator.validate('')
     with pytest.raises(errors.ValidationError):
         validator.validate('na' * 10)
 
+
+def test_length_validation_string_min():
     validator = validators.Length(minimum_value=1)
     validator.validate("a")
     validator.validate("aasdasd" * 1000)
     with pytest.raises(errors.ValidationError):
         validator.validate("")
 
+
+def test_length_validation_string_max():
     validator = validators.Length(maximum_value=10)
     validator.validate("")
     validator.validate("a")
     validator.validate("a" * 10)
     with pytest.raises(errors.ValidationError):
         validator.validate("a" * 11)
+
+
+def test_length_validation_list_min_max():
+    validator = validators.Length(1, 10)
+    validator.validate([1, 2, 3, 4])
+    validator.validate([1] * 10)
+    validator.validate([1])
+
+    with pytest.raises(errors.ValidationError):
+        validator.validate([])
+    with pytest.raises(errors.ValidationError):
+        validator.validate([1, 2] * 10)
+
+
+def test_length_validation_list_min():
+    validator = validators.Length(minimum_value=1)
+    validator.validate([1])
+    validator.validate(range(1000))
+    with pytest.raises(errors.ValidationError):
+        validator.validate([])
+
+
+def test_length_validation_list_max():
+    validator = validators.Length(maximum_value=10)
+    validator.validate([])
+    validator.validate([1])
+    validator.validate([1] * 10)
+    with pytest.raises(errors.ValidationError):
+        validator.validate([1] * 11)
 
 
 def test_validation_nullable():

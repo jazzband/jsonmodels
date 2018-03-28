@@ -191,13 +191,14 @@ class ListField(BaseField):
         """Init.
 
         `ListField` is **always not required**. If you want to control number
-        of items use validators. If you want to validate each individual item, use `item_validators`.
+        of items use validators. If you want to validate each individual item,
+        use `item_validators`.
 
         """
         self._assign_types(items_types)
+        self.item_validators = item_validators
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
-        self.item_validators = item_validators
 
     def get_default_value(self):
         default = super(ListField, self).get_default_value()

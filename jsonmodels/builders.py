@@ -129,6 +129,8 @@ def _apply_validators_modifications(field_schema, field):
         except AttributeError:
             pass
 
+    # arrays may have separate validators for each item.
+    # we should also add those validators to the schema.
     if "items" in field_schema:
         for validator in field.item_validators:
             try:

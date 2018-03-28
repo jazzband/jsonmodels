@@ -186,16 +186,17 @@ class ListField(BaseField):
 
     types = (list,)
 
-    def __init__(self, items_types=None, *args, **kwargs):
+    def __init__(self, items_types=None, item_validators=(), *args, **kwargs):
         """Init.
 
         `ListField` is **always not required**. If you want to control number
-        of items use validators.
+        of items use validators. If you want to validate each individual item, use `item_validators`.
 
         """
         self._assign_types(items_types)
         super().__init__(*args, **kwargs)
         self.required = False
+        self.item_validators = item_validators
 
     def get_default_value(self):
         default = super().get_default_value()
@@ -223,22 +224,25 @@ class ListField(BaseField):
     def validate(self, value):
         super().validate(value)
 
-        if len(self.items_types) == 0:
-            return
-
         for item in value:
             self.validate_single_value(item)
 
-    def validate_single_value(self, item):
+    def validate_single_value(self, value):
+        for validator in self.item_validators:
+            try:
+                validator.validate(value)
+            except AttributeError:
+                validator(value)
+
         if len(self.items_types) == 0:
             return
 
-        if not isinstance(item, self.items_types):
+        if not isinstance(value, self.items_types):
             raise ValidationError(
                 'All items must be instances '
                 'of "{types}", and not "{type}".'.format(
                     types=', '.join([t.__name__ for t in self.items_types]),
-                    type=type(item).__name__,
+                    type=type(value).__name__,
                 ))
 
     def parse_value(self, values):

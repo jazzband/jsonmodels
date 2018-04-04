@@ -7,6 +7,19 @@
         },
         "surname": {
             "type": "string"
+        },
+        "friend_names": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "some": "unproper value"
+            }
+        },
+        "friend_surnames": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         }
     },
     "type": "object"

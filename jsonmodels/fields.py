@@ -88,10 +88,10 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{types}"'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                ),
-                value,
+                'Value is wrong, expected type "{types}", received {value}.'.format(
+                    types=', '.join([t.__name__ for t in self.types]),
+                    value=value
+                )
             )
 
     def _check_types(self):
@@ -262,7 +262,7 @@ class ListField(BaseField):
     def _cast_value(self, value):
         if isinstance(value, self.items_types):
             return value
-        else:
+        elif isinstance(value, dict):
             if len(self.items_types) != 1:
                 tpl = 'Cannot decide which type to choose from "{types}".'
                 raise ValidationError(
@@ -271,6 +271,13 @@ class ListField(BaseField):
                     )
                 )
             return self.items_types[0](**value)
+        else:
+            raise ValidationError(
+                'All items must be instances '
+                'of "{types}", and not "{type}".'.format(
+                    types=', '.join([t.__name__ for t in self.items_types]),
+                    type=type(value).__name__,
+                ))
 
     def _finish_initialization(self, owner):
         super(ListField, self)._finish_initialization(owner)

@@ -194,6 +194,13 @@ def test_validators_can_modify_schema():
         name = fields.StringField(validators=ClassBasedValidator())
         surname = fields.StringField(validators=function_validator)
 
+        friend_names = fields.ListField(
+            str, item_validators=ClassBasedValidator()
+        )
+        friend_surnames = fields.ListField(
+            str, item_validators=function_validator
+        )
+
     for person in [Person, Person()]:
         schema = person.to_json_schema()
 

@@ -88,10 +88,9 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{types}", received {value}.'.format(
-                    types=', '.join([t.__name__ for t in self.types]),
-                    value=value
-                )
+                'Value is wrong, expected type "{types}", received {value}.'
+                .format(types=', '.join([t.__name__ for t in self.types]),
+                        value=value)
             )
 
     def _check_types(self):
@@ -196,7 +195,9 @@ class ListField(BaseField):
 
         """
         self._assign_types(items_types)
-        self.item_validators = item_validators
+        self.item_validators = [item_validators] \
+            if item_validators and not isinstance(item_validators, list) \
+            else item_validators
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
 

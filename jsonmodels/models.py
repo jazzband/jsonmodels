@@ -58,7 +58,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         try:
             field.__set__(self, value)
         except ValidationError as error:
-            raise ValidationError("Error for field '{name}': {error}."
+            raise ValidationError("Error for field '{name}': {error}"
                                   .format(name=field_name, error=error))
 
     def __iter__(self):
@@ -72,7 +72,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
             try:
                 field.validate_for_object(self)
             except ValidationError as error:
-                raise ValidationError("Error for field '{name}': {error}."
+                raise ValidationError("Error for field '{name}': {error}"
                                       .format(name=name, error=error))
 
     @classmethod
@@ -128,7 +128,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         try:
             return super(Base, self).__setattr__(name, value)
         except ValidationError as error:
-            raise ValidationError("Error for field '{name}': {error}."
+            raise ValidationError("Error for field '{name}': {error}"
                                   .format(name=name, error=error))
 
     def __eq__(self, other):

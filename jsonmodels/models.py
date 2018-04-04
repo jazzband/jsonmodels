@@ -128,10 +128,8 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         try:
             return super(Base, self).__setattr__(name, value)
         except ValidationError as error:
-            raise ValidationError(
-                "Error for field '{name}'.".format(name=name),
-                error
-            )
+            raise ValidationError("Error for field '{name}': {error}."
+                                  .format(name=name, error=error))
 
     def __eq__(self, other):
         if type(other) is not type(self):

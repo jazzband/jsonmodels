@@ -171,12 +171,44 @@ def test_deep_initialization_error_with_list_and_multitypes():
         ],
     }
 
-    with pytest.raises(errors.ValidationError):
+    expected_error = 'Error for field \'cars\': ' \
+                         'Cannot decide which type to ' \
+                         'choose from "Viper, Lamborghini".'
+
+    with pytest.raises(errors.ValidationError) as exc_info:
         Parking(**data)
 
+    assert expected_error == str(exc_info.value)
+
     parking = Parking()
-    with pytest.raises(errors.ValidationError):
+    with pytest.raises(errors.ValidationError) as exc_info:
         parking.populate(**data)
+
+    assert expected_error == str(exc_info.value)
+
+
+def test_deep_initialization_error_with_invalid_type():
+    class Viper(models.Base):
+
+        brand = fields.StringField()
+
+    class Lamborghini(models.Base):
+
+        brand = fields.StringField()
+
+    class Parking(models.Base):
+
+        location = fields.StringField()
+        cars = fields.ListField([Viper, Lamborghini])
+
+    parking = Parking()
+    with pytest.raises(errors.ValidationError) as exc_info:
+        parking.populate(location="somewhere", cars=["viper", "lamborghini"])
+
+    expected_error = 'Error for field \'cars\': ' \
+                         'All items must be instances of ' \
+                         '"Viper, Lamborghini", and not "str".'
+    assert expected_error == str(exc_info.value)
 
 
 def test_deep_initialization_error_when_result_non_iterable():

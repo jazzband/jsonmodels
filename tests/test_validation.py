@@ -53,6 +53,35 @@ def test_validation():
     assert 33 == arg.pop()
 
 
+def test_list_item_validation():
+
+    validator1 = FakeValidator()
+    validator2 = FakeValidator()
+
+    called = []
+    arg = []
+
+    def validator3(value):
+        called.append(1)
+        arg.append(value)
+
+    class Article(models.Base):
+
+        tags = fields.ListField(
+            str,
+            item_validators=[validator1, validator2, validator3]
+        )
+
+    article = Article()
+    article.tags.append("news")
+
+    validator1.assert_called_once_with('news')
+    validator2.assert_called_once_with('news')
+
+    assert 1 == sum(called)
+    assert "news" == arg.pop()
+
+
 def test_validators_are_always_iterable():
 
     class Person(models.Base):
@@ -62,6 +91,17 @@ def test_validators_are_always_iterable():
     alan = Person()
 
     assert isinstance(alan.get_field('children').validators, list)
+
+
+def test_item_validators_are_always_iterable():
+
+    class Person(models.Base):
+
+        children = fields.ListField()
+
+    alan = Person()
+
+    assert isinstance(alan.get_field('children').item_validators, list)
 
 
 def test_get_field_not_found():
@@ -142,6 +182,25 @@ def test_regex_validation():
         validator.validate('asdf')
     with pytest.raises(errors.ValidationError):
         validator.validate('trololo')
+
+
+def test_regex_validation_custom_error():
+
+    validator = validators.Regex('some', custom_error="error")
+    assert 'some' == validator.pattern
+
+    validator.validate('some string')
+    validator.validate('get some chips')
+
+    expected_error = "error"
+
+    with pytest.raises(errors.ValidationError) as exc_info:
+        validator.validate('asdf')
+    assert expected_error == str(exc_info.value)
+
+    with pytest.raises(errors.ValidationError) as exc_info:
+        validator.validate('trololo')
+    assert expected_error == str(exc_info.value)
 
 
 def test_regex_validation_flags():

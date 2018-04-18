@@ -86,7 +86,7 @@ class Regex(object):
         'multiline': re.M,
     }
 
-    def __init__(self, pattern, **flags):
+    def __init__(self, pattern, custom_error=None, **flags):
         """Init.
 
         Note, that if given pattern is ECMA regex, given flags will be
@@ -94,6 +94,7 @@ class Regex(object):
 
 
         :param string pattern: Pattern of regex.
+        :param custom_error: Custom error message in case the regex fails.
         :param bool flags: Flags used for the regex matching.
             Allowed flag names are in the `FLAGS` attribute. The flag value
             does not matter as long as it evaluates to True.
@@ -101,6 +102,7 @@ class Regex(object):
             Invalid flags will be ignored.
 
         """
+        self.custom_error = custom_error
         if utilities.is_ecma_regex(pattern):
             result = utilities.convert_ecma_regex_to_python(pattern)
             self.pattern, self.flags = result
@@ -119,6 +121,8 @@ class Regex(object):
             raise ValidationError(*te.args)
 
         if not result:
+            if self.custom_error:
+                raise ValidationError(self.custom_error)
             raise ValidationError(
                 'Value "{value}" did not match pattern "{pattern}".'.format(
                     value=value, pattern=self.pattern

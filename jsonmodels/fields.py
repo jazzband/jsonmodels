@@ -197,7 +197,7 @@ class ListField(BaseField):
         self._assign_types(items_types)
         self.item_validators = [item_validators] \
             if item_validators and not isinstance(item_validators, list) \
-            else item_validators
+            else item_validators or []
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
 

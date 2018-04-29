@@ -271,6 +271,19 @@ def test_length_validation():
     with pytest.raises(errors.ValidationError):
         validator.validate('na' * 10)
 
+    validator = validators.Length(minimum_value=1)
+    validator.validate("a")
+    validator.validate("aasdasd" * 1000)
+    with pytest.raises(errors.ValidationError):
+        validator.validate("")
+
+    validator = validators.Length(maximum_value=10)
+    validator.validate("")
+    validator.validate("a")
+    validator.validate("a" * 10)
+    with pytest.raises(errors.ValidationError):
+        validator.validate("a" * 11)
+
 
 def test_validation_nullable():
     class Emb(models.Base):

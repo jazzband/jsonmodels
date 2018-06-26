@@ -90,6 +90,8 @@ def _create_primitive_field_schema(field):
         obj_type = 'float'
     elif isinstance(field, fields.BoolField):
         obj_type = 'boolean'
+    elif isinstance(field, fields.DictField):
+        obj_type = 'object'
     else:
         raise errors.FieldNotSupported(
             'Field {field} is not supported!'.format(

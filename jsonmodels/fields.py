@@ -1,5 +1,6 @@
 import datetime
 import re
+from copy import deepcopy
 from weakref import WeakKeyDictionary
 
 import six
@@ -358,6 +359,17 @@ class EmbeddedField(BaseField):
 
     def to_struct(self, value):
         return value.to_struct()
+
+
+class DictField(BaseField):
+    """
+    Field for dictionaries that are not modelled.
+    """
+    types = dict,
+
+    def to_struct(self, value):
+        """Cast value to Python structure."""
+        return deepcopy(value)
 
 
 class _LazyType(object):

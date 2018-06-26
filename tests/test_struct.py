@@ -18,6 +18,7 @@ def test_to_struct_basic():
         surname = fields.StringField(required=True)
         age = fields.IntField()
         cash = fields.FloatField()
+        meta = fields.DictField()
 
     alan = Person()
     with pytest.raises(errors.ValidationError):
@@ -29,12 +30,14 @@ def test_to_struct_basic():
 
     alan.age = 24
     alan.cash = 2445.45
+    alan.meta = {'registered': True, 'friends': []}
 
     pattern = {
         'name': 'Alan',
         'surname': 'Wake',
         'age': 24,
         'cash': 2445.45,
+        'meta': {'registered': True, 'friends': []}
     }
 
     assert pattern == alan.to_struct()

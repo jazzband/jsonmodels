@@ -32,6 +32,7 @@
                 }
             ]
         },
+        "meta": {"type": "object"},
         "computer": {
             "items": {
                 "oneOf": [

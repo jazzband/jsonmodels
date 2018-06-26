@@ -88,9 +88,9 @@ def test_model3():
         age = fields.IntField()
         car = fields.EmbeddedField([Viper, Lamborghini])
         computer = fields.ListField([PC, Laptop, Tablet])
+        meta = fields.DictField()
 
-    chuck = Person()
-    schema = chuck.to_json_schema()
+    schema = Person.to_json_schema()
 
     pattern = get_fixture('schema3.json')
     assert compare_schemas(pattern, schema) is True
@@ -434,7 +434,7 @@ def test_primitives():
         (str, "string"),
         (bool, "boolean"),
         (int, "number"),
-        (float, "number")
+        (float, "number"),
     )
     for pytpe, jstype in cases:
         b = builders.PrimitiveBuilder(pytpe)

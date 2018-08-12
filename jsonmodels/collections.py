@@ -1,5 +1,3 @@
-
-
 class ModelCollection(list):
 
     """`ModelCollection` is list which validates stored values.

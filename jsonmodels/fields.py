@@ -212,7 +212,7 @@ class ListField(BaseField):
             try:
                 self.items_types = tuple(items_types)
             except TypeError:
-                self.items_types = items_types,
+                self.items_types = (items_types, )
         else:
             self.items_types = tuple()
 
@@ -271,11 +271,11 @@ class ListField(BaseField):
         super(ListField, self)._finish_initialization(owner)
 
         types = []
-        for type in self.items_types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for type_ in self.items_types:
+            if isinstance(type_, _LazyType):
+                types.append(type_.evaluate(owner))
             else:
-                types.append(type)
+                types.append(type_)
         self.items_types = tuple(types)
 
     def _elem_to_struct(self, value):

@@ -19,10 +19,10 @@ class JsonmodelMeta(type):
         }
         taken_names = set()
         for name, field in fields.items():
-            structue_name = field.structue_name(name)
-            if structue_name in taken_names:
-                raise ValueError('Name taken', structue_name, name)
-            taken_names.add(structue_name)
+            structure_name = field.structure_name(name)
+            if structure_name in taken_names:
+                raise ValueError('Name taken', structure_name, name)
+            taken_names.add(structure_name)
 
 
 class Base(six.with_metaclass(JsonmodelMeta, object)):
@@ -99,7 +99,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def __repr__(self):
         attrs = {}
-        for name, _ in self:
+        for name, field in self:
             try:
                 attr = getattr(self, name)
                 if attr is not None:
@@ -152,3 +152,4 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
 class _CacheKey(object):
     """Object to identify model in memory."""
+    pass

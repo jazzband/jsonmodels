@@ -14,6 +14,9 @@ from .collections import ModelCollection
 NotSet = object()
 
 
+_FIELD_NAME_REGEX = re.compile(r'^[A-Za-z_](([\w\-]*)?\w+)?$')
+
+
 class BaseField(object):
 
     """Base class for all fields."""
@@ -132,15 +135,14 @@ class BaseField(object):
         return self._default if self.has_default else None
 
     def _validate_name(self):
-        if self.name is not None and not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+        if self.name is not None \
+                and not re.match(_FIELD_NAME_REGEX, self.name):
             raise ValueError('Wrong name', self.name)
 
     def structure_name(self, default):
         return self.name if self.name is not None else default
 
-
-    def structue_name(self, default):
-        return self.structure_name(default)
+    structue_name = structure_name
 
 
 class StringField(BaseField):

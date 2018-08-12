@@ -44,13 +44,14 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
             if name in values:
                 field.__set__(self, values.pop(name))
 
-    def get_field(self, field_name):
+    @classmethod
+    def get_field(cls, field_name):
         """Get field associated with given attribute."""
-        for attr_name, field in self:
-            if field_name == attr_name:
-                return field
-
-        raise errors.FieldNotFound('Field not found', field_name)
+        field = getattr(cls, field_name, None)
+        if isinstance(field, BaseField):
+            return field
+        else:
+            raise errors.FieldNotFound('Field not found', field_name)
 
     def __iter__(self):
         """Iterate through fields and values."""

@@ -132,9 +132,7 @@ class BaseField(object):
         return self._default if self.has_default else None
 
     def _validate_name(self):
-        if self.name is None:
-            return
-        if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+        if self.name is not None and not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
             raise ValueError('Wrong name', self.name)
 
     def structure_name(self, default):
@@ -163,7 +161,8 @@ class IntField(BaseField):
         parsed = super(IntField, self).parse_value(value)
         if parsed is None:
             return parsed
-        return int(parsed)
+        else:
+            return int(parsed)
 
 
 class FloatField(BaseField):
@@ -248,15 +247,12 @@ class ListField(BaseField):
 
     def parse_value(self, values):
         """Cast value to proper collection."""
-        result = self.get_default_value()
-
         if not values:
-            return result
-
-        if not isinstance(values, list):
+            return self.get_default_value()
+        elif not isinstance(values, list):
             return values
-
-        return [self._cast_value(value) for value in values]
+        else:
+            return [self._cast_value(value) for value in values]
 
     def _cast_value(self, value):
         if isinstance(value, self.items_types):
@@ -334,9 +330,9 @@ class EmbeddedField(BaseField):
         """Parse value to proper model type."""
         if not isinstance(value, dict):
             return value
-
-        embed_type = self._get_embed_type()
-        return embed_type(**value)
+        else:
+            embed_type = self._get_embed_type()
+            return embed_type(**value)
 
     def _get_embed_type(self):
         if len(self.types) != 1:
@@ -423,9 +419,10 @@ class TimeField(StringField):
         """Parse string into instance of `time`."""
         if value is None:
             return value
-        if isinstance(value, datetime.time):
+        elif isinstance(value, datetime.time):
             return value
-        return parse(value).timetz()
+        else:
+            return parse(value).timetz()
 
 
 class DateField(StringField):
@@ -455,9 +452,10 @@ class DateField(StringField):
         """Parse string into instance of `date`."""
         if value is None:
             return value
-        if isinstance(value, datetime.date):
+        elif isinstance(value, datetime.date):
             return value
-        return parse(value).date()
+        else:
+            return parse(value).date()
 
 
 class DateTimeField(StringField):
@@ -486,7 +484,7 @@ class DateTimeField(StringField):
         """Parse string into instance of `datetime`."""
         if isinstance(value, datetime.datetime):
             return value
-        if value:
+        elif value:
             return parse(value)
         else:
             return None

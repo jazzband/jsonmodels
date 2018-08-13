@@ -3,7 +3,7 @@ import re
 from weakref import WeakKeyDictionary
 
 import six
-from dateutil.parser import parse
+import dateutil.parser
 
 from .errors import ValidationError
 from .collections import ModelCollection
@@ -431,7 +431,7 @@ class TimeField(StringField):
         elif isinstance(value, datetime.time):
             return value
         else:
-            return parse(value).timetz()
+            return dateutil.parser.parse(value).timetz()
 
 
 class DateField(StringField):
@@ -464,7 +464,7 @@ class DateField(StringField):
         elif isinstance(value, datetime.date):
             return value
         else:
-            return parse(value).date()
+            return dateutil.parser.parse(value).date()
 
 
 class DateTimeField(StringField):
@@ -494,6 +494,6 @@ class DateTimeField(StringField):
         if isinstance(value, datetime.datetime):
             return value
         elif value:
-            return parse(value)
+            return dateutil.parser.parse(value)
         else:
             return None

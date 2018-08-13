@@ -98,10 +98,8 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{types}"'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                ),
-                value,
+                'Value {value!r} is wrong, expected type {types!r}'
+                .format(value=value, types=', '.join(t.__name__ for t in self.types))
             )
 
     def _check_types(self):

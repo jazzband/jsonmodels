@@ -42,6 +42,8 @@ class BaseField(object):
             self.validate(default)
         self._default = default
 
+        self._initialized = False
+
     @property
     def has_default(self):
         return self._default is not NotSet
@@ -52,20 +54,25 @@ class BaseField(object):
         self.validators = validators or []
 
     def __set__(self, instance, value):
-        self._finish_initialization(type(instance))
+        if not self._initialized:
+            self._finish_initialization(type(instance))
+            self._initialized = True
         value = self.parse_value(value)
         self.validate(value)
         self.memory[instance._cache_key] = value
 
     def __get__(self, instance, owner=None):
+        if not self._initialized:
+            if instance is None:
+                self._finish_initialization(owner)
+            else:
+                self._finish_initialization(type(instance))
+            self._initialized = True
         if instance is None:
-            self._finish_initialization(owner)
             return self
-
-        self._finish_initialization(type(instance))
-
-        self._check_value(instance)
-        return self.memory[instance._cache_key]
+        else:
+            self._check_value(instance)
+            return self.memory[instance._cache_key]
 
     def _finish_initialization(self, owner):
         pass

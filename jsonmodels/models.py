@@ -58,22 +58,22 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def validate(self):
         """Explicitly validate all the fields."""
-        for name, field in self:
+        for attr_name, field in self:
             try:
                 field.validate_for_object(self)
             except ValidationError as error:
                 raise ValidationError(
-                    "Error for field '{name}'.".format(name=name),
-                    error,
+                    'Error for field {attr_name!r}: {error}'
+                    .format(attr_name=attr_name, error=error)
                 )
 
     @classmethod
     def iterate_over_fields(cls):
         """Iterate through fields as `(attribute_name, field_instance)`."""
-        for clsname in dir(cls):
-            clsattr = getattr(cls, clsname)
-            if isinstance(clsattr, BaseField):
-                yield clsname, clsattr
+        for attr_name in dir(cls):
+            field = getattr(cls, attr_name)
+            if isinstance(field, BaseField):
+                yield attr_name, field
 
     @classmethod
     def iterate_with_name(cls):
@@ -98,11 +98,11 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def __repr__(self):
         attrs = {}
-        for name, field in self:
+        for attr_name, field in self:
             try:
-                attr = getattr(self, name)
+                attr = getattr(self, attr_name)
                 if attr is not None:
-                    attrs[name] = repr(attr)
+                    attrs[attr_name] = repr(attr)
             except ValidationError:
                 pass
 
@@ -129,14 +129,14 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         if type(other) is not type(self):
             return False
 
-        for name, _ in self.iterate_over_fields():
+        for attr_name, _ in self.iterate_over_fields():
             try:
-                our = getattr(self, name)
+                our = getattr(self, attr_name)
             except errors.ValidationError:
                 our = None
 
             try:
-                their = getattr(other, name)
+                their = getattr(other, attr_name)
             except errors.ValidationError:
                 their = None
 

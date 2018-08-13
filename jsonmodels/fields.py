@@ -71,13 +71,13 @@ class BaseField(object):
         if instance is None:
             return self
         else:
-            self._check_value(instance)
+            self._maybe_assign_default_value(instance)
             return self.memory[instance._cache_key]
 
     def _finish_initialization(self, owner):
         pass
 
-    def _check_value(self, obj):
+    def _maybe_assign_default_value(self, obj):
         if obj._cache_key not in self.memory:
             self.__set__(obj, self.get_default_value())
 

@@ -36,13 +36,12 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
     def populate(self, **values):
         """Populate values to fields. Skip non-existing."""
         values = values.copy()
-        fields = list(self.iterate_with_name())
-        for _, structure_name, field in fields:
+        for attr_name, structure_name, field in self.iterate_with_name():
+            # set field by structure name
             if structure_name in values:
                 field.__set__(self, values.pop(structure_name))
-        for name, _, field in fields:
-            if name in values:
-                field.__set__(self, values.pop(name))
+            elif attr_name in values:
+                field.__set__(self, values.pop(attr_name))
 
     @classmethod
     def get_field(cls, field_name):

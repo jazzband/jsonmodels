@@ -31,7 +31,12 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def __init__(self, **kwargs):
         self._cache_key = _CacheKey()
+        self.initialize_fields()
         self.populate(**kwargs)
+
+    def initialize_fields(self):
+        for _, _, _ in self.iterate_with_name():
+            pass
 
     def populate(self, **values):
         """Populate values to fields. Skip non-existing."""

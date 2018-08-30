@@ -8,14 +8,12 @@ from dateutil.parser import parse
 from .errors import ValidationError
 from .collections import ModelCollection
 
-
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
 NotSet = object()
 
 
 class BaseField(object):
-
     """Base class for all fields."""
 
     types = None
@@ -27,7 +25,8 @@ class BaseField(object):
             help_text=None,
             validators=None,
             default=NotSet,
-            name=None):
+            name=None,
+            type_validation=True):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
@@ -35,6 +34,7 @@ class BaseField(object):
         self._assign_validators(validators)
         self.name = name
         self._validate_name()
+        self.type_validation = type_validation
         if default is not NotSet:
             self.validate(default)
         self._default = default
@@ -76,8 +76,9 @@ class BaseField(object):
         self.validate(value)
 
     def validate(self, value):
-        self._check_types()
-        self._validate_against_types(value)
+        if self.type_validation:
+            self._check_types()
+            self._validate_against_types(value)
         self._check_against_required(value)
         self._validate_with_custom_validators(value)
 
@@ -86,7 +87,9 @@ class BaseField(object):
             raise ValidationError('Field is required!')
 
     def _validate_against_types(self, value):
-        if value is not None and not isinstance(value, self.types):
+        if value is not None \
+                and not isinstance(value, self.types) \
+                and self.type_validation:
             raise ValidationError(
                 'Value is wrong, expected type "{types}"'.format(
                     types=', '.join([t.__name__ for t in self.types])
@@ -142,20 +145,20 @@ class BaseField(object):
 
 
 class StringField(BaseField):
-
     """String field."""
 
     types = six.string_types
 
 
 class IntField(BaseField):
-
     """Integer field."""
 
     types = (int,)
 
     def parse_value(self, value):
         """Cast value to `int`, e.g. from string or long"""
+        if not self.type_validation:
+            return value
         parsed = super(IntField, self).parse_value(value)
         if parsed is None:
             return parsed
@@ -163,26 +166,25 @@ class IntField(BaseField):
 
 
 class FloatField(BaseField):
-
     """Float field."""
 
     types = (float, int)
 
 
 class BoolField(BaseField):
-
     """Bool field."""
 
     types = (bool,)
 
     def parse_value(self, value):
         """Cast value to `bool`."""
+        if not self.type_validation:
+            return value
         parsed = super(BoolField, self).parse_value(value)
         return bool(parsed) if parsed is not None else None
 
 
 class ListField(BaseField):
-
     """List field."""
 
     types = (list,)
@@ -289,7 +291,6 @@ class ListField(BaseField):
 
 
 class EmbeddedField(BaseField):
-
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
@@ -394,7 +395,6 @@ def _import(module_name, type_name):
 
 
 class TimeField(StringField):
-
     """Time field."""
 
     types = (datetime.time,)
@@ -417,6 +417,8 @@ class TimeField(StringField):
 
     def parse_value(self, value):
         """Parse string into instance of `time`."""
+        if not self.type_validation:
+            return value
         if value is None:
             return value
         if isinstance(value, datetime.time):
@@ -425,7 +427,6 @@ class TimeField(StringField):
 
 
 class DateField(StringField):
-
     """Date field."""
 
     types = (datetime.date,)
@@ -449,6 +450,8 @@ class DateField(StringField):
 
     def parse_value(self, value):
         """Parse string into instance of `date`."""
+        if not self.type_validation:
+            return value
         if value is None:
             return value
         if isinstance(value, datetime.date):
@@ -457,7 +460,6 @@ class DateField(StringField):
 
 
 class DateTimeField(StringField):
-
     """Datetime field."""
 
     types = (datetime.datetime,)
@@ -480,6 +482,8 @@ class DateTimeField(StringField):
 
     def parse_value(self, value):
         """Parse string into instance of `datetime`."""
+        if not self.type_validation:
+            return value
         if isinstance(value, datetime.datetime):
             return value
         if value:

@@ -186,7 +186,8 @@ def test_regex_validation():
 
 def test_regex_validation_custom_error():
 
-    validator = validators.Regex('some', custom_error="error")
+    custom_error = ValidationError("error")
+    validator = validators.Regex('some', custom_error=custom_error)
     assert 'some' == validator.pattern
 
     validator.validate('some string')

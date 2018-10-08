@@ -94,7 +94,7 @@ class Regex(object):
 
 
         :param string pattern: Pattern of regex.
-        :param custom_error: Custom error message in case the regex fails.
+        :param custom_error: Custom exception raised if the regex fails.
         :param bool flags: Flags used for the regex matching.
             Allowed flag names are in the `FLAGS` attribute. The flag value
             does not matter as long as it evaluates to True.
@@ -122,7 +122,7 @@ class Regex(object):
 
         if not result:
             if self.custom_error:
-                raise ValidationError(self.custom_error)
+                raise self.custom_error
             raise ValidationError(
                 'Value "{value}" did not match pattern "{pattern}".'.format(
                     value=value, pattern=self.pattern

@@ -139,6 +139,27 @@ def test_regex_validation():
         validator.validate('trololo')
 
 
+def test_regex_validation_flags():
+    # Invalid flags ignored
+    validator = validators.Regex("foo", bla=True, ble=False, ignorecase=True)
+    assert validator.flags == [validators.Regex.FLAGS["ignorecase"]]
+
+    # Flag kwargs must be True-y
+    validator = validators.Regex("foo", ignorecase=False, multiline=True)
+    assert validator.flags == [validators.Regex.FLAGS["multiline"]]
+
+    # ECMA pattern flags recognized
+    validator = validators.Regex("/foo/im")
+    assert sorted(validator.flags) == sorted([
+        validators.Regex.FLAGS["multiline"],
+        validators.Regex.FLAGS["ignorecase"],
+    ])
+
+    # ECMA pattern overrides flags kwargs
+    validator = validators.Regex("/foo/", ignorecase=True, multiline=True)
+    assert validator.flags == []
+
+
 def test_regex_validation_for_wrong_type():
 
     validator = validators.Regex('some')
@@ -244,6 +265,19 @@ def test_length_validation():
         validator.validate('')
     with pytest.raises(errors.ValidationError):
         validator.validate('na' * 10)
+
+    validator = validators.Length(minimum_value=1)
+    validator.validate("a")
+    validator.validate("aasdasd" * 1000)
+    with pytest.raises(errors.ValidationError):
+        validator.validate("")
+
+    validator = validators.Length(maximum_value=10)
+    validator.validate("")
+    validator.validate("a")
+    validator.validate("a" * 10)
+    with pytest.raises(errors.ValidationError):
+        validator.validate("a" * 11)
 
 
 def test_validation_nullable():

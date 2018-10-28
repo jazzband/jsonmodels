@@ -83,6 +83,8 @@ def compare_schemas(one, two):
         return _compare_dicts(one, two)
     elif isinstance(one, SCALAR_TYPES):
         return one == two
+    elif one is None:
+        return one is two
     else:
         raise RuntimeError('Not allowed type "{type}"'.format(
             type=type(one).__name__))

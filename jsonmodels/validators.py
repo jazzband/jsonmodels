@@ -94,28 +94,20 @@ class Regex(object):
 
 
         :param string pattern: Pattern of regex.
-        :param dict flags: Allowed flags can be found in attribute
-            `ATTRIBUTES_TO_FLAGS`. Invalid flags will be ignored.
+        :param bool flags: Flags used for the regex matching.
+            Allowed flag names are in the `FLAGS` attribute. The flag value
+            does not matter as long as it evaluates to True.
+            Flags with False values will be ignored.
+            Invalid flags will be ignored.
 
         """
-        flags = dict(
-            (key, value) for key, value in flags.items()
-            if key in self.FLAGS
-        )
-
         if utilities.is_ecma_regex(pattern):
             result = utilities.convert_ecma_regex_to_python(pattern)
-            self.pattern = result.regex
-
-            for key, _ in flags.items():
-                flags.update(
-                    {key: self.FLAGS[key] in result.flags})
+            self.pattern, self.flags = result
         else:
             self.pattern = pattern
-
-        self.flags = [
-            self.FLAGS[key] for key, value
-            in flags.items() if value]
+            self.flags = [self.FLAGS[key] for key, value in flags.items()
+                          if key in self.FLAGS and value]
 
     def validate(self, value):
         """Validate value."""
@@ -172,7 +164,7 @@ class Length(object):
                 val=value, min=self.minimum_value
             ))
 
-        if self.minimum_value is not None and len_ > self.maximum_value:
+        if self.maximum_value is not None and len_ > self.maximum_value:
             raise ValidationError(
                 "Value '{val}' length is bigger than "
                 "allowed maximum '{max}'.".format(

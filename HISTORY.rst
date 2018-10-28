@@ -3,6 +3,13 @@
 History
 -------
 
+2.3 (2018-02-04)
+++++++++++++++++
+
+* Added name mapping for fields.
+* Added value parsing to IntField.
+* Fixed bug with ECMA regex flags recognition.
+
 2.2 (2017-08-21)
 ++++++++++++++++
 

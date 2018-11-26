@@ -7,7 +7,7 @@ from dateutil.parser import parse
 
 from .errors import ValidationError
 from .collections import ModelCollection
-
+from . import models
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
@@ -258,14 +258,14 @@ class ListField(BaseField):
         if isinstance(value, self.items_types):
             return value
         else:
-            if len(self.items_types) != 1:
-                tpl = 'Cannot decide which type to choose from "{types}".'
+            embed_type = models.JsonmodelMeta.find_type(value, self.items_types)
+            if not embed_type:
                 raise ValidationError(
-                    tpl.format(
+                    'Cannot decide which type to choose from "{types}".'
+                    .format(
                         types=', '.join([t.__name__ for t in self.items_types])
-                    )
-                )
-            return self.items_types[0](**value)
+                    ))
+            return embed_type(**value)
 
     def _finish_initialization(self, owner):
         super(ListField, self)._finish_initialization(owner)
@@ -330,18 +330,13 @@ class EmbeddedField(BaseField):
         """Parse value to proper model type."""
         if not isinstance(value, dict):
             return value
-
-        embed_type = self._get_embed_type()
-        return embed_type(**value)
-
-    def _get_embed_type(self):
-        if len(self.types) != 1:
+        embed_type = models.JsonmodelMeta.find_type(value, self.types)
+        if not embed_type:
             raise ValidationError(
                 'Cannot decide which type to choose from "{types}".'.format(
                     types=', '.join([t.__name__ for t in self.types])
-                )
-            )
-        return self.types[0]
+                ))
+        return embed_type(**value)
 
     def to_struct(self, value):
         return value.to_struct()

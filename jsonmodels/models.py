@@ -35,7 +35,6 @@ class JsonmodelMeta(type):
                 matching.setdefault(typ, 0)
                 if key in dir(typ):
                     matching[typ] += 1
-                    print('Found: %s in %s: %d' % (key, typ, matching[typ]))
 
         ordered = sorted(matching.items(), key=lambda kv: kv[1], reverse=True)
         if not ordered:

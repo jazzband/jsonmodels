@@ -3,6 +3,12 @@
 History
 -------
 
+2.4 (2018-12-01)
+++++++++++++++++
+
+* Fixed length validator.
+* Added Python 3.7 support.
+
 2.3 (2018-02-04)
 ++++++++++++++++
 

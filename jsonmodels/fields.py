@@ -3,7 +3,7 @@ import re
 from weakref import WeakKeyDictionary
 
 import six
-from dateutil.parser import parse
+import dateutil.parser
 
 from .errors import ValidationError
 from .collections import ModelCollection
@@ -12,6 +12,9 @@ from .collections import ModelCollection
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
 NotSet = object()
+
+
+_FIELD_NAME_REGEX = re.compile(r'^[A-Za-z_](([\w\-]*)?\w+)?$')
 
 
 class BaseField(object):
@@ -39,6 +42,8 @@ class BaseField(object):
             self.validate(default)
         self._default = default
 
+        self._initialized = False
+
     @property
     def has_default(self):
         return self._default is not NotSet
@@ -49,25 +54,30 @@ class BaseField(object):
         self.validators = validators or []
 
     def __set__(self, instance, value):
-        self._finish_initialization(type(instance))
+        if not self._initialized:
+            self._finish_initialization(type(instance))
+            self._initialized = True
         value = self.parse_value(value)
         self.validate(value)
         self.memory[instance._cache_key] = value
 
     def __get__(self, instance, owner=None):
+        if not self._initialized:
+            if instance is None:
+                self._finish_initialization(owner)
+            else:
+                self._finish_initialization(type(instance))
+            self._initialized = True
         if instance is None:
-            self._finish_initialization(owner)
             return self
-
-        self._finish_initialization(type(instance))
-
-        self._check_value(instance)
-        return self.memory[instance._cache_key]
+        else:
+            self._maybe_assign_default_value(instance)
+            return self.memory[instance._cache_key]
 
     def _finish_initialization(self, owner):
         pass
 
-    def _check_value(self, obj):
+    def _maybe_assign_default_value(self, obj):
         if obj._cache_key not in self.memory:
             self.__set__(obj, self.get_default_value())
 
@@ -88,10 +98,9 @@ class BaseField(object):
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
-                'Value is wrong, expected type "{types}"'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                ),
-                value,
+                'Value {value!r} is wrong, expected type {types!r}'
+                .format(value=value,
+                        types=', '.join(t.__name__ for t in self.types))
             )
 
     def _check_types(self):
@@ -132,13 +141,14 @@ class BaseField(object):
         return self._default if self.has_default else None
 
     def _validate_name(self):
-        if self.name is None:
-            return
-        if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+        if self.name is not None \
+                and not re.match(_FIELD_NAME_REGEX, self.name):
             raise ValueError('Wrong name', self.name)
 
-    def structue_name(self, default):
+    def structure_name(self, default):
         return self.name if self.name is not None else default
+
+    structue_name = structure_name
 
 
 class StringField(BaseField):
@@ -159,7 +169,8 @@ class IntField(BaseField):
         parsed = super(IntField, self).parse_value(value)
         if parsed is None:
             return parsed
-        return int(parsed)
+        else:
+            return int(parsed)
 
 
 class FloatField(BaseField):
@@ -209,7 +220,7 @@ class ListField(BaseField):
             try:
                 self.items_types = tuple(items_types)
             except TypeError:
-                self.items_types = items_types,
+                self.items_types = (items_types, )
         else:
             self.items_types = tuple()
 
@@ -244,15 +255,12 @@ class ListField(BaseField):
 
     def parse_value(self, values):
         """Cast value to proper collection."""
-        result = self.get_default_value()
-
         if not values:
-            return result
-
-        if not isinstance(values, list):
+            return self.get_default_value()
+        elif not isinstance(values, list):
             return values
-
-        return [self._cast_value(value) for value in values]
+        else:
+            return [self._cast_value(value) for value in values]
 
     def _cast_value(self, value):
         if isinstance(value, self.items_types):
@@ -271,11 +279,11 @@ class ListField(BaseField):
         super(ListField, self)._finish_initialization(owner)
 
         types = []
-        for type in self.items_types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for type_ in self.items_types:
+            if isinstance(type_, _LazyType):
+                types.append(type_.evaluate(owner))
             else:
-                types.append(type)
+                types.append(type_)
         self.items_types = tuple(types)
 
     def _elem_to_struct(self, value):
@@ -330,9 +338,9 @@ class EmbeddedField(BaseField):
         """Parse value to proper model type."""
         if not isinstance(value, dict):
             return value
-
-        embed_type = self._get_embed_type()
-        return embed_type(**value)
+        else:
+            embed_type = self._get_embed_type()
+            return embed_type(**value)
 
     def _get_embed_type(self):
         if len(self.types) != 1:
@@ -419,9 +427,10 @@ class TimeField(StringField):
         """Parse string into instance of `time`."""
         if value is None:
             return value
-        if isinstance(value, datetime.time):
+        elif isinstance(value, datetime.time):
             return value
-        return parse(value).timetz()
+        else:
+            return dateutil.parser.parse(value).timetz()
 
 
 class DateField(StringField):
@@ -451,9 +460,10 @@ class DateField(StringField):
         """Parse string into instance of `date`."""
         if value is None:
             return value
-        if isinstance(value, datetime.date):
+        elif isinstance(value, datetime.date):
             return value
-        return parse(value).date()
+        else:
+            return dateutil.parser.parse(value).date()
 
 
 class DateTimeField(StringField):
@@ -482,7 +492,7 @@ class DateTimeField(StringField):
         """Parse string into instance of `datetime`."""
         if isinstance(value, datetime.datetime):
             return value
-        if value:
-            return parse(value)
+        elif value:
+            return dateutil.parser.parse(value)
         else:
             return None

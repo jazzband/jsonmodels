@@ -332,10 +332,13 @@ class EmbeddedField(BaseField):
             return value
         embed_type = models.JsonmodelMeta.find_type(value, self.types)
         if not embed_type:
-            raise ValidationError(
-                'Cannot decide which type to choose from "{types}".'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                ))
+            if self.nullable:
+                return None
+            else:
+                raise ValidationError(
+                    'Cannot decide which type to choose from "{types}".'.format(
+                        types=', '.join([t.__name__ for t in self.types])
+                    ))
         return embed_type(**value)
 
     def to_struct(self, value):

@@ -5,8 +5,8 @@ from . import fields, builders, errors
 
 
 def to_struct(model):
-    """Cast instance of model to python structure.
-
+    """
+    Cast instance of model to python structure.
     :param model: Model to be casted.
     :rtype: ``dict``
 
@@ -20,7 +20,8 @@ def to_struct(model):
             continue
 
         value = field.to_struct(value)
-        resp[name] = value
+        if value is not None:
+            resp[name] = value
     return resp
 
 

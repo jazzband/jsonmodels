@@ -54,10 +54,10 @@ def test_base_field_should_not_be_usable():
 
     alan = Person()
 
-    with pytest.raises(errors.ValidationError):
+    with pytest.raises(ValueError):
         alan.name = 'some name'
 
-    with pytest.raises(errors.ValidationError):
+    with pytest.raises(ValueError):
         alan.name = 2345
 
 
@@ -110,6 +110,16 @@ def test_list_field_types():
 
     with pytest.raises(errors.ValidationError):
         viper.wheels.append(Wheel2)
+
+
+def test_list_omit_empty():
+
+    class Car(models.Base):
+        wheels = fields.ListField(items_types=[Wheel],
+                                  omit_empty=True)
+
+    viper = Car()
+    assert viper.to_struct() == {}
 
 
 def test_list_field_types_when_assigning():

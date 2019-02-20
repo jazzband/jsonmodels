@@ -345,7 +345,7 @@ def test_repr():
 
     class Person2(models.Base):
 
-        name = fields.StringField()
+        name = fields.StringField(required=True)
         surname = fields.StringField()
         age = fields.IntField()
 

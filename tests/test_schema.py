@@ -44,7 +44,8 @@ def test_model2():
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
-        kids = fields.ListField(Kid)
+        kids = fields.ListField(Kid,
+                                default=[Kid(name="Name", surname="Surname")])
         car = fields.EmbeddedField(Car)
 
     chuck = Person()
@@ -117,21 +118,20 @@ def test_model_with_constructors():
         age = fields.IntField()
         toys = fields.ListField(Toy)
 
-        def __init__(self, some_value):
-            pass
+        def __init__(self, name="Name", surname="Surname"):
+            super().__init__(name=name, surname=surname)
 
     class Person(models.Base):
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
-        kids = fields.ListField(Kid)
+        kids = fields.ListField(Kid, default=[Kid()])
         car = fields.EmbeddedField(Car)
 
         def __init__(self, some_value):
             pass
 
     schema = Person.to_json_schema()
-
     pattern = get_fixture('schema2.json')
     assert compare_schemas(pattern, schema) is True
 

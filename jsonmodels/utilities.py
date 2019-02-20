@@ -44,12 +44,13 @@ def _compare_lists(one, two):
     if len(one) != len(two):
         return False
 
-    they_match = False
+    they_match = not one  # two empty lists are equal
     for first_item in one:
         for second_item in two:
             if they_match:
                 continue
             they_match = compare_schemas(first_item, second_item)
+
     return they_match
 
 
@@ -133,7 +134,7 @@ def convert_ecma_regex_to_python(value):
     return PythonRegex('/'.join(parts[1:]), result_flags)
 
 
-def convert_python_regex_to_ecma(value, flags=[]):
+def convert_python_regex_to_ecma(value, flags=()):
     """Convert Python regex to ECMA 262 regex.
 
     If given value is already ECMA regex it will be returned unchanged.

@@ -13,13 +13,15 @@ class FieldNotFound(RuntimeError):
         """
         :param field_name: The name of the field.
         """
-        super().__init__('Field not found', field_name)
+        super(FieldNotFound, self).__init__('Field not found', field_name)
         self.field_name = field_name
 
 
 class FieldNotSupported(ValueError):
     def __init__(self, field_type: Type):
-        super().__init__("Can't specify value schema!", field_type)
+        super(FieldNotSupported, self).__init__(
+            "Can't specify value schema!", field_type
+        )
         self.field_type = field_type
 
 
@@ -41,7 +43,9 @@ class FieldValidationError(ValidationError):
         :param error: The validator error.
         """
         tpl = "Error for field '{name}': {error}"
-        super().__init__(tpl.format(name=field_name, error=error))
+        super(FieldValidationError, self).__init__(tpl.format(
+            name=field_name, error=error
+        ))
         self.field_name = field_name
         self.error = error
 
@@ -49,7 +53,7 @@ class FieldValidationError(ValidationError):
 class RequiredFieldError(ValidatorError):
     """ Error raised when a required field has no value """
     def __init__(self):
-        super().__init__('Field is required!')
+        super(RequiredFieldError, self).__init__('Field is required!')
 
 
 class RegexError(ValidatorError):
@@ -57,7 +61,9 @@ class RegexError(ValidatorError):
 
     def __init__(self, value: str, pattern: str):
         tpl = 'Value "{value}" did not match pattern "{pattern}".'
-        super().__init__(tpl.format(value=value, pattern=pattern))
+        super(RegexError, self).__init__(tpl.format(
+            value=value, pattern=pattern
+        ))
         self.value = value
         self.pattern = pattern
 
@@ -78,7 +84,7 @@ class BadTypeError(ValidatorError):
             tpl = 'All items must be instances of "{types}", and not "{type}".'
         else:
             tpl = 'Value is wrong, expected type "{types}", received {value}.'
-        super().__init__(tpl.format(
+        super(BadTypeError, self).__init__(tpl.format(
             types=', '.join([t.__name__ for t in types]),
             value=value,
             type=type(value).__name__
@@ -97,7 +103,7 @@ class AmbiguousTypeError(ValidatorError):
     def __init__(self, types: Tuple):
         """ The types that are allowed """
         tpl = 'Cannot decide which type to choose from "{types}".'
-        super().__init__(tpl.format(
+        super(AmbiguousTypeError, self).__init__(tpl.format(
             types=', '.join([t.__name__ for t in types])
         ))
 
@@ -111,7 +117,9 @@ class MinLengthError(ValidatorError):
         :param minimum_length: The minimum length expected.
         """
         tpl = "Value '{value}' length is lower than allowed minimum '{min}'."
-        super().__init__(tpl.format(value=value, min=minimum_length))
+        super(MinLengthError, self).__init__(tpl.format(
+            value=value, min=minimum_length
+        ))
         self.value = value
         self.minimum_length = minimum_length
 
@@ -125,7 +133,9 @@ class MaxLengthError(ValidatorError):
         :param maximum_length: The maximum length expected.
         """
         tpl = "Value '{value}' length is bigger than allowed maximum '{max}'."
-        super().__init__(tpl.format(value=value, max=maximum_length))
+        super(MaxLengthError, self).__init__(tpl.format(
+            value=value, max=maximum_length
+        ))
         self.value = value
         self.maximum_length = maximum_length
 
@@ -141,7 +151,9 @@ class MinValidationError(ValidatorError):
         """
         tpl = "'{value}' is lower or equal than minimum ('{min}')." \
             if exclusive else "'{value}' is lower than minimum ('{min}')."
-        super().__init__(tpl.format(value=value, min=minimum_value))
+        super(MinValidationError, self).__init__(tpl.format(
+            value=value, min=minimum_value
+        ))
         self.value = value
         self.minimum_value = minimum_value
         self.exclusive = exclusive
@@ -158,7 +170,9 @@ class MaxValidationError(ValidatorError):
         """
         tpl = "'{value}' is bigger or equal than maximum ('{max}')." \
             if exclusive else "'{value}' is bigger than maximum ('{max}')."
-        super().__init__(tpl.format(value=value, max=maximum_value))
+        super(MaxValidationError, self).__init__(tpl.format(
+            value=value, max=maximum_value
+        ))
         self.value = value
         self.maximum_value = maximum_value
         self.exclusive = exclusive
@@ -173,6 +187,6 @@ class EnumError(ValidatorError):
         :param choices: The allowed choices.
         """
         tpl = "Value '{val}' is not a valid choice."
-        super().__init__(tpl.format(val=value))
+        super(EnumError, self).__init__(tpl.format(val=value))
         self.value = value
         self.choices = choices

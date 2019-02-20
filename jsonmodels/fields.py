@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional, List
+from typing import List
 
 import datetime
 import re
@@ -298,8 +298,7 @@ class DerivedListField(ListField):
     A list field that has another field for its items.
     """
 
-    def __init__(self, field: BaseField, help_text: str,
-                 validators: Optional[List[any]] = None):
+    def __init__(self, field: BaseField, *args, **kwargs):
         """
         :param field: The field that will be in each of the items of the list.
         :param help_text: The help text of the list field.
@@ -308,8 +307,7 @@ class DerivedListField(ListField):
         super(DerivedListField, self).__init__(
             items_types=field.types,
             item_validators=field.validators,
-            help_text=help_text,
-            validators=validators,
+            *args, **kwargs,
         )
         self._field = field
 
@@ -419,7 +417,7 @@ class MapField(BaseField):
             validating the values in this mapping.
         :param kwargs: Other keyword arguments to the base class.
         """
-        super().__init__(**kwargs)
+        super(MapField, self).__init__(**kwargs)
         self._key_field = key_field
         self._value_field = value_field
 
@@ -439,7 +437,7 @@ class MapField(BaseField):
         Validates all keys and values in the map field.
         :param values: The values in the mapping.
         """
-        super().validate(values)
+        super(MapField, self).validate(values)
         if not values:
             return
         for key, value in values.items():
@@ -596,3 +594,8 @@ class AnyField(BaseField):
 
     def _validate_against_types(self, value: any) -> None:
         """ This field does not validate its type. """
+
+    def to_struct(self, value):
+        from .models import Base
+        value = super().to_struct(value)
+        return value.to_struct() if isinstance(value, Base) else value

@@ -32,12 +32,17 @@
                         }
                     }
                 },
-                "required": ["surname", "name"],
+                "required": ["name", "surname"],
                 "additionalProperties": false
             },
-            "type": "array"
+            "type": "array",
+            "default": [{
+                "name": "Name",
+                "surname": "Surname",
+                "toys": []
+            }]
         }
     },
-    "required": ["surname", "name"],
+    "required": ["name", "surname"],
     "additionalProperties": false
 }

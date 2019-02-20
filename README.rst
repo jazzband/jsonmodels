@@ -86,7 +86,7 @@ Features
 
     >>> dog = Dog()
     >>> dog.validate()
-    *** ValidationError: Field "name" is required!
+    *** FieldValidationError: Error for field 'name': Field is required!
 
 * Cast models to python struct and JSON:
 
@@ -336,6 +336,18 @@ Features
     True
     >>> compare_schemas(schema1, schema2)
     False
+
+* Create custom reusable fields:
+
+  .. code-block:: python
+
+    class NameField(fields.StringField):
+        def __init__(self):
+            super().__init__(required=True)
+
+    class Person(models.Base):
+        name = NameField()
+        surnames = fields.DerivedListField(NameField())
 
 More
 ----

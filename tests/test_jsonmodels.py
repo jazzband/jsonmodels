@@ -115,7 +115,7 @@ def test_list_field_types():
 def test_list_omit_empty():
 
     class Car(models.Base):
-        wheels = fields.ListField(items_types=[Wheel],
+        wheels = fields.ListField(items_types=[str],
                                   omit_empty=True)
 
     viper = Car()

@@ -37,8 +37,10 @@ class FieldValidationError(ValidationError):
     """
     Enriches a validator error with the name of the field that caused it.
     """
-    def __init__(self, field_name: str, error: ValidatorError):
+    def __init__(self, model_name: str, field_name: str,
+                 given_value: any, error: ValidatorError):
         """
+        :param model_name: The name of the model.
         :param field_name: The name of the field.
         :param error: The validator error.
         """
@@ -46,7 +48,9 @@ class FieldValidationError(ValidationError):
         super(FieldValidationError, self).__init__(tpl.format(
             name=field_name, error=error
         ))
+        self.model_name = model_name
         self.field_name = field_name
+        self.given_value = given_value
         self.error = error
 
 
@@ -106,6 +110,7 @@ class AmbiguousTypeError(ValidatorError):
         super(AmbiguousTypeError, self).__init__(tpl.format(
             types=', '.join([t.__name__ for t in types])
         ))
+        self.types = types
 
 
 class MinLengthError(ValidatorError):

@@ -58,7 +58,8 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         try:
             field.__set__(self, value)
         except ValidatorError as error:
-            raise FieldValidationError(field_name, error)
+            raise FieldValidationError(type(self).__name__, field_name,
+                                       value, error)
 
     def __iter__(self):
         """Iterate through fields and values."""
@@ -71,7 +72,9 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
             try:
                 field.validate_for_object(self)
             except ValidatorError as error:
-                raise FieldValidationError(name, error)
+                value = field.memory.get(self._cache_key)
+                raise FieldValidationError(type(self).__name__, name,
+                                           value, error)
 
     @classmethod
     def iterate_over_fields(cls):
@@ -126,7 +129,8 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         try:
             return super(Base, self).__setattr__(name, value)
         except ValidatorError as error:
-            raise FieldValidationError(name, error)
+            raise FieldValidationError(type(self).__name__, name,
+                                       value, error)
 
     def __eq__(self, other):
         if type(other) is not type(self):

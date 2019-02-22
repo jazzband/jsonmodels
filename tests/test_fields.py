@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pytest
 from jsonmodels import models, fields, validators, errors
 
@@ -120,10 +122,17 @@ def test_map_field_validation():
         model.validate()
 
 
-def test_any_field():
+def test_generic_field():
     class Model(models.Base):
-        field = fields.AnyField()
+        field = fields.GenericField()
 
-    assert {"field": 1} == Model(field=1).to_struct()
-    assert {"field": "1"} == Model(field="1").to_struct()
-    assert {"field": {"field": {}}} == Model(field=Model(field={})).to_struct()
+    model_int = Model(field=1)
+    model_str = Model(field="str")
+    model_model = Model(field=model_int)
+    model_ordered = Model(field=OrderedDict([("b", 2), ("a", 1)]))
+
+    assert {"field": 1} == model_int.to_struct()
+    assert {"field": "str"} == model_str.to_struct()
+    assert {"field": {"field": 1}} == model_model.to_struct()
+    expected = {"field": OrderedDict([("b", 2), ("a", 1)])}
+    assert expected == model_ordered.to_struct()

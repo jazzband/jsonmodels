@@ -89,7 +89,7 @@ def test_model3():
         age = fields.IntField()
         car = fields.EmbeddedField([Viper, Lamborghini])
         computer = fields.ListField([PC, Laptop, Tablet])
-        meta = fields.DictField()
+        meta = fields.GenericField()
 
     schema = Person.to_json_schema()
 

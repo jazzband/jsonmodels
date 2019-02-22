@@ -1,17 +1,14 @@
 import warnings
-from typing import List
+from weakref import WeakKeyDictionary
 
 import datetime
 import re
-from copy import deepcopy
-from weakref import WeakKeyDictionary
-
 import six
 from dateutil.parser import parse
+from typing import List
 
-from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
 from .collections import ModelCollection
-
+from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
@@ -393,17 +390,6 @@ class EmbeddedField(BaseField):
         return value.to_struct()
 
 
-class DictField(BaseField):
-    """
-    Field for dictionaries that are not modelled.
-    """
-    types = (dict,)
-
-    def to_struct(self, value):
-        """Cast value to Python structure."""
-        return deepcopy(value)
-
-
 class MapField(BaseField):
     """
     Model field that keeps a mapping between two other fields.
@@ -589,16 +575,25 @@ class DateTimeField(StringField):
             return None
 
 
-class AnyField(BaseField):
+class GenericField(BaseField):
     """
-    Model field that accepts anything.
+    Field that supports any kind of value, converting models to their correct
+    struct, keeping ordered dictionaries in their original order.
     """
     types = (any,)
 
-    def _validate_against_types(self, value: any) -> None:
-        """ This field does not validate its type. """
+    def _validate_against_types(self, value) -> None:
+        pass
 
-    def to_struct(self, value):
+    def to_struct(self, values: any) -> any:
+        """ Casts value to Python structure. """
         from .models import Base
-        value = super().to_struct(value)
-        return value.to_struct() if isinstance(value, Base) else value
+        if isinstance(values, Base):
+            return values.to_struct()
+        if isinstance(values, (list, tuple)):
+            return [self.to_struct(value) for value in values]
+        if isinstance(values, dict):
+            items = [(self.to_struct(key), self.to_struct(value))
+                     for key, value in values.items()]
+            return type(values)(items)  # preserves OrderedDict
+        return values

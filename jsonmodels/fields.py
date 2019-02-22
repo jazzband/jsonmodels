@@ -162,7 +162,10 @@ class IntField(BaseField):
         parsed = super(IntField, self).parse_value(value)
         if parsed is None:
             return parsed
-        return int(parsed)
+        try:
+            return int(parsed)
+        except ValueError:
+            raise BadTypeError(value, types=(int,), is_list=False)
 
 
 class FloatField(BaseField):

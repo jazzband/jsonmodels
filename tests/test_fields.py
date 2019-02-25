@@ -100,6 +100,23 @@ def test_map_field():
     assert expected == model.to_struct()
 
 
+class CircularMapModel(models.Base):
+    """
+    Test model used in the following test,
+    must be defined outside function for lazy loading
+    """
+    mapping = fields.MapField(
+        fields.IntField(),
+        fields.EmbeddedField("CircularMapModel")
+    )
+
+
+def test_map_field_circular():
+    model = CircularMapModel(mapping={1: {}, 2: CircularMapModel()})
+    expected = {'mapping': {1: {'mapping': {}}, 2: {'mapping': {}}}}
+    assert expected == model.to_struct()
+
+
 def test_map_field_validation():
     class Model(models.Base):
         str_to_int = fields.MapField(fields.StringField(), fields.IntField())

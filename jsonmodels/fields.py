@@ -410,6 +410,16 @@ class MapField(BaseField):
         self._key_field = key_field
         self._value_field = value_field
 
+    def _finish_initialization(self, owner):
+        """
+        Completes the initialization of the fields, increasing
+        :param owner:
+        :return:
+        """
+        super(MapField, self)._finish_initialization(owner)
+        self._key_field._finish_initialization(owner)
+        self._value_field._finish_initialization(owner)
+
     def get_default_value(self) -> dict:
         """ Gets the default value for this field """
         return dict()

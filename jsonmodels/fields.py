@@ -5,7 +5,7 @@ import datetime
 import re
 import six
 from dateutil.parser import parse
-from typing import List
+from typing import List, Optional
 
 from .collections import ModelCollection
 from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
@@ -196,7 +196,8 @@ class ListField(BaseField):
 
         `ListField` is **always not required**. If you want to control number
         of items use validators. If you want to validate each individual item,
-        use `item_validators`.
+        use `item_validators`. You can pass omit_empty so empty lists are not
+        included in the to_struct method.
 
         """
         self._assign_types(items_types)
@@ -412,9 +413,7 @@ class MapField(BaseField):
 
     def _finish_initialization(self, owner):
         """
-        Completes the initialization of the fields, increasing
-        :param owner:
-        :return:
+        Completes the initialization of the fields, allowing for lazy refs.
         """
         super(MapField, self)._finish_initialization(owner)
         self._key_field._finish_initialization(owner)
@@ -422,33 +421,38 @@ class MapField(BaseField):
 
     def get_default_value(self) -> dict:
         """ Gets the default value for this field """
-        return dict()
+        return self._default if self.has_default else dict()
 
-    def parse_value(self, values: dict) -> dict:
+    def parse_value(self, values: Optional[dict]) -> Optional[dict]:
         """ Parses the given values into a new dict. """
-        dict_type = type(values)  # use same type to support OrderedDict
-        return dict_type([
+        values = super().parse_value(values)
+        if values is None:
+            return
+        items = [
             (self._key_field.parse_value(key),
              self._value_field.parse_value(value))
             for key, value in values.items()
-        ])
+        ]
+        return type(values)(items)  # Preserves OrderedDict
 
-    def to_struct(self, values: dict) -> dict:
+    def to_struct(self, values: Optional[dict]) -> Optional[dict]:
         """ Casts the field values into a dict. """
-        dict_type = type(values)  # use same type to support OrderedDict
-        return dict_type([
+        if values is None:
+            return
+        items = [
             (self._key_field.to_struct(key),
              self._value_field.to_struct(value))
             for key, value in values.items()
-        ])
+        ]
+        return type(values)(items)  # Preserves OrderedDict
 
-    def validate(self, values: dict) -> None:
+    def validate(self, values: Optional[dict]) -> Optional[dict]:
         """
         Validates all keys and values in the map field.
         :param values: The values in the mapping.
         """
         super(MapField, self).validate(values)
-        if not values:
+        if values is None:
             return
         for key, value in values.items():
             self._key_field.validate(key)

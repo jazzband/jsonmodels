@@ -414,6 +414,14 @@ class MapField(BaseField):
         """ Gets the default value for this field """
         return dict()
 
+    def parse_value(self, values: dict) -> dict:
+        """ Parses the given values into a new dict. """
+        return {
+            self._key_field.parse_value(key):
+                self._value_field.parse_value(value)
+            for key, value in values.items()
+        }
+
     def to_struct(self, values: dict) -> dict:
         """ Casts the field values into a dict. """
         return {
@@ -590,10 +598,13 @@ class GenericField(BaseField):
         from .models import Base
         if isinstance(values, Base):
             return values.to_struct()
+
         if isinstance(values, (list, tuple)):
             return [self.to_struct(value) for value in values]
+
         if isinstance(values, dict):
             items = [(self.to_struct(key), self.to_struct(value))
                      for key, value in values.items()]
             return type(values)(items)  # preserves OrderedDict
+
         return values

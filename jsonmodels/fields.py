@@ -426,18 +426,21 @@ class MapField(BaseField):
 
     def parse_value(self, values: dict) -> dict:
         """ Parses the given values into a new dict. """
-        return {
-            self._key_field.parse_value(key):
-                self._value_field.parse_value(value)
+        dict_type = type(values)  # use same type to support OrderedDict
+        return dict_type([
+            (self._key_field.parse_value(key),
+             self._value_field.parse_value(value))
             for key, value in values.items()
-        }
+        ])
 
     def to_struct(self, values: dict) -> dict:
         """ Casts the field values into a dict. """
-        return {
-            self._key_field.to_struct(key): self._value_field.to_struct(value)
+        dict_type = type(values)  # use same type to support OrderedDict
+        return dict_type([
+            (self._key_field.to_struct(key),
+             self._value_field.to_struct(value))
             for key, value in values.items()
-        }
+        ])
 
     def validate(self, values: dict) -> None:
         """

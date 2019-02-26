@@ -83,25 +83,34 @@ def build_json_schema_primitive(cls, parent_builder):
 
 
 def _create_primitive_field_schema(field):
+    schema = {'type': _get_schema_type(field)}
+
+    if isinstance(field, fields.FloatField):
+        schema['format'] = 'float'
+    elif isinstance(field, fields.DateField):
+        schema['format'] = 'date'
+    elif isinstance(field, fields.DateTimeField):
+        schema['format'] = 'date-time'
+
+    if field.has_default:
+        schema["default"] = field._default
+
+    return schema
+
+
+def _get_schema_type(field):
     if isinstance(field, fields.StringField):
         obj_type = 'string'
     elif isinstance(field, fields.IntField):
         obj_type = 'number'
     elif isinstance(field, fields.FloatField):
-        obj_type = 'float'
+        obj_type = 'number'
     elif isinstance(field, fields.BoolField):
         obj_type = 'boolean'
     elif isinstance(field, fields.GenericField):
         obj_type = 'object'
     else:
         raise errors.FieldNotSupported(type(field))
-
     if field.nullable:
         obj_type = [obj_type, 'null']
-
-    schema = {'type': obj_type}
-
-    if field.has_default:
-        schema["default"] = field._default
-
-    return schema
+    return obj_type

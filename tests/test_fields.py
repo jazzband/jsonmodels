@@ -88,6 +88,7 @@ def test_map_field():
     class Model(models.Base):
         str_to_int = fields.MapField(fields.StringField(), fields.IntField())
         int_to_str = fields.MapField(fields.IntField(), fields.StringField())
+        empty = fields.MapField(fields.IntField(), fields.StringField())
 
     model = Model()
     model.str_to_int = {"first": 1, "second": 2}
@@ -107,20 +108,24 @@ class CircularMapModel(models.Base):
     """
     mapping = fields.MapField(
         fields.IntField(),
-        fields.EmbeddedField("CircularMapModel")
+        fields.EmbeddedField("CircularMapModel"),
+        default=None
     )
 
 
 def test_map_field_circular():
     model = CircularMapModel(mapping={1: {}, 2: CircularMapModel()})
-    expected = {'mapping': {1: {'mapping': {}}, 2: {'mapping': {}}}}
+    expected = {'mapping': {1: {}, 2: {}}}
     assert expected == model.to_struct()
 
 
 def test_map_field_validation():
     class Model(models.Base):
         str_to_int = fields.MapField(fields.StringField(), fields.IntField())
-        int_to_str = fields.MapField(fields.IntField(), fields.StringField())
+        int_to_str = fields.MapField(fields.IntField(), fields.StringField(),
+                                     required=True)
+
+    assert Model().to_struct() == {"int_to_str": {}}
 
     with pytest.raises(errors.FieldValidationError):
         Model().str_to_int = {1: "first", 2: "second"}
@@ -128,7 +133,7 @@ def test_map_field_validation():
     with pytest.raises(errors.FieldValidationError):
         Model().int_to_str = {"first": 1, "second": 2}
 
-    model = Model()
+    model = Model(str_to_int={})
     model.str_to_int[1] = "first"
     with pytest.raises(errors.FieldValidationError):
         model.validate()
@@ -153,3 +158,49 @@ def test_generic_field():
     assert {"field": {"field": 1}} == model_model.to_struct()
     expected = {"field": OrderedDict([("b", 2), ("a", 1)])}
     assert expected == model_ordered.to_struct()
+
+
+def test_derived_list_omit_empty():
+
+    class Car(models.Base):
+        wheels = fields.DerivedListField(fields.StringField(),
+                                         omit_empty=True)
+        doors = fields.DerivedListField(fields.StringField(),
+                                        omit_empty=False)
+
+    viper = Car()
+    assert viper.to_struct() == {"doors": []}
+
+
+def test_automatic_model_detection():
+
+    class FullName(models.Base):
+        first_name = fields.StringField()
+        last_name = fields.StringField()
+
+    class Car(models.Base):
+        models = fields.DerivedListField(fields.StringField(),
+                                         omit_empty=False)
+
+    class Person(models.Base):
+
+        names = fields.ListField(
+            [str, int, float, bool, FullName, Car],
+            help_text='A list of names.',
+        )
+
+    person = Person(names=['Daniel', 1, True, {'last_name': 'Schiavini'},
+                           {'models': ['Model 3']}])
+    assert person.to_struct() == {
+        'names': ['Daniel', 1, True, {'last_name': 'Schiavini'},
+                  {'models': ['Model 3']}]
+    }
+
+    assert isinstance(person.names[-2], FullName)
+    assert isinstance(person.names[-1], Car)
+
+    with pytest.raises(errors.FieldValidationError):
+        Person(names=[{'last_name': 'Schiavini', 'models': ['Model 3']}])
+
+    with pytest.raises(errors.FieldValidationError):
+        Person(names=[{'models': 1}])

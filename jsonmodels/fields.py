@@ -5,7 +5,7 @@ import datetime
 import re
 import six
 from dateutil.parser import parse
-from typing import List, Optional
+from typing import List, Optional, Dict, Set
 
 from .collections import ModelCollection
 from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
@@ -94,6 +94,36 @@ class BaseField(object):
         if self.types is None:
             tpl = 'Field "{type}" is not usable, try different field type.'
             raise ValueError(tpl.format(type=type(self).__name__))
+
+    @staticmethod
+    def _get_embed_type(value, models):
+        """
+        Tries to guess which of the given models is applicable to the dict.
+        :param value: The dict to check.
+        :param models: A list of acceptable models.
+        :return: A single model from the list that contains all the fields
+        that are also in the dict.
+        :raise AmbiguousTypeError: If more than one model is matched.
+        """
+        if len(models) > 1:
+            # dict of the available fields per model, so we can automatically
+            # recognize dicts
+            model_fields = {
+                model: {
+                   name or attr for attr, name, field
+                   in model.iterate_with_name()
+                } for model in models
+                if hasattr(model, "iterate_with_name")
+            }  # type: Dict[type, Set[str]]
+            matching_models = [model for model, fields in model_fields.items()
+                               if fields.issuperset(value)]
+
+            if len(matching_models) != 1:
+                raise AmbiguousTypeError(models)
+
+            # this is the only model that has all given fields
+            return matching_models[0]
+        return models[0]
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -188,7 +218,7 @@ class ListField(BaseField):
 
     """List field."""
 
-    types = (list,)
+    types = (list, tuple)
 
     def __init__(self, items_types=None, item_validators=(), omit_empty=False,
                  *args, **kwargs):
@@ -196,7 +226,7 @@ class ListField(BaseField):
 
         `ListField` is **always not required**. If you want to control number
         of items use validators. If you want to validate each individual item,
-        use `item_validators`. You can pass omit_empty so empty lists are not
+        use `item_validators`. You may pass omit_empty so empty lists are not
         included in the to_struct method.
 
         """
@@ -266,9 +296,8 @@ class ListField(BaseField):
         if isinstance(value, self.items_types):
             return value
         elif isinstance(value, dict):
-            if len(self.items_types) != 1:
-                raise AmbiguousTypeError(self.items_types)
-            return self.items_types[0](**value)
+            model_type = self._get_embed_type(value, self.items_types)
+            return model_type(**value)
         else:
             raise BadTypeError(value, self.items_types, is_list=True)
 
@@ -318,7 +347,8 @@ class DerivedListField(ListField):
         :param values: The values in the list.
         :return: The converted values.
         """
-        return [self._field.to_struct(value) for value in values]
+        return [self._field.to_struct(value) for value in values] \
+            if values or not self._omit_empty else None
 
     def parse_value(self, values: List[any]) -> List[any]:
         """
@@ -326,7 +356,10 @@ class DerivedListField(ListField):
         :param values: The values in the list.
         :return: The converted values.
         """
-        return [self._field.parse_value(value) for value in values]
+        try:
+            return [self._field.parse_value(value) for value in values]
+        except TypeError:
+            raise BadTypeError(values, self._field.types, is_list=True)
 
     def validate_single_value(self, value: any) -> None:
         """
@@ -358,13 +391,13 @@ class EmbeddedField(BaseField):
 
     def _finish_initialization(self, owner):
         super(EmbeddedField, self)._finish_initialization(owner)
-
         types = []
         for model_type in self.types:
             if isinstance(model_type, _LazyType):
                 types.append(model_type.evaluate(owner))
             else:
                 types.append(model_type)
+
         self.types = tuple(types)
 
     def validate(self, value):
@@ -379,13 +412,8 @@ class EmbeddedField(BaseField):
         if not isinstance(value, dict):
             return value
 
-        embed_type = self._get_embed_type()
+        embed_type = self._get_embed_type(value, self.types)
         return embed_type(**value)
-
-    def _get_embed_type(self):
-        if len(self.types) != 1:
-            raise AmbiguousTypeError(self.types)
-        return self.types[0]
 
     def to_struct(self, value):
         return value.to_struct()
@@ -395,6 +423,11 @@ class MapField(BaseField):
     """
     Model field that keeps a mapping between two other fields.
     It is basically a dictionary with key and values being separate fields.
+
+    `MapField` is **always not required**. If you want to control number
+    of items use validators. You may pass omit_empty so empty lists are not
+    included in the to_struct method.
+
     """
     types = (dict,)
 
@@ -419,9 +452,12 @@ class MapField(BaseField):
         self._key_field._finish_initialization(owner)
         self._value_field._finish_initialization(owner)
 
-    def get_default_value(self) -> dict:
+    def get_default_value(self) -> any:
         """ Gets the default value for this field """
-        return self._default if self.has_default else dict()
+        default = super(MapField, self).get_default_value()
+        if default is None and self.required:
+            return dict()
+        return default
 
     def parse_value(self, values: Optional[dict]) -> Optional[dict]:
         """ Parses the given values into a new dict. """
@@ -437,8 +473,6 @@ class MapField(BaseField):
 
     def to_struct(self, values: Optional[dict]) -> Optional[dict]:
         """ Casts the field values into a dict. """
-        if values is None:
-            return
         items = [
             (self._key_field.to_struct(key),
              self._value_field.to_struct(value))

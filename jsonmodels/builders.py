@@ -67,6 +67,8 @@ class ObjectBuilder(Builder):
 
     def add_field(self, name, field, schema):
         _apply_validators_modifications(schema, field)
+        if field.help_text:
+            schema["description"] = field.help_text
         self.properties[name] = schema
         if field.required:
             self.required.append(name)
@@ -158,6 +160,7 @@ class PrimitiveBuilder(Builder):
             obj_type = 'number'
         elif issubclass(self.type, float):
             obj_type = 'number'
+            schema['format'] = 'float'
         else:
             raise errors.FieldNotSupported(self.type)
 

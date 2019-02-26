@@ -67,6 +67,8 @@ class ObjectBuilder(Builder):
 
     def add_field(self, name, field, schema):
         _apply_validators_modifications(schema, field)
+        if isinstance(schema, dict) and field.help_text:
+            schema["description"] = field.help_text
         self.properties[name] = schema
         if field.required:
             self.required.append(name)
@@ -78,7 +80,7 @@ class ObjectBuilder(Builder):
             [self.maybe_build(value) for _, value in self.properties.items()]
             return '#/definitions/{name}'.format(name=self.type_name)
         else:
-            return builder.build_definition(nullable=self.nullable)
+            return builder.build_definition()
 
     @property
     def type_name(self):
@@ -88,7 +90,7 @@ class ObjectBuilder(Builder):
         )
         return module_name.replace('.', '_').lower()
 
-    def build_definition(self, add_defintitions=True, nullable=False):
+    def build_definition(self, add_definitions=True):
         properties = dict(
             (name, self.maybe_build(value))
             for name, value
@@ -99,11 +101,14 @@ class ObjectBuilder(Builder):
             'additionalProperties': False,
             'properties': properties,
         }
+
         if self.required:
             schema['required'] = self.required
-        if self.definitions and add_defintitions:
+
+        if self.definitions and add_definitions:
             schema['definitions'] = dict(
-                (builder.type_name, builder.build_definition(False, False))
+                (builder.type_name,
+                 builder.build_definition(add_definitions=False))
                 for builder in self.definitions
             )
         return schema
@@ -155,10 +160,9 @@ class PrimitiveBuilder(Builder):
             obj_type = 'number'
         elif issubclass(self.type, float):
             obj_type = 'number'
+            schema['format'] = 'float'
         else:
-            raise errors.FieldNotSupported(
-                "Can't specify value schema!", self.type
-            )
+            raise errors.FieldNotSupported(self.type)
 
         if self.nullable:
             obj_type = [obj_type, 'null']

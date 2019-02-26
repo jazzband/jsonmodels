@@ -10,6 +10,7 @@ class ModelCollection(list):
     """
 
     def __init__(self, field):
+        super(ModelCollection, self).__init__()
         self.field = field
 
     def append(self, value):

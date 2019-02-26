@@ -2,7 +2,7 @@ import six
 
 from . import parsers, errors
 from .fields import BaseField
-from .errors import ValidationError
+from .errors import FieldValidationError, ValidatorError, ValidationError
 
 
 class JsonmodelMeta(type):
@@ -19,10 +19,10 @@ class JsonmodelMeta(type):
         }
         taken_names = set()
         for name, field in fields.items():
-            structue_name = field.structue_name(name)
-            if structue_name in taken_names:
-                raise ValueError('Name taken', structue_name, name)
-            taken_names.add(structue_name)
+            structure_name = field.structure_name(name)
+            if structure_name in taken_names:
+                raise ValueError('Name taken', structure_name, name)
+            taken_names.add(structure_name)
 
 
 class Base(six.with_metaclass(JsonmodelMeta, object)):
@@ -51,15 +51,15 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
             if field_name == attr_name:
                 return field
 
-        raise errors.FieldNotFound('Field not found', field_name)
+        raise errors.FieldNotFound(field_name)
 
     def set_field(self, field, field_name, value):
         """ Sets the value of a field. """
         try:
             field.__set__(self, value)
-        except ValidationError as error:
-            raise ValidationError("Error for field '{name}': {error}"
-                                  .format(name=field_name, error=error))
+        except ValidatorError as error:
+            raise FieldValidationError(type(self).__name__, field_name,
+                                       value, error)
 
     def __iter__(self):
         """Iterate through fields and values."""
@@ -71,28 +71,29 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         for name, field in self:
             try:
                 field.validate_for_object(self)
-            except ValidationError as error:
-                raise ValidationError("Error for field '{name}': {error}"
-                                      .format(name=name, error=error))
+            except ValidatorError as error:
+                value = field.memory.get(self._cache_key)
+                raise FieldValidationError(type(self).__name__, name,
+                                           value, error)
 
     @classmethod
     def iterate_over_fields(cls):
         """Iterate through fields as `(attribute_name, field_instance)`."""
         for attr in dir(cls):
-            clsattr = getattr(cls, attr)
-            if isinstance(clsattr, BaseField):
-                yield attr, clsattr
+            class_attribute = getattr(cls, attr)
+            if isinstance(class_attribute, BaseField):
+                yield attr, class_attribute
 
     @classmethod
     def iterate_with_name(cls):
         """Iterate over fields, but also give `structure_name`.
 
-        Format is `(attribute_name, structue_name, field_instance)`.
+        Format is `(attribute_name, structure_name, field_instance)`.
         Structure name is name under which value is seen in structure and
         schema (in primitives) and only there.
         """
         for attr_name, field in cls.iterate_over_fields():
-            structure_name = field.structue_name(attr_name)
+            structure_name = field.structure_name(attr_name)
             yield attr_name, structure_name, field
 
     def to_struct(self):
@@ -127,9 +128,9 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
     def __setattr__(self, name, value):
         try:
             return super(Base, self).__setattr__(name, value)
-        except ValidationError as error:
-            raise ValidationError("Error for field '{name}': {error}"
-                                  .format(name=name, error=error))
+        except ValidatorError as error:
+            raise FieldValidationError(type(self).__name__, name,
+                                       value, error)
 
     def __eq__(self, other):
         if type(other) is not type(self):
@@ -138,12 +139,12 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         for name, _ in self.iterate_over_fields():
             try:
                 our = getattr(self, name)
-            except errors.ValidationError:
+            except ValidationError:
                 our = None
 
             try:
                 their = getattr(other, name)
-            except errors.ValidationError:
+            except ValidationError:
                 their = None
 
             if our != their:

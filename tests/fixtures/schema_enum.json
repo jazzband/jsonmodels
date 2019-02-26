@@ -2,6 +2,7 @@
     "additionalProperties": false,
     "properties": {
         "handness": {
+            "description": "The person's favorite hand.",
             "type": "string",
             "enum": ["left", "right"]
         }

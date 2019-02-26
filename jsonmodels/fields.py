@@ -1,14 +1,14 @@
-import datetime
-import re
-from copy import deepcopy
+import warnings
 from weakref import WeakKeyDictionary
 
+import datetime
+import re
 import six
 from dateutil.parser import parse
+from typing import List, Optional, Dict, Set
 
-from .errors import ValidationError
 from .collections import ModelCollection
-
+from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
@@ -84,21 +84,46 @@ class BaseField(object):
 
     def _check_against_required(self, value):
         if value is None and self.required:
-            raise ValidationError('Field is required!')
+            raise RequiredFieldError()
 
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
-            raise ValidationError(
-                'Value is wrong, expected type "{types}", received {value}.'
-                .format(types=', '.join([t.__name__ for t in self.types]),
-                        value=value)
-            )
+            raise BadTypeError(value, self.types, is_list=False)
 
     def _check_types(self):
         if self.types is None:
-            raise ValidationError(
-                'Field "{type}" is not usable, try '
-                'different field type.'.format(type=type(self).__name__))
+            tpl = 'Field "{type}" is not usable, try different field type.'
+            raise ValueError(tpl.format(type=type(self).__name__))
+
+    @staticmethod
+    def _get_embed_type(value, models):
+        """
+        Tries to guess which of the given models is applicable to the dict.
+        :param value: The dict to check.
+        :param models: A list of acceptable models.
+        :return: A single model from the list that contains all the fields
+        that are also in the dict.
+        :raise AmbiguousTypeError: If more than one model is matched.
+        """
+        if len(models) > 1:
+            # dict of the available fields per model, so we can automatically
+            # recognize dicts
+            model_fields = {
+                model: {
+                   name or attr for attr, name, field
+                   in model.iterate_with_name()
+                } for model in models
+                if hasattr(model, "iterate_with_name")
+            }  # type: Dict[type, Set[str]]
+            matching_models = [model for model, fields in model_fields.items()
+                               if fields.issuperset(value)]
+
+            if len(matching_models) != 1:
+                raise AmbiguousTypeError(models)
+
+            # this is the only model that has all given fields
+            return matching_models[0]
+        return models[0]
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -134,11 +159,16 @@ class BaseField(object):
     def _validate_name(self):
         if self.name is None:
             return
-        if not re.match('^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
+        if not re.match(r'^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
             raise ValueError('Wrong name', self.name)
 
-    def structue_name(self, default):
+    def structure_name(self, default):
         return self.name if self.name is not None else default
+
+    def structue_name(self, default):
+        warnings.warn("`structue_name` is deprecated, please use "
+                      "`structure_name`")
+        return self.structure_name(default)
 
 
 class StringField(BaseField):
@@ -159,7 +189,10 @@ class IntField(BaseField):
         parsed = super(IntField, self).parse_value(value)
         if parsed is None:
             return parsed
-        return int(parsed)
+        try:
+            return int(parsed)
+        except ValueError:
+            raise BadTypeError(value, types=(int,), is_list=False)
 
 
 class FloatField(BaseField):
@@ -185,14 +218,16 @@ class ListField(BaseField):
 
     """List field."""
 
-    types = (list,)
+    types = (list, tuple)
 
-    def __init__(self, items_types=None, item_validators=(), *args, **kwargs):
+    def __init__(self, items_types=None, item_validators=(), omit_empty=False,
+                 *args, **kwargs):
         """Init.
 
         `ListField` is **always not required**. If you want to control number
         of items use validators. If you want to validate each individual item,
-        use `item_validators`.
+        use `item_validators`. You may pass omit_empty so empty lists are not
+        included in the to_struct method.
 
         """
         self._assign_types(items_types)
@@ -201,6 +236,7 @@ class ListField(BaseField):
             else item_validators or []
         super(ListField, self).__init__(*args, **kwargs)
         self.required = False
+        self._omit_empty = omit_empty
 
     def get_default_value(self):
         default = super(ListField, self).get_default_value()
@@ -242,12 +278,7 @@ class ListField(BaseField):
             return
 
         if not isinstance(value, self.items_types):
-            raise ValidationError(
-                'All items must be instances '
-                'of "{types}", and not "{type}".'.format(
-                    types=', '.join([t.__name__ for t in self.items_types]),
-                    type=type(value).__name__,
-                ))
+            raise BadTypeError(value, self.items_types, is_list=True)
 
     def parse_value(self, values):
         """Cast value to proper collection."""
@@ -265,31 +296,20 @@ class ListField(BaseField):
         if isinstance(value, self.items_types):
             return value
         elif isinstance(value, dict):
-            if len(self.items_types) != 1:
-                tpl = 'Cannot decide which type to choose from "{types}".'
-                raise ValidationError(
-                    tpl.format(
-                        types=', '.join([t.__name__ for t in self.items_types])
-                    )
-                )
-            return self.items_types[0](**value)
+            model_type = self._get_embed_type(value, self.items_types)
+            return model_type(**value)
         else:
-            raise ValidationError(
-                'All items must be instances '
-                'of "{types}", and not "{type}".'.format(
-                    types=', '.join([t.__name__ for t in self.items_types]),
-                    type=type(value).__name__,
-                ))
+            raise BadTypeError(value, self.items_types, is_list=True)
 
     def _finish_initialization(self, owner):
         super(ListField, self)._finish_initialization(owner)
 
         types = []
-        for type in self.items_types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for item_type in self.items_types:
+            if isinstance(item_type, _LazyType):
+                types.append(item_type.evaluate(owner))
             else:
-                types.append(type)
+                types.append(item_type)
         self.items_types = tuple(types)
 
     def _elem_to_struct(self, value):
@@ -299,7 +319,54 @@ class ListField(BaseField):
             return value
 
     def to_struct(self, values):
-        return [self._elem_to_struct(v) for v in values]
+        return [self._elem_to_struct(v) for v in values] \
+            if values or not self._omit_empty else None
+
+
+class DerivedListField(ListField):
+    """
+    A list field that has another field for its items.
+    """
+
+    def __init__(self, field: BaseField, *args, **kwargs):
+        """
+        :param field: The field that will be in each of the items of the list.
+        :param help_text: The help text of the list field.
+        :param validators: The validators for the list field.
+        """
+        super(DerivedListField, self).__init__(
+            items_types=field.types,
+            item_validators=field.validators,
+            *args, **kwargs,
+        )
+        self._field = field
+
+    def to_struct(self, values: List[any]) -> List[any]:
+        """
+        Converts the list to its output format.
+        :param values: The values in the list.
+        :return: The converted values.
+        """
+        return [self._field.to_struct(value) for value in values] \
+            if values or not self._omit_empty else None
+
+    def parse_value(self, values: List[any]) -> List[any]:
+        """
+        Converts the list to its internal format.
+        :param values: The values in the list.
+        :return: The converted values.
+        """
+        try:
+            return [self._field.parse_value(value) for value in values]
+        except TypeError:
+            raise BadTypeError(values, self._field.types, is_list=True)
+
+    def validate_single_value(self, value: any) -> None:
+        """
+        Validates a single value in the list.
+        :param value: One of the values in the list.
+        """
+        self._field.validate(value)
 
 
 class EmbeddedField(BaseField):
@@ -324,13 +391,13 @@ class EmbeddedField(BaseField):
 
     def _finish_initialization(self, owner):
         super(EmbeddedField, self)._finish_initialization(owner)
-
         types = []
-        for type in self.types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for model_type in self.types:
+            if isinstance(model_type, _LazyType):
+                types.append(model_type.evaluate(owner))
             else:
-                types.append(type)
+                types.append(model_type)
+
         self.types = tuple(types)
 
     def validate(self, value):
@@ -345,31 +412,85 @@ class EmbeddedField(BaseField):
         if not isinstance(value, dict):
             return value
 
-        embed_type = self._get_embed_type()
+        embed_type = self._get_embed_type(value, self.types)
         return embed_type(**value)
-
-    def _get_embed_type(self):
-        if len(self.types) != 1:
-            raise ValidationError(
-                'Cannot decide which type to choose from "{types}".'.format(
-                    types=', '.join([t.__name__ for t in self.types])
-                )
-            )
-        return self.types[0]
 
     def to_struct(self, value):
         return value.to_struct()
 
 
-class DictField(BaseField):
+class MapField(BaseField):
     """
-    Field for dictionaries that are not modelled.
-    """
-    types = dict,
+    Model field that keeps a mapping between two other fields.
+    It is basically a dictionary with key and values being separate fields.
 
-    def to_struct(self, value):
-        """Cast value to Python structure."""
-        return deepcopy(value)
+    `MapField` is **always not required**. If you want to control number
+    of items use validators. You may pass omit_empty so empty lists are not
+    included in the to_struct method.
+
+    """
+    types = (dict,)
+
+    def __init__(self, key_field: BaseField, value_field: BaseField,
+                 **kwargs):
+        """
+        :param key_field: The field that is responsible for converting and
+            validating the keys in this mapping.
+        :param value_field: The field that is responsible for converting and
+            validating the values in this mapping.
+        :param kwargs: Other keyword arguments to the base class.
+        """
+        super(MapField, self).__init__(**kwargs)
+        self._key_field = key_field
+        self._value_field = value_field
+
+    def _finish_initialization(self, owner):
+        """
+        Completes the initialization of the fields, allowing for lazy refs.
+        """
+        super(MapField, self)._finish_initialization(owner)
+        self._key_field._finish_initialization(owner)
+        self._value_field._finish_initialization(owner)
+
+    def get_default_value(self) -> any:
+        """ Gets the default value for this field """
+        default = super(MapField, self).get_default_value()
+        if default is None and self.required:
+            return dict()
+        return default
+
+    def parse_value(self, values: Optional[dict]) -> Optional[dict]:
+        """ Parses the given values into a new dict. """
+        values = super().parse_value(values)
+        if values is None:
+            return
+        items = [
+            (self._key_field.parse_value(key),
+             self._value_field.parse_value(value))
+            for key, value in values.items()
+        ]
+        return type(values)(items)  # Preserves OrderedDict
+
+    def to_struct(self, values: Optional[dict]) -> Optional[dict]:
+        """ Casts the field values into a dict. """
+        items = [
+            (self._key_field.to_struct(key),
+             self._value_field.to_struct(value))
+            for key, value in values.items()
+        ]
+        return type(values)(items)  # Preserves OrderedDict
+
+    def validate(self, values: Optional[dict]) -> Optional[dict]:
+        """
+        Validates all keys and values in the map field.
+        :param values: The values in the mapping.
+        """
+        super(MapField, self).validate(values)
+        if values is None:
+            return
+        for key, value in values.items():
+            self._key_field.validate(key)
+            self._value_field.validate(value)
 
 
 class _LazyType(object):
@@ -511,3 +632,30 @@ class DateTimeField(StringField):
             return parse(value)
         else:
             return None
+
+
+class GenericField(BaseField):
+    """
+    Field that supports any kind of value, converting models to their correct
+    struct, keeping ordered dictionaries in their original order.
+    """
+    types = (any,)
+
+    def _validate_against_types(self, value) -> None:
+        pass
+
+    def to_struct(self, values: any) -> any:
+        """ Casts value to Python structure. """
+        from .models import Base
+        if isinstance(values, Base):
+            return values.to_struct()
+
+        if isinstance(values, (list, tuple)):
+            return [self.to_struct(value) for value in values]
+
+        if isinstance(values, dict):
+            items = [(self.to_struct(key), self.to_struct(value))
+                     for key, value in values.items()]
+            return type(values)(items)  # preserves OrderedDict
+
+        return values

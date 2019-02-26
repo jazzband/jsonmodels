@@ -2,10 +2,12 @@
     "additionalProperties": false,
     "properties": {
         "date": {
-            "type": "string"
+            "type": "string",
+            "format": "date"
         },
         "end": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
         },
         "time": {
             "type": "string"

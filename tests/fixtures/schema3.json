@@ -13,7 +13,8 @@
                             "type": "string"
                         },
                         "capacity": {
-                            "type": "float"
+                            "type": "number",
+                            "format": "float"
                         }
                     },
                     "type": "object"
@@ -25,7 +26,8 @@
                             "type": "string"
                         },
                         "velocity": {
-                            "type": "float"
+                            "type": "number",
+                            "format": "float"
                         }
                     },
                     "type": "object"
@@ -52,7 +54,8 @@
                         "additionalProperties": false,
                         "properties": {
                             "battery_voltage": {
-                                "type": "float"
+                                "type": "number",
+                                "format": "float"
                             },
                             "name": {
                                 "type": "string"

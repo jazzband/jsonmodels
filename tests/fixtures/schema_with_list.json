@@ -33,6 +33,7 @@
                     }
                 ]
             },
+            "description": "A list of names.",
             "type": "array"
         }
     },

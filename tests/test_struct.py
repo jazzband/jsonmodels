@@ -18,7 +18,7 @@ def test_to_struct_basic():
         surname = fields.StringField(required=True)
         age = fields.IntField()
         cash = fields.FloatField()
-        meta = fields.DictField()
+        meta = fields.GenericField()
 
     alan = Person()
     with pytest.raises(errors.ValidationError):

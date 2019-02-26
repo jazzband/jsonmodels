@@ -44,7 +44,8 @@ def test_model2():
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
-        kids = fields.ListField(Kid)
+        kids = fields.ListField(Kid,
+                                default=[Kid(name="Name", surname="Surname")])
         car = fields.EmbeddedField(Car)
 
     chuck = Person()
@@ -88,7 +89,7 @@ def test_model3():
         age = fields.IntField()
         car = fields.EmbeddedField([Viper, Lamborghini])
         computer = fields.ListField([PC, Laptop, Tablet])
-        meta = fields.DictField()
+        meta = fields.GenericField()
 
     schema = Person.to_json_schema()
 
@@ -117,21 +118,20 @@ def test_model_with_constructors():
         age = fields.IntField()
         toys = fields.ListField(Toy)
 
-        def __init__(self, some_value):
-            pass
+        def __init__(self, name="Name", surname="Surname"):
+            super().__init__(name=name, surname=surname)
 
     class Person(models.Base):
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
-        kids = fields.ListField(Kid)
+        kids = fields.ListField(Kid, default=[Kid()])
         car = fields.EmbeddedField(Car)
 
         def __init__(self, some_value):
             pass
 
     schema = Person.to_json_schema()
-
     pattern = get_fixture('schema2.json')
     assert compare_schemas(pattern, schema) is True
 
@@ -380,7 +380,10 @@ def test_schema_for_list_and_primitives():
 
     class Person(models.Base):
 
-        names = fields.ListField([str, int, float, bool, Event])
+        names = fields.ListField(
+            [str, int, float, bool, Event],
+            help_text="A list of names.",
+        )
 
     schema = Person.to_json_schema()
 
@@ -401,12 +404,12 @@ def test_schema_for_unsupported_primitive():
 def test_enum_validator():
     class Person(models.Base):
         handness = fields.StringField(
+            help_text="The person's favorite hand.",
             validators=validators.Enum('left', 'right')
         )
 
     schema = Person.to_json_schema()
     pattern = get_fixture('schema_enum.json')
-
     assert compare_schemas(pattern, schema)
 
 
@@ -434,7 +437,6 @@ def test_primitives():
         (str, "string"),
         (bool, "boolean"),
         (int, "number"),
-        (float, "number"),
     )
     for pytpe, jstype in cases:
         b = builders.PrimitiveBuilder(pytpe)
@@ -443,3 +445,11 @@ def test_primitives():
         assert b.build() == {"type": [jstype, "null"]}
         b = builders.PrimitiveBuilder(pytpe, nullable=True, default=0)
         assert b.build() == {"type": [jstype, "null"], "default": 0}
+
+    b = builders.PrimitiveBuilder(float)
+    assert b.build() == {"type": "number", "format": "float"}
+    b = builders.PrimitiveBuilder(float, nullable=True)
+    assert b.build() == {"type": ["number", "null"], "format": "float"}
+    b = builders.PrimitiveBuilder(float, nullable=True, default=0)
+    assert b.build() == {"type": ["number", "null"], "default": 0,
+                         "format": "float"}

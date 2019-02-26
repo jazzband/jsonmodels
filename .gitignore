@@ -1,4 +1,5 @@
 *.py[cod]
+.coverage.*
 
 # C extensions
 *.so

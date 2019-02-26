@@ -26,7 +26,8 @@
                     "type": "string"
                 },
                 "size": {
-                    "type": "float"
+                    "type": "number",
+                    "format": "float"
                 }
             },
             "type": "object"

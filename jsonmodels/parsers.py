@@ -5,8 +5,8 @@ from . import fields, builders, errors
 
 
 def to_struct(model):
-    """Cast instance of model to python structure.
-
+    """
+    Cast instance of model to python structure.
     :param model: Model to be casted.
     :rtype: ``dict``
 
@@ -20,7 +20,8 @@ def to_struct(model):
             continue
 
         value = field.to_struct(value)
-        resp[name] = value
+        if value is not None:
+            resp[name] = value
     return resp
 
 
@@ -82,27 +83,34 @@ def build_json_schema_primitive(cls, parent_builder):
 
 
 def _create_primitive_field_schema(field):
-    if isinstance(field, fields.StringField):
-        obj_type = 'string'
-    elif isinstance(field, fields.IntField):
-        obj_type = 'number'
-    elif isinstance(field, fields.FloatField):
-        obj_type = 'float'
-    elif isinstance(field, fields.BoolField):
-        obj_type = 'boolean'
-    elif isinstance(field, fields.DictField):
-        obj_type = 'object'
-    else:
-        raise errors.FieldNotSupported(
-            'Field {field} is not supported!'.format(
-                field=type(field).__class__.__name__))
+    schema = {'type': _get_schema_type(field)}
 
-    if field.nullable:
-        obj_type = [obj_type, 'null']
-
-    schema = {'type': obj_type}
+    if isinstance(field, fields.FloatField):
+        schema['format'] = 'float'
+    elif isinstance(field, fields.DateField):
+        schema['format'] = 'date'
+    elif isinstance(field, fields.DateTimeField):
+        schema['format'] = 'date-time'
 
     if field.has_default:
         schema["default"] = field._default
 
     return schema
+
+
+def _get_schema_type(field):
+    if isinstance(field, fields.StringField):
+        obj_type = 'string'
+    elif isinstance(field, fields.IntField):
+        obj_type = 'number'
+    elif isinstance(field, fields.FloatField):
+        obj_type = 'number'
+    elif isinstance(field, fields.BoolField):
+        obj_type = 'boolean'
+    elif isinstance(field, fields.GenericField):
+        obj_type = 'object'
+    else:
+        raise errors.FieldNotSupported(type(field))
+    if field.nullable:
+        obj_type = [obj_type, 'null']
+    return obj_type

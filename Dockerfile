@@ -9,7 +9,7 @@ RUN pip install coveralls
 ADD requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-ADD . .
+COPY . .
 RUN pip install --no-cache-dir -e .
 
 RUN python ./setup.py test

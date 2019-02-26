@@ -67,7 +67,7 @@ class ObjectBuilder(Builder):
 
     def add_field(self, name, field, schema):
         _apply_validators_modifications(schema, field)
-        if field.help_text:
+        if isinstance(schema, dict) and field.help_text:
             schema["description"] = field.help_text
         self.properties[name] = schema
         if field.required:

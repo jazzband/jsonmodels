@@ -179,8 +179,10 @@ def test_automatic_model_detection():
         last_name = fields.StringField()
 
     class Car(models.Base):
-        models = fields.DerivedListField(fields.StringField(),
-                                         omit_empty=False)
+        models = fields.DerivedListField(
+            fields.StringField(),
+            omit_empty=False,
+            default=["default"])
 
     class Person(models.Base):
 

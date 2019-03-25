@@ -334,12 +334,12 @@ class DerivedListField(ListField):
         :param help_text: The help text of the list field.
         :param validators: The validators for the list field.
         """
+        self._field = field
         super(DerivedListField, self).__init__(
             items_types=field.types,
             item_validators=field.validators,
             *args, **kwargs,
         )
-        self._field = field
 
     def to_struct(self, values: List[any]) -> List[any]:
         """

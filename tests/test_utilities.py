@@ -117,7 +117,7 @@ def test_convert_ecma_regex_to_python():
 
     assert (
         (r'^another \d python regex$', []) ==
-        utilities.convert_ecma_regex_to_python('^another \d python regex$')
+        utilities.convert_ecma_regex_to_python(r'^another \d python regex$')
     )
 
     result = utilities.convert_ecma_regex_to_python('python regex')
@@ -128,27 +128,27 @@ def test_convert_ecma_regex_to_python():
 def test_convert_python_regex_to_ecma():
     assert (
         '/^some regex$/' ==
-        utilities.convert_python_regex_to_ecma('^some regex$')
+        utilities.convert_python_regex_to_ecma(r'^some regex$')
     )
 
     assert (
         '/^some regex$/' ==
-        utilities.convert_python_regex_to_ecma('^some regex$', [])
+        utilities.convert_python_regex_to_ecma(r'^some regex$', [])
     )
 
     assert (
         r'/pattern \d+/i' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.I])
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.I])
     )
 
     assert (
         r'/pattern \d+/m' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.M])
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.M])
     )
 
     assert (
         r'/pattern \d+/im' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.I, re.M])
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.I, re.M])
     )
 
     assert (
@@ -176,7 +176,7 @@ def test_converters():
     assert (
         r'/^ecma \d regex$/im' ==
         utilities.convert_python_regex_to_ecma(
-            *utilities.convert_ecma_regex_to_python('/^ecma \d regex$/im'))
+            *utilities.convert_ecma_regex_to_python(r'/^ecma \d regex$/im'))
     )
 
     result = utilities.convert_ecma_regex_to_python(

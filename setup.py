@@ -60,7 +60,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author=__author__,
     author_email=__email__,
-    url='https://github.com/beregond/jsonmodels',
+    url='https://github.com/jazzband/jsonmodels',
     packages=[
         PROJECT_NAME,
     ],

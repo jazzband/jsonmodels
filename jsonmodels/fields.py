@@ -5,7 +5,7 @@ import datetime
 import re
 import six
 from dateutil.parser import parse
-from typing import List, Optional, Dict, Set
+from typing import List, Optional, Dict, Set, Union, Pattern
 
 from .collections import ModelCollection
 from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
@@ -13,6 +13,12 @@ from .errors import RequiredFieldError, BadTypeError, AmbiguousTypeError
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
 NotSet = object()
+
+# BSON compatible types, which can be returned by toPlain.
+BsonEncodable = Union[
+    float, str, object, Dict, List, bytes, bool, datetime.datetime, None,
+    Pattern, int, bytes
+]
 
 
 class BaseField(object):
@@ -125,8 +131,27 @@ class BaseField(object):
             return matching_models[0]
         return models[0]
 
+    def toPlain(self, value: types) -> BsonEncodable:
+        """Optionally return a python object instead of JSON compatible value.
+
+        Returned object should be BSON compatible. By default uses the
+        `to_struct` method, which creates JSON compatible types. JSON is
+        compatible with bson. When required, this method should cast the value
+        to supported bson type.
+        See: https://api.mongodb.com/python/current/api/bson/index.html
+
+        For example: when a value is a datetime object return it as a datetime
+        object. When a value is of CustomDateObject, cast it to a datetime
+        object before returning it.
+
+        :param value: Value
+        :return: a value which should be bson encodable
+
+        """
+        return self.to_struct(value=value)
+
     def to_struct(self, value):
-        """Cast value to Python structure."""
+        """Cast value to Python dict."""
         return value
 
     def parse_value(self, value):

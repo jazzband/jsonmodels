@@ -1,5 +1,3 @@
-import six
-
 from . import parsers, errors
 from .fields import BaseField
 from .errors import ValidationError

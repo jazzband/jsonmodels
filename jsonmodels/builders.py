@@ -3,8 +3,6 @@
 
 from collections import defaultdict
 
-import six
-
 from . import errors
 from .fields import NotSet
 

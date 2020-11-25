@@ -1,4 +1,3 @@
-import six
 import re
 from collections import namedtuple
 

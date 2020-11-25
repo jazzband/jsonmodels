@@ -187,7 +187,7 @@ class ListField(BaseField):
 
     types = (list,)
 
-    def __init__(self, items_types=None, *args, **kwargs):
+    def __init__(self, items_types, *args, **kwargs):
         """Init.
 
         `ListField` is **always not required**. If you want to control number

@@ -3,16 +3,18 @@ import pytest
 from jsonmodels import models, fields, errors
 
 
+class Person(models.Base):
+
+    name = fields.StringField()
+    surname = fields.StringField()
+    age = fields.IntField()
+    cash = fields.FloatField()
+    children = fields.ListField(["Person"])
+
+
 def test_model1():
 
-    class Person(models.Base):
-
-        name = fields.StringField()
-        surname = fields.StringField()
-        age = fields.IntField()
-
     alan = Person()
-
     alan.name = 'Alan'
     alan.surname = 'Wake'
     alan.age = 34
@@ -20,39 +22,30 @@ def test_model1():
 
 def test_required():
 
-    class Person(models.Base):
+    class Foo(models.Base):
+        bar = fields.StringField(required=True)
 
-        name = fields.StringField(required=True)
-        surname = fields.StringField()
-        age = fields.IntField()
-
-    alan = Person()
+    alan = Foo()
     with pytest.raises(errors.ValidationError):
         alan.validate()
 
-    alan.name = 'Chuck'
+    alan.bar = 'Chuck'
     alan.validate()
 
 
 def test_type_validation():
 
-    class Person(models.Base):
-
-        name = fields.StringField()
-        age = fields.IntField()
-
     alan = Person()
-
     alan.age = 42
 
 
 def test_base_field_should_not_be_usable():
 
-    class Person(models.Base):
+    class Foo(models.Base):
 
         name = fields.BaseField()
 
-    alan = Person()
+    alan = Foo()
 
     with pytest.raises(errors.ValidationError):
         alan.name = 'some name'
@@ -62,13 +55,6 @@ def test_base_field_should_not_be_usable():
 
 
 def test_value_replacements():
-
-    class Person(models.Base):
-
-        name = fields.StringField()
-        age = fields.IntField()
-        cash = fields.FloatField()
-        children = fields.ListField()
 
     alan = Person()
     assert alan.name is None
@@ -81,7 +67,7 @@ def test_list_field():
 
     class Car(models.Base):
 
-        wheels = fields.ListField()
+        wheels = fields.ListField([str])
 
     viper = Car()
 
@@ -167,9 +153,12 @@ def test_list_field_for_subtypes():
 
 def test_list_validation():
 
+    class Car(models.Base):
+        pass
+
     class Garage(models.Base):
 
-        cars = fields.ListField()
+        cars = fields.ListField([Car])
 
     garage = Garage()
 
@@ -401,24 +390,21 @@ def test_types():
 
 def test_items_types():
 
-    class Person(object):
+    class Foo(object):
         pass
 
-    class Person2(object):
+    class Bar(object):
         pass
 
-    allowed_types = (Person,)
+    allowed_types = (Foo,)
 
     field = fields.ListField(allowed_types)
     assert allowed_types == field.items_types
 
-    allowed_types = (Person, Person2)
+    allowed_types = (Foo, Bar)
 
     field = fields.ListField(allowed_types)
     assert allowed_types == field.items_types
-
-    field = fields.ListField()
-    assert tuple() == field.items_types
 
 
 def test_required_embedded_field():

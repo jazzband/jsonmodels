@@ -1,3 +1,4 @@
+import re
 import pytest
 
 from jsonmodels import models, fields, validators, errors, builders
@@ -268,6 +269,22 @@ def test_regex_validator():
 
     pattern = get_fixture('schema_pattern.json')
     assert compare_schemas(pattern, schema)
+
+
+def test_python_regex_validator():
+    pattern = "some pattern"
+    schema = {}
+    validator = validators.PythonRegex(pattern)
+    validator.modify_schema(schema)
+    assert schema["pattern"] == pattern
+
+
+def test_python_regex_validator_ignore_flags():
+    pattern = "some pattern"
+    schema = {}
+    validator = validators.PythonRegex(pattern, re.DOTALL | re.VERBOSE)
+    validator.modify_schema(schema)
+    assert schema["pattern"] == pattern
 
 
 def test_regex_validator_when_ecma_regex_given():

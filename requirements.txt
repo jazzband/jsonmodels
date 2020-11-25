@@ -5,7 +5,7 @@ Pygments
 Sphinx
 coverage
 docutils
-flake8; python_version == '2.7' or python_version >= '3.4'
+flake8
 invoke
 mccabe
 mock
@@ -14,7 +14,8 @@ py
 pyflakes
 pytest
 pytest-cov
-sphinxcontrib-spelling
+sphinxcontrib-spelling<5.0.0; python_version == '2.7'
+sphinxcontrib-spelling; python_version > '2.7'
 tox
 virtualenv
 wheel

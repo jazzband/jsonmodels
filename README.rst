@@ -2,17 +2,23 @@
 JSON models
 ===========
 
-.. image:: https://badge.fury.io/py/jsonmodels.png
+.. image:: https://jazzband.co/static/img/badge.svg
+   :target: https://jazzband.co/
+   :alt: Jazzband
+
+.. image:: https://badge.fury.io/py/jsonmodels.svg
     :target: http://badge.fury.io/py/jsonmodels
 
-.. image:: https://travis-ci.org/jazzband/jsonmodels.png?branch=master
-    :target: https://travis-ci.org/jazzband/jsonmodels
+.. image:: https://github.com/jazzband/jsonmodels/workflows/Test/badge.svg
+    :target: https://github.com/jazzband/jsonmodels/actions
+   :alt: Tests
 
 .. image:: https://img.shields.io/pypi/dm/jsonmodels.svg
     :target: https://pypi.python.org/pypi/jsonmodels
 
-.. image:: https://coveralls.io/repos/jazzband/jsonmodels/badge.png
-    :target: https://coveralls.io/r/jazzband/jsonmodels
+.. image:: https://codecov.io/gh/jazzband/jsonmodels/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/jazzband/jsonmodels
+   :alt: Coverage
 
 .. image:: https://jazzband.co/static/img/badge.svg
    :target: https://jazzband.co/
@@ -29,7 +35,7 @@ are converted to, or read from JSON.
 Features
 --------
 
-* Fully tested with Python 2.7, 3.4, 3.5, 3.6, 3.7, 3.8.
+* Fully tested with Python 2.7, 3.5, 3.6, 3.7, 3.8.
 
 * Support for PyPy (see implementation notes in docs for more details).
 

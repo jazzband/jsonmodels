@@ -313,7 +313,7 @@ def test_int_field_parsing():
     counter2 = Counter(value='2')
     assert isinstance(counter2.value, int)
     assert counter2.value == 2
-    if not six.PY3:
+    if six.PY2:
         counter3 = Counter(value=long(3))  # noqa
         assert isinstance(counter3.value, int)
         assert counter3.value == 3

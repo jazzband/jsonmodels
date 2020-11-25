@@ -60,7 +60,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author=__author__,
     author_email=__email__,
-    url='https://github.com/beregond/jsonmodels',
+    url='https://github.com/jazzband/jsonmodels',
     packages=[
         PROJECT_NAME,
     ],
@@ -80,11 +80,11 @@ setup(
         "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     cmdclass={
         'test': PyTest,

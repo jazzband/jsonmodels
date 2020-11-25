@@ -5,14 +5,18 @@ JSON models
 .. image:: https://badge.fury.io/py/jsonmodels.png
     :target: http://badge.fury.io/py/jsonmodels
 
-.. image:: https://travis-ci.org/beregond/jsonmodels.png?branch=master
-    :target: https://travis-ci.org/beregond/jsonmodels
+.. image:: https://travis-ci.org/jazzband/jsonmodels.png?branch=master
+    :target: https://travis-ci.org/jazzband/jsonmodels
 
 .. image:: https://img.shields.io/pypi/dm/jsonmodels.svg
     :target: https://pypi.python.org/pypi/jsonmodels
 
-.. image:: https://coveralls.io/repos/beregond/jsonmodels/badge.png
-    :target: https://coveralls.io/r/beregond/jsonmodels
+.. image:: https://coveralls.io/repos/jazzband/jsonmodels/badge.png
+    :target: https://coveralls.io/r/jazzband/jsonmodels
+
+.. image:: https://jazzband.co/static/img/badge.svg
+   :target: https://jazzband.co/
+   :alt: Jazzband
 
 
 `jsonmodels` is library to make it easier for you to deal with structures that
@@ -20,12 +24,12 @@ are converted to, or read from JSON.
 
 * Free software: BSD license
 * Documentation: http://jsonmodels.rtfd.org
-* Source: https://github.com/beregond/jsonmodels
+* Source: https://github.com/jazzband/jsonmodels
 
 Features
 --------
 
-* Fully tested with Python 2.7, 3.3, 3.4, 3.5, 3.6.
+* Fully tested with Python 2.7, 3.4, 3.5, 3.6, 3.7, 3.8.
 
 * Support for PyPy (see implementation notes in docs for more details).
 

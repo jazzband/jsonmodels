@@ -1,6 +1,5 @@
 """Builders to generate in memory representation of model and fields tree."""
 
-from __future__ import absolute_import
 
 from collections import defaultdict
 
@@ -10,7 +9,7 @@ from . import errors
 from .fields import NotSet
 
 
-class Builder(object):
+class Builder:
 
     def __init__(self, parent=None, nullable=False, default=NotSet):
         self.parent = parent
@@ -58,7 +57,7 @@ class Builder(object):
 class ObjectBuilder(Builder):
 
     def __init__(self, model_type, *args, **kwargs):
-        super(ObjectBuilder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.properties = {}
         self.required = []
         self.type = model_type
@@ -76,7 +75,7 @@ class ObjectBuilder(Builder):
         if self.is_definition and not self.is_root:
             self.add_definition(builder)
             [self.maybe_build(value) for _, value in self.properties.items()]
-            return '#/definitions/{name}'.format(name=self.type_name)
+            return f'#/definitions/{self.type_name}'
         else:
             return builder.build_definition(nullable=self.nullable)
 
@@ -89,11 +88,11 @@ class ObjectBuilder(Builder):
         return module_name.replace('.', '_').lower()
 
     def build_definition(self, add_defintitions=True, nullable=False):
-        properties = dict(
-            (name, self.maybe_build(value))
+        properties = {
+            name: self.maybe_build(value)
             for name, value
             in self.properties.items()
-        )
+        }
         schema = {
             'type': 'object',
             'additionalProperties': False,
@@ -102,10 +101,10 @@ class ObjectBuilder(Builder):
         if self.required:
             schema['required'] = self.required
         if self.definitions and add_defintitions:
-            schema['definitions'] = dict(
-                (builder.type_name, builder.build_definition(False, False))
+            schema['definitions'] = {
+                builder.type_name: builder.build_definition(False, False)
                 for builder in self.definitions
-            )
+            }
         return schema
 
     @property
@@ -133,12 +132,12 @@ def _apply_validators_modifications(field_schema, field):
 class PrimitiveBuilder(Builder):
 
     def __init__(self, type, *args, **kwargs):
-        super(PrimitiveBuilder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.type = type
 
     def build(self):
         schema = {}
-        if issubclass(self.type, six.string_types):
+        if issubclass(self.type, str):
             obj_type = 'string'
         elif issubclass(self.type, bool):
             obj_type = 'boolean'
@@ -164,7 +163,7 @@ class PrimitiveBuilder(Builder):
 class ListBuilder(Builder):
 
     def __init__(self, *args, **kwargs):
-        super(ListBuilder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.schemas = []
 
     def add_type_schema(self, schema):
@@ -202,7 +201,7 @@ class ListBuilder(Builder):
 class EmbeddedBuilder(Builder):
 
     def __init__(self, *args, **kwargs):
-        super(EmbeddedBuilder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.schemas = []
 
     def add_type_schema(self, schema):

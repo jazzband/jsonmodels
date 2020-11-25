@@ -14,7 +14,7 @@ from .collections import ModelCollection
 NotSet = object()
 
 
-class BaseField(object):
+class BaseField:
 
     """Base class for all fields."""
 
@@ -145,7 +145,7 @@ class StringField(BaseField):
 
     """String field."""
 
-    types = six.string_types
+    types = (str,)
 
 
 class IntField(BaseField):
@@ -156,7 +156,7 @@ class IntField(BaseField):
 
     def parse_value(self, value):
         """Cast value to `int`, e.g. from string or long"""
-        parsed = super(IntField, self).parse_value(value)
+        parsed = super().parse_value(value)
         if parsed is None:
             return parsed
         return int(parsed)
@@ -177,7 +177,7 @@ class BoolField(BaseField):
 
     def parse_value(self, value):
         """Cast value to `bool`."""
-        parsed = super(BoolField, self).parse_value(value)
+        parsed = super().parse_value(value)
         return bool(parsed) if parsed is not None else None
 
 
@@ -195,11 +195,11 @@ class ListField(BaseField):
 
         """
         self._assign_types(items_types)
-        super(ListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.required = False
 
     def get_default_value(self):
-        default = super(ListField, self).get_default_value()
+        default = super().get_default_value()
         if default is None:
             return ModelCollection(self)
         return default
@@ -215,14 +215,14 @@ class ListField(BaseField):
 
         types = []
         for type_ in self.items_types:
-            if isinstance(type_, six.string_types):
+            if isinstance(type_, str):
                 types.append(_LazyType(type_))
             else:
                 types.append(type_)
         self.items_types = tuple(types)
 
     def validate(self, value):
-        super(ListField, self).validate(value)
+        super().validate(value)
 
         if len(self.items_types) == 0:
             return
@@ -268,7 +268,7 @@ class ListField(BaseField):
             return self.items_types[0](**value)
 
     def _finish_initialization(self, owner):
-        super(ListField, self)._finish_initialization(owner)
+        super()._finish_initialization(owner)
 
         types = []
         for type in self.items_types:
@@ -294,7 +294,7 @@ class EmbeddedField(BaseField):
 
     def __init__(self, model_types, *args, **kwargs):
         self._assign_model_types(model_types)
-        super(EmbeddedField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _assign_model_types(self, model_types):
         if not isinstance(model_types, (list, tuple)):
@@ -302,14 +302,14 @@ class EmbeddedField(BaseField):
 
         types = []
         for type_ in model_types:
-            if isinstance(type_, six.string_types):
+            if isinstance(type_, str):
                 types.append(_LazyType(type_))
             else:
                 types.append(type_)
         self.types = tuple(types)
 
     def _finish_initialization(self, owner):
-        super(EmbeddedField, self)._finish_initialization(owner)
+        super()._finish_initialization(owner)
 
         types = []
         for type in self.types:
@@ -320,7 +320,7 @@ class EmbeddedField(BaseField):
         self.types = tuple(types)
 
     def validate(self, value):
-        super(EmbeddedField, self).validate(value)
+        super().validate(value)
         try:
             value.validate()
         except AttributeError:
@@ -347,7 +347,7 @@ class EmbeddedField(BaseField):
         return value.to_struct()
 
 
-class _LazyType(object):
+class _LazyType:
 
     def __init__(self, path):
         self.path = path
@@ -380,7 +380,7 @@ def _get_modules(relative_path, base_module):
     parent_modules = base_module.split('.')
     parents_amount = max(0, parents_amount - 1)
     if parents_amount > len(parent_modules):
-        raise ValueError("Can't evaluate path '{}'".format(relative_path))
+        raise ValueError(f"Can't evaluate path '{relative_path}'")
     return parent_modules[:parents_amount * -1] + canonical_modules
 
 
@@ -390,7 +390,7 @@ def _import(module_name, type_name):
         return getattr(module, type_name)
     except AttributeError:
         raise ValueError(
-            "Can't find type '{}.{}'.".format(module_name, type_name))
+            f"Can't find type '{module_name}.{type_name}'.")
 
 
 class TimeField(StringField):
@@ -407,7 +407,7 @@ class TimeField(StringField):
 
         """
         self.str_format = str_format
-        super(TimeField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_struct(self, value):
         """Cast `time` object to string."""
@@ -439,7 +439,7 @@ class DateField(StringField):
 
         """
         self.str_format = str_format
-        super(DateField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_struct(self, value):
         """Cast `date` object to string."""
@@ -470,7 +470,7 @@ class DateTimeField(StringField):
 
         """
         self.str_format = str_format
-        super(DateTimeField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_struct(self, value):
         """Cast `datetime` object to string."""

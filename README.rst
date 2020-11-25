@@ -7,23 +7,19 @@ JSON models
    :alt: Jazzband
 
 .. image:: https://badge.fury.io/py/jsonmodels.svg
-    :target: http://badge.fury.io/py/jsonmodels
+   :target: http://badge.fury.io/py/jsonmodels
 
 .. image:: https://github.com/jazzband/jsonmodels/workflows/Test/badge.svg
-    :target: https://github.com/jazzband/jsonmodels/actions
+   :target: https://github.com/jazzband/jsonmodels/actions
    :alt: Tests
 
 .. image:: https://img.shields.io/pypi/dm/jsonmodels.svg
-    :target: https://pypi.python.org/pypi/jsonmodels
+   :target: https://pypi.python.org/pypi/jsonmodels
+   :alt: PyPI
 
 .. image:: https://codecov.io/gh/jazzband/jsonmodels/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/jazzband/jsonmodels
    :alt: Coverage
-
-.. image:: https://jazzband.co/static/img/badge.svg
-   :target: https://jazzband.co/
-   :alt: Jazzband
-
 
 `jsonmodels` is library to make it easier for you to deal with structures that
 are converted to, or read from JSON.

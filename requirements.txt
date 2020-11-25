@@ -5,7 +5,7 @@ Pygments
 Sphinx
 coverage
 docutils
-flake8; python_version == '2.7' or python_version >= '3.4'
+flake8
 invoke
 mccabe
 mock

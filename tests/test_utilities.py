@@ -74,11 +74,11 @@ def test_is_ecma_regex():
     with pytest.raises(ValueError):
         utilities.is_ecma_regex('wrong regex/asdf')
 
-    assert utilities.is_ecma_regex('/^some regex\/gim') is True
+    assert utilities.is_ecma_regex(r'/^some regex\/gim') is True
 
-    assert utilities.is_ecma_regex('/^some regex\\\\/trololo') is True
-    assert utilities.is_ecma_regex('/^some regex\\\\\/gim') is True
-    assert utilities.is_ecma_regex('/\\\\/') is True
+    assert utilities.is_ecma_regex(r'/^some regex\\\\/trololo') is True
+    assert utilities.is_ecma_regex(r'/^some regex\\\\\/gim') is True
+    assert utilities.is_ecma_regex(r'/\\\\/') is True
 
     assert utilities.is_ecma_regex('some /regex/asdf') is False
     assert utilities.is_ecma_regex('^some regex$//') is False
@@ -91,20 +91,20 @@ def test_convert_ecma_regex_to_python():
         utilities.convert_ecma_regex_to_python('/some/pattern/')
     )
     assert (
-        ('^some \d+ pattern$', []) ==
-        utilities.convert_ecma_regex_to_python('/^some \d+ pattern$/')
+        (r'^some \d+ pattern$', []) ==
+        utilities.convert_ecma_regex_to_python(r'/^some \d+ pattern$/')
     )
 
-    regex, flags = utilities.convert_ecma_regex_to_python('/^regex \d/i')
-    assert '^regex \d' == regex
+    regex, flags = utilities.convert_ecma_regex_to_python(r'/^regex \d/i')
+    assert r'^regex \d' == regex
     assert set([re.I]) == set(flags)
 
-    result = utilities.convert_ecma_regex_to_python('/^regex \d/m')
-    assert '^regex \d' == result.regex
+    result = utilities.convert_ecma_regex_to_python(r'/^regex \d/m')
+    assert r'^regex \d' == result.regex
     assert set([re.M]) == set(result.flags)
 
-    result = utilities.convert_ecma_regex_to_python('/^regex \d/mi')
-    assert '^regex \d' == result.regex
+    result = utilities.convert_ecma_regex_to_python(r'/^regex \d/mi')
+    assert r'^regex \d' == result.regex
     assert set([re.M, re.I]) == set(result.flags)
 
     with pytest.raises(ValueError):
@@ -116,8 +116,8 @@ def test_convert_ecma_regex_to_python():
     )
 
     assert (
-        ('^another \d python regex$', []) ==
-        utilities.convert_ecma_regex_to_python('^another \d python regex$')
+        (r'^another \d python regex$', []) ==
+        utilities.convert_ecma_regex_to_python(r'^another \d python regex$')
     )
 
     result = utilities.convert_ecma_regex_to_python('python regex')
@@ -128,27 +128,27 @@ def test_convert_ecma_regex_to_python():
 def test_convert_python_regex_to_ecma():
     assert (
         '/^some regex$/' ==
-        utilities.convert_python_regex_to_ecma('^some regex$')
+        utilities.convert_python_regex_to_ecma(r'^some regex$')
     )
 
     assert (
         '/^some regex$/' ==
-        utilities.convert_python_regex_to_ecma('^some regex$', [])
+        utilities.convert_python_regex_to_ecma(r'^some regex$', [])
     )
 
     assert (
-        '/pattern \d+/i' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.I])
+        r'/pattern \d+/i' ==
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.I])
     )
 
     assert (
-        '/pattern \d+/m' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.M])
+        r'/pattern \d+/m' ==
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.M])
     )
 
     assert (
-        '/pattern \d+/im' ==
-        utilities.convert_python_regex_to_ecma('pattern \d+', [re.I, re.M])
+        r'/pattern \d+/im' ==
+        utilities.convert_python_regex_to_ecma(r'pattern \d+', [re.I, re.M])
     )
 
     assert (
@@ -174,14 +174,14 @@ def test_convert_python_regex_to_ecma():
 
 def test_converters():
     assert (
-        '/^ecma \d regex$/im' ==
+        r'/^ecma \d regex$/im' ==
         utilities.convert_python_regex_to_ecma(
-            *utilities.convert_ecma_regex_to_python('/^ecma \d regex$/im'))
+            *utilities.convert_ecma_regex_to_python(r'/^ecma \d regex$/im'))
     )
 
     result = utilities.convert_ecma_regex_to_python(
         utilities.convert_python_regex_to_ecma(
-            '^some \w python regex$', [re.I]))
+            r'^some \w python regex$', [re.I]))
 
-    assert '^some \w python regex$' == result.regex
+    assert r'^some \w python regex$' == result.regex
     assert [re.I] == result.flags

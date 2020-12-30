@@ -408,12 +408,15 @@ def test_primitives():
         (str, "string"),
         (bool, "boolean"),
         (int, "number"),
-        (float, "number")
+        (float, "number"),
+        (dict, "object")
     )
     for pytpe, jstype in cases:
         b = builders.PrimitiveBuilder(pytpe)
         assert b.build() == {"type": jstype}
         b = builders.PrimitiveBuilder(pytpe, nullable=True)
         assert b.build() == {"type": [jstype, "null"]}
+        b = builders.PrimitiveBuilder(pytpe, nullable=True, default=0)
+        assert b.build() == {"type": [jstype, "null"], "default": 0}
         b = builders.PrimitiveBuilder(pytpe, nullable=True, default=0)
         assert b.build() == {"type": [jstype, "null"], "default": 0}

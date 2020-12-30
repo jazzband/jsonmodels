@@ -8,9 +8,10 @@
             "type": "object",
             "properties": {
                 "brand": {"type": "string"},
-                "registration": {"type": "string"}
+                "registration": {"type": "string"},
+                "extra": {"type": "dict"}
             },
-            "required": ["brand", "registration"],
+            "required": ["brand", "registration","extra"],
             "additionalProperties": false
         },
         "kids": {

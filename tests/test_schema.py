@@ -13,6 +13,7 @@ def test_model1():
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
+        extra = fields.DictField()
 
     alan = Person()
     schema = alan.to_json_schema()
@@ -27,6 +28,7 @@ def test_model2():
 
         brand = fields.StringField(required=True)
         registration = fields.StringField(required=True)
+        extra = fields.DictField(required=True)
 
     class Toy(models.Base):
 
@@ -101,6 +103,7 @@ def test_model_with_constructors():
     class Car(models.Base):
         brand = fields.StringField(required=True)
         registration = fields.StringField(required=True)
+        extra = fields.DictField(required=True)
 
         def __init__(self, some_value):
             pass

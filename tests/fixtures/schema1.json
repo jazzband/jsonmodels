@@ -3,7 +3,8 @@
     "properties": {
         "name": {"type": "string"},
         "surname": {"type": "string"},
-        "age": {"type": "number"}
+        "age": {"type": "number"},
+        "extra": {"type": "dict"}
     },
     "required": ["name", "surname"],
     "additionalProperties": false

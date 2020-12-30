@@ -33,19 +33,23 @@ def test_bool_field():
 def test_dict_field():
 
     field = fields.DictField()
+    default_field = fields.DictField(default={
+        "extra_default": "Hello",
+        "deep_extra": {"spanish": "Hola"}},
+        validators=[validators.Length(2)])
 
     class Person(models.Base):
 
         extra = field
         extra_required = fields.DictField(required=True)
-        extra_default = fields.DictField(default={"extra_default":"Hello", "deep_extra": {"spanish": "Hola"}}, validators=[validators.Length(2)])
+        extra_default = default_field
         extra_nullable = fields.DictField(nullable=True)
 
     person = Person(extra_required={"required": True})
     assert person.extra is None
     assert person.extra_required == {"required": True}
-    assert person.extra_default == {"extra_default":"Hello", "deep_extra": {"spanish": "Hola"}}
+    assert person.extra_default == {"extra_default": "Hello",
+                                    "deep_extra": {"spanish": "Hola"}}
 
-    person.extra = {"extra":True}
-    assert person.extra == {"extra":True}
-
+    person.extra = {"extra": True}
+    assert person.extra == {"extra": True}

@@ -32,7 +32,8 @@ def test_initialization():
         assert alan.surname == 'Wake'
         assert alan.age == 24
         assert alan.cash == 2445.45
-        assert alan.extra_data == {"location": "Oviedo, Spain", "gender": "Unknown"}
+        assert alan.extra_data == {"location": "Oviedo, Spain",
+                                   "gender": "Unknown"}
 
         assert not hasattr(alan, 'trash')
 
@@ -53,7 +54,9 @@ def test_deep_initialization():
         'location': 'somewhere',
         'car': {
             'brand': 'awesome brand',
-            'extra': {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
+            'extra': {"extra_int": 1, "extra_str": "a",
+                      "extra_bool": True,
+                      "extra_dict": {"I am extra": True}}
         }
     }
 
@@ -65,13 +68,17 @@ def test_deep_initialization():
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
-        assert car.extra == {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
+        assert car.extra == {"extra_int": 1, "extra_str": "a",
+                             "extra_bool": True,
+                             "extra_dict": {"I am extra": True}}
 
         assert parking.location == 'somewhere'
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
-        assert car.extra == {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
+        assert car.extra == {"extra_int": 1, "extra_str": "a",
+                             "extra_bool": True,
+                             "extra_dict": {"I am extra": True}}
 
 
 def test_deep_initialization_error_with_multitypes():

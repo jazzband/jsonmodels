@@ -30,14 +30,14 @@ def test_to_struct_basic():
 
     alan.age = 24
     alan.cash = 2445.45
-    alan.extra = {"extra_value":1}
+    alan.extra = {"extra_value": 1}
 
     pattern = {
         'name': 'Alan',
         'surname': 'Wake',
         'age': 24,
         'cash': 2445.45,
-        'extra' : {"extra_value":1}
+        'extra': {"extra_value": 1}
     }
 
     assert pattern == alan.to_struct()
@@ -68,9 +68,9 @@ def test_to_struct_nested_1():
     assert pattern == place.to_struct()
 
     place.car.brand = 'Fiat'
-    place.car.extra = {"extra":1}
+    place.car.extra = {"extra": 1}
     pattern['car']['brand'] = 'Fiat'
-    pattern['car']['extra'] = {"extra":1}
+    pattern['car']['extra'] = {"extra": 1}
     assert pattern == place.to_struct()
 
 

@@ -180,11 +180,13 @@ class BoolField(BaseField):
         parsed = super(BoolField, self).parse_value(value)
         return bool(parsed) if parsed is not None else None
 
+
 class DictField(BaseField):
 
     """Dict field."""
 
     types = (dict, )
+
 
 class ListField(BaseField):
 

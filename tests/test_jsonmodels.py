@@ -17,7 +17,7 @@ def test_model1():
     alan.name = 'Alan'
     alan.surname = 'Wake'
     alan.age = 34
-    alan.extra = {"extra_value":1}
+    alan.extra = {"extra_value": 1}
 
 
 def test_required():

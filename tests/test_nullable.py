@@ -23,7 +23,7 @@ def test_nullable_simple_field():
 def test_nullable_dict_field():
     result = NullableDict.to_json_schema()
 
-    assert result['properties']['field']['type'] == ['dict', 'null']
+    assert result['properties']['field']['type'] == ['object', 'null']
 
 def test_nullable_list_field():
     result = NullableListField.to_json_schema()

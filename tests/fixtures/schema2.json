@@ -9,7 +9,7 @@
             "properties": {
                 "brand": {"type": "string"},
                 "registration": {"type": "string"},
-                "extra": {"type": "dict"}
+                "extra": {"type": "object"}
             },
             "required": ["brand", "registration","extra"],
             "additionalProperties": false

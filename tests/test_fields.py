@@ -39,24 +39,13 @@ def test_dict_field():
         extra = field
         extra_required = fields.DictField(required=True)
         extra_default = fields.DictField(default={"extra_default":"Hello", "deep_extra": {"spanish": "Hola"}}, validators=[validators.Length(2)])
-        extra_nullable = field.DictField(nullable=True)
+        extra_nullable = fields.DictField(nullable=True)
 
-    person = Person()
-    assert person.is_programmer is None
+    person = Person(extra_required={"required": True})
+    assert person.extra is None
+    assert person.extra_required == {"required": True}
+    assert person.extra_default == {"extra_default":"Hello", "deep_extra": {"spanish": "Hola"}}
 
-    person.is_programmer = True
-    assert person.is_programmer is True
+    person.extra = {"extra":True}
+    assert person.extra == {"extra":True}
 
-    person.is_programmer = False
-    assert person.is_programmer is False
-
-    assert field.parse_value(True) is True
-    assert field.parse_value('something') is True
-    assert field.parse_value(object()) is True
-
-    assert field.parse_value(None) is None
-
-    assert field.parse_value(False) is False
-    assert field.parse_value(0) is False
-    assert field.parse_value('') is False
-    assert field.parse_value([]) is False

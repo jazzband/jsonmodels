@@ -20,7 +20,7 @@ def test_initialization():
         surname='Wake',
         age=24,
         cash=2445.45,
-        extra_data={"location": "Oviedo, Spain", "gender": "Unknown"}
+        extra_data={"location": "Oviedo, Spain", "gender": "Unknown"},
         trash='123qwe',
     )
 
@@ -65,13 +65,13 @@ def test_deep_initialization():
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
-        assert car.extra = {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
+        assert car.extra == {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
 
         assert parking.location == 'somewhere'
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
-        assert car.extra = {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
+        assert car.extra == {"extra_int": 1, "extra_str": "a", "extra_bool": True, "extra_dict": {"I am extra": True}}
 
 
 def test_deep_initialization_error_with_multitypes():

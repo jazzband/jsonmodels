@@ -4,7 +4,7 @@
         "name": {"type": "string"},
         "surname": {"type": "string"},
         "age": {"type": "number"},
-        "extra": {"type": "dict"}
+        "extra": {"type": "object"}
     },
     "required": ["name", "surname"],
     "additionalProperties": false

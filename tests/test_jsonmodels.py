@@ -382,10 +382,10 @@ def test_help_text():
 
 def test_types():
 
-    class Person(object):
+    class Person:
         pass
 
-    class Person2(object):
+    class Person2:
         pass
 
     allowed_types = (Person,)
@@ -401,10 +401,10 @@ def test_types():
 
 def test_items_types():
 
-    class Person(object):
+    class Person:
         pass
 
-    class Person2(object):
+    class Person2:
         pass
 
     allowed_types = (Person,)

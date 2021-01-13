@@ -1,13 +1,13 @@
 """Predefined validators."""
 import re
 
-from six.moves import reduce
+from functools import reduce
 
 from .errors import ValidationError
 from . import utilities
 
 
-class Min(object):
+class Min:
 
     """Validator for minimum value."""
 
@@ -42,7 +42,7 @@ class Min(object):
             field_schema['exclusiveMinimum'] = True
 
 
-class Max(object):
+class Max:
 
     """Validator for maximum value."""
 
@@ -77,7 +77,7 @@ class Max(object):
             field_schema['exclusiveMaximum'] = True
 
 
-class Regex(object):
+class Regex:
 
     """Validator for regular expressions."""
 
@@ -133,7 +133,7 @@ class Regex(object):
             self.pattern, self.flags)
 
 
-class Length(object):
+class Length:
 
     """Validator for length."""
 
@@ -181,7 +181,7 @@ class Length(object):
             field_schema['maxLength'] = self.maximum_value
 
 
-class Enum(object):
+class Enum:
 
     """Validator for enums."""
 

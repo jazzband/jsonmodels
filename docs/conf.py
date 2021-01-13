@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Configuration for documentation."""
 #
 # complexity documentation build configuration file, created by
@@ -62,8 +61,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'JSON models'
-copyright = u'2014, Szczepan Cieślik'
+project = 'JSON models'
+copyright = '2014, Szczepan Cieślik'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -208,8 +207,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'jsonmodels.tex', u'JSON models Documentation',
-   u'Szczepan Cieślik', 'manual'),
+  ('index', 'jsonmodels.tex', 'JSON models Documentation',
+   'Szczepan Cieślik', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -238,8 +237,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'jsonmodels', u'JSON models Documentation',
-     [u'Szczepan Cieślik'], 1)
+    ('index', 'jsonmodels', 'JSON models Documentation',
+     ['Szczepan Cieślik'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -252,8 +251,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'jsonmodels', u'JSON models Documentation',
-   u'Szczepan Cieślik', 'jsonmodels', 'One line description of project.',
+  ('index', 'jsonmodels', 'JSON models Documentation',
+   'Szczepan Cieślik', 'jsonmodels', 'One line description of project.',
    'Miscellaneous'),
 ]
 

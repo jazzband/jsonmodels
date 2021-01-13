@@ -1,5 +1,3 @@
-
-
 class ModelCollection(list):
 
     """`ModelCollection` is list which validates stored values.
@@ -14,8 +12,8 @@ class ModelCollection(list):
 
     def append(self, value):
         self.field.validate_single_value(value)
-        super(ModelCollection, self).append(value)
+        super().append(value)
 
     def __setitem__(self, key, value):
         self.field.validate_single_value(value)
-        super(ModelCollection, self).__setitem__(key, value)
+        super().__setitem__(key, value)

@@ -5,7 +5,7 @@ import pytest
 from jsonmodels import models, fields, validators, errors
 
 
-class FakeValidator(object):
+class FakeValidator:
 
     def __init__(self):
         self.called_with = None

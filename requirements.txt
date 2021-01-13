@@ -14,8 +14,7 @@ py
 pyflakes
 pytest
 pytest-cov
-sphinxcontrib-spelling<5.0.0; python_version == '2.7'
-sphinxcontrib-spelling; python_version > '2.7'
+sphinxcontrib-spelling
 tox
 virtualenv
 wheel

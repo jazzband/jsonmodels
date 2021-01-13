@@ -190,9 +190,6 @@ class ListBuilder(Builder):
 
     @staticmethod
     def to_struct(item):
-        from .models import Base
-        if isinstance(item, Base):
-            return item.to_struct()
         return item
 
 

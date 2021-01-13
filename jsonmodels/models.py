@@ -100,12 +100,9 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
     def __repr__(self):
         attrs = {}
         for name, _ in self:
-            try:
-                attr = getattr(self, name)
-                if attr is not None:
-                    attrs[name] = repr(attr)
-            except ValidationError:
-                pass
+            attr = getattr(self, name)
+            if attr is not None:
+                attrs[name] = repr(attr)
 
         return '{class_name}({fields})'.format(
             class_name=self.__class__.__name__,

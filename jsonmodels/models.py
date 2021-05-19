@@ -1,5 +1,3 @@
-import six
-
 from . import parsers, errors
 from .fields import BaseField
 from .errors import ValidationError
@@ -25,7 +23,7 @@ class JsonmodelMeta(type):
             taken_names.add(structue_name)
 
 
-class Base(six.with_metaclass(JsonmodelMeta, object)):
+class Base(metaclass=JsonmodelMeta):
 
     """Base class for all models."""
 
@@ -54,8 +52,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
 
     def __iter__(self):
         """Iterate through fields and values."""
-        for name, field in self.iterate_over_fields():
-            yield name, field
+        yield from self.iterate_over_fields()
 
     def validate(self):
         """Explicitly validate all the fields."""
@@ -64,7 +61,7 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
                 field.validate_for_object(self)
             except ValidationError as error:
                 raise ValidationError(
-                    "Error for field '{name}'.".format(name=name),
+                    f"Error for field '{name}'.",
                     error,
                 )
 
@@ -100,12 +97,9 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
     def __repr__(self):
         attrs = {}
         for name, _ in self:
-            try:
-                attr = getattr(self, name)
-                if attr is not None:
-                    attrs[name] = repr(attr)
-            except ValidationError:
-                pass
+            attr = getattr(self, name)
+            if attr is not None:
+                attrs[name] = repr(attr)
 
         return '{class_name}({fields})'.format(
             class_name=self.__class__.__name__,
@@ -115,14 +109,14 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         )
 
     def __str__(self):
-        return '{name} object'.format(name=self.__class__.__name__)
+        return f'{self.__class__.__name__} object'
 
     def __setattr__(self, name, value):
         try:
-            return super(Base, self).__setattr__(name, value)
+            return super().__setattr__(name, value)
         except ValidationError as error:
             raise ValidationError(
-                "Error for field '{name}'.".format(name=name),
+                f"Error for field '{name}'.",
                 error
             )
 
@@ -150,5 +144,5 @@ class Base(six.with_metaclass(JsonmodelMeta, object)):
         return not (self == other)
 
 
-class _CacheKey(object):
+class _CacheKey:
     """Object to identify model in memory."""

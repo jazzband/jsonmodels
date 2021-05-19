@@ -1,26 +1,23 @@
-from __future__ import absolute_import
-
-import six
 import re
 from collections import namedtuple
 
-SCALAR_TYPES = tuple(list(six.string_types) + [int, float, bool])
+SCALAR_TYPES = tuple(list((str,)) + [int, float, bool])
 
 ECMA_TO_PYTHON_FLAGS = {
     'i': re.I,
     'm': re.M,
 }
 
-PYTHON_TO_ECMA_FLAGS = dict(
-    (value, key) for key, value in ECMA_TO_PYTHON_FLAGS.items()
-)
+PYTHON_TO_ECMA_FLAGS = {
+    value: key for key, value in ECMA_TO_PYTHON_FLAGS.items()
+}
 
 PythonRegex = namedtuple('PythonRegex', ['regex', 'flags'])
 
 
 def _normalize_string_type(value):
-    if isinstance(value, six.string_types):
-        return six.text_type(value)
+    if isinstance(value, str):
+        return str(value)
     else:
         return value
 
@@ -131,7 +128,7 @@ def convert_ecma_regex_to_python(value):
     try:
         result_flags = [ECMA_TO_PYTHON_FLAGS[f] for f in flags]
     except KeyError:
-        raise ValueError('Wrong flags "{}".'.format(flags))
+        raise ValueError(f'Wrong flags "{flags}".')
 
     return PythonRegex('/'.join(parts[1:]), result_flags)
 
@@ -153,4 +150,4 @@ def convert_python_regex_to_ecma(value, flags=[]):
     result_flags = [PYTHON_TO_ECMA_FLAGS[f] for f in flags]
     result_flags = ''.join(result_flags)
 
-    return '/{value}/{flags}'.format(value=value, flags=result_flags)
+    return f'/{value}/{result_flags}'

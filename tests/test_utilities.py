@@ -97,15 +97,15 @@ def test_convert_ecma_regex_to_python():
 
     regex, flags = utilities.convert_ecma_regex_to_python(r'/^regex \d/i')
     assert r'^regex \d' == regex
-    assert set([re.I]) == set(flags)
+    assert {re.I} == set(flags)
 
     result = utilities.convert_ecma_regex_to_python(r'/^regex \d/m')
     assert r'^regex \d' == result.regex
-    assert set([re.M]) == set(result.flags)
+    assert {re.M} == set(result.flags)
 
     result = utilities.convert_ecma_regex_to_python(r'/^regex \d/mi')
     assert r'^regex \d' == result.regex
-    assert set([re.M, re.I]) == set(result.flags)
+    assert {re.M, re.I} == set(result.flags)
 
     with pytest.raises(ValueError):
         utilities.convert_ecma_regex_to_python('/regex/wrong')

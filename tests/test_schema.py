@@ -181,7 +181,7 @@ def test_unsupported_field():
 
 def test_validators_can_modify_schema():
 
-    class ClassBasedValidator(object):
+    class ClassBasedValidator:
 
         def validate(self, value):
             raise RuntimeError()

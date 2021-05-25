@@ -174,11 +174,15 @@ class Length:
 
     def modify_schema(self, field_schema):
         """Modify field schema."""
+        is_array = field_schema.get('type') == 'array'
+
         if self.minimum_value:
-            field_schema['minLength'] = self.minimum_value
+            key = 'minItems' if is_array else 'minLength'
+            field_schema[key] = self.minimum_value
 
         if self.maximum_value:
-            field_schema['maxLength'] = self.maximum_value
+            key = 'maxItems' if is_array else 'maxLength'
+            field_schema[key] = self.maximum_value
 
 
 class Enum:

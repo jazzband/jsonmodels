@@ -1,9 +1,13 @@
-from jsonmodels.fields import StringField, ListField, EmbeddedField
+from jsonmodels.fields import StringField, DictField, ListField, EmbeddedField
 from jsonmodels.models import Base
 
 
 class Nullable(Base):
     field = StringField(nullable=True)
+
+
+class NullableDict(Base):
+    field = DictField(nullable=True)
 
 
 class NullableListField(Base):
@@ -18,6 +22,12 @@ def test_nullable_simple_field():
     result = Nullable.to_json_schema()
 
     assert result['properties']['field']['type'] == ['string', 'null']
+
+
+def test_nullable_dict_field():
+    result = NullableDict.to_json_schema()
+
+    assert result['properties']['field']['type'] == ['object', 'null']
 
 
 def test_nullable_list_field():

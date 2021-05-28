@@ -12,12 +12,14 @@ def test_initialization():
         surname = fields.StringField()
         age = fields.IntField()
         cash = fields.FloatField()
+        extra_data = fields.DictField()
 
     data = dict(
         name='Alan',
         surname='Wake',
         age=24,
         cash=2445.45,
+        extra_data={"location": "Oviedo, Spain", "gender": "Unknown"},
         trash='123qwe',
     )
 
@@ -29,6 +31,8 @@ def test_initialization():
         assert alan.surname == 'Wake'
         assert alan.age == 24
         assert alan.cash == 2445.45
+        assert alan.extra_data == {"location": "Oviedo, Spain",
+                                   "gender": "Unknown"}
 
         assert not hasattr(alan, 'trash')
 
@@ -38,6 +42,7 @@ def test_deep_initialization():
     class Car(models.Base):
 
         brand = fields.StringField()
+        extra = fields.DictField()
 
     class ParkingPlace(models.Base):
 
@@ -47,7 +52,10 @@ def test_deep_initialization():
     data = {
         'location': 'somewhere',
         'car': {
-            'brand': 'awesome brand'
+            'brand': 'awesome brand',
+            'extra': {"extra_int": 1, "extra_str": "a",
+                      "extra_bool": True,
+                      "extra_dict": {"I am extra": True}}
         }
     }
 
@@ -59,11 +67,17 @@ def test_deep_initialization():
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
+        assert car.extra == {"extra_int": 1, "extra_str": "a",
+                             "extra_bool": True,
+                             "extra_dict": {"I am extra": True}}
 
         assert parking.location == 'somewhere'
         car = parking.car
         assert isinstance(car, Car)
         assert car.brand == 'awesome brand'
+        assert car.extra == {"extra_int": 1, "extra_str": "a",
+                             "extra_bool": True,
+                             "extra_dict": {"I am extra": True}}
 
 
 def test_deep_initialization_error_with_multitypes():

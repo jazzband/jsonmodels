@@ -23,6 +23,7 @@ fields classes from :mod:`jsonmodels.fields`).
 
         name = fields.StringField(required=True)
         breed = fields.StringField()
+        extra = fields.DictField()
 
 
     class Dog(models.Base):

@@ -77,7 +77,7 @@ def test_is_ecma_regex():
     assert utilities.is_ecma_regex(r'/^some regex\/gim') is True
 
     assert utilities.is_ecma_regex('/^some regex\\\\/miug') is True
-    assert utilities.is_ecma_regex('/^some regex\\\\\/gim') is True
+    assert utilities.is_ecma_regex('/^some regex\\\\/gim') is True
     assert utilities.is_ecma_regex('/\\\\/') is True
 
     assert utilities.is_ecma_regex('some /regex/asdf') is False

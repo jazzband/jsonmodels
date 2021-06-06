@@ -53,7 +53,6 @@ def test_validation():
     assert 33 == arg.pop()
 
 
-
 def test_validators_are_always_iterable():
 
     class Person(models.Base):

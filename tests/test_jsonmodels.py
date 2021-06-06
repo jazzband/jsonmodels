@@ -10,12 +10,14 @@ def test_model1():
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
+        extra = fields.DictField()
 
     alan = Person()
 
     alan.name = 'Alan'
     alan.surname = 'Wake'
     alan.age = 34
+    alan.extra = {"extra_value": 1}
 
 
 def test_required():

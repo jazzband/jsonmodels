@@ -65,7 +65,7 @@ def _parse_list(field, parent_builder):
         parent_builder, field.nullable, default=field._default)
     for type in field.items_types:
         builder.add_type_schema(build_json_schema(type, builder))
-    return builder
+    return builder.build()
 
 
 def _parse_embedded(field, parent_builder):
@@ -73,7 +73,7 @@ def _parse_embedded(field, parent_builder):
         parent_builder, field.nullable, default=field._default)
     for type in field.types:
         builder.add_type_schema(build_json_schema(type, builder))
-    return builder
+    return builder.build()
 
 
 def build_json_schema_primitive(cls, parent_builder):
@@ -90,6 +90,8 @@ def _create_primitive_field_schema(field):
         obj_type = 'float'
     elif isinstance(field, fields.BoolField):
         obj_type = 'boolean'
+    elif isinstance(field, fields.DictField):
+        obj_type = 'object'
     else:
         raise errors.FieldNotSupported(
             'Field {field} is not supported!'.format(

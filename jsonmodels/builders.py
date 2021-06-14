@@ -130,7 +130,7 @@ def _apply_validators_modifications(field_schema, field):
         for validator in field.item_validators:
             try:
                 validator.modify_schema(field_schema["items"])
-            except AttributeError:
+            except AttributeError:  # Case when validator is simple function.
                 pass
 
 

@@ -350,6 +350,26 @@ def test_length_validator_list():
     assert compare_schemas(pattern, schema)
 
 
+def test_item_validator_for_simple_functions():
+
+    def only_odd_numbers(item):
+        if item % 2 != 1:
+            raise validators.ValidationError("Only odd numbers are accepted")
+
+    class Person(models.Base):
+        lucky_numbers = fields.ListField(
+            int, item_validators=[only_odd_numbers]
+        )
+
+    Person(lucky_numbers=[1, 3])
+    with pytest.raises(validators.ValidationError):
+        Person(lucky_numbers=[1, 2, 3])
+
+    schema = Person.to_json_schema()
+    pattern = get_fixture('schema_list_item_simple.json')
+    assert compare_schemas(pattern, schema)
+
+
 def test_max_only_validator():
 
     class Person(models.Base):

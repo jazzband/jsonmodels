@@ -239,7 +239,7 @@ class ListField(BaseField):
         for validator in self.item_validators:
             try:
                 validator.validate(value)
-            except AttributeError:
+            except AttributeError:  # Case when validator is simple function.
                 validator(value)
 
         if len(self.items_types) == 0:

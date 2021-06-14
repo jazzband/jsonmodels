@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "lucky_numbers": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}

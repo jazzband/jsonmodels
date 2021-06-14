@@ -331,12 +331,42 @@ def test_length_validator():
 def test_length_validator_list():
 
     class People(models.Base):
-        names = fields.ListField(str, validators=validators.Length(2, 4))
+        min_max_len = fields.ListField(str, validators=validators.Length(2, 4))
+        min_len = fields.ListField(str, validators=validators.Length(2))
+        max_len = fields.ListField(str, validators=validators.Length(4))
+        item_validator_int = fields.ListField(
+            int, item_validators=[validators.Min(10), validators.Max(20)]
+        )
+        item_validator_str = fields.ListField(
+            str, item_validators=[validators.Length(10, 20),
+                                  validators.Regex(r"\w+")],
+            validators=[validators.Length(1, 2)],
+        )
         surname = fields.StringField()
 
     schema = People.to_json_schema()
 
     pattern = get_fixture('schema_length_list.json')
+    assert compare_schemas(pattern, schema)
+
+
+def test_item_validator_for_simple_functions():
+
+    def only_odd_numbers(item):
+        if item % 2 != 1:
+            raise validators.ValidationError("Only odd numbers are accepted")
+
+    class Person(models.Base):
+        lucky_numbers = fields.ListField(
+            int, item_validators=[only_odd_numbers]
+        )
+
+    Person(lucky_numbers=[1, 3])
+    with pytest.raises(validators.ValidationError):
+        Person(lucky_numbers=[1, 2, 3])
+
+    schema = Person.to_json_schema()
+    pattern = get_fixture('schema_list_item_simple.json')
     assert compare_schemas(pattern, schema)
 
 

@@ -126,6 +126,13 @@ def _apply_validators_modifications(field_schema, field):
         except AttributeError:
             pass
 
+    if "items" in field_schema:
+        for validator in field.item_validators:
+            try:
+                validator.modify_schema(field_schema["items"])
+            except AttributeError:  # Case when validator is simple function.
+                pass
+
 
 class PrimitiveBuilder(Builder):
 

@@ -37,10 +37,11 @@ class Base(metaclass=JsonmodelMeta):
         fields = list(self.iterate_with_name())
         for _, structure_name, field in fields:
             if structure_name in values:
-                field.__set__(self, values.pop(structure_name))
+                self.set_field(field, structure_name,
+                               values.pop(structure_name))
         for name, _, field in fields:
             if name in values:
-                field.__set__(self, values.pop(name))
+                self.set_field(field, name, values.pop(name))
 
     def get_field(self, field_name):
         """Get field associated with given attribute."""
@@ -49,6 +50,14 @@ class Base(metaclass=JsonmodelMeta):
                 return field
 
         raise errors.FieldNotFound('Field not found', field_name)
+
+    def set_field(self, field, field_name, value):
+        """ Sets the value of a field. """
+        try:
+            field.__set__(self, value)
+        except ValidationError as error:
+            raise ValidationError("Error for field '{name}': {error}."
+                                  .format(name=field_name, error=error))
 
     def __iter__(self):
         """Iterate through fields and values."""

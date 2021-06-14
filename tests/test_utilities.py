@@ -63,22 +63,22 @@ def test_is_ecma_regex():
     assert utilities.is_ecma_regex('^some regex$') is False
     assert utilities.is_ecma_regex('/^some regex$/') is True
     assert utilities.is_ecma_regex('/^some regex$/gim') is True
-    assert utilities.is_ecma_regex('/^some regex$/trololo') is True
+    assert utilities.is_ecma_regex('/^some regex$/miug') is True
 
     with pytest.raises(ValueError):
-        utilities.is_ecma_regex('/wrong regex')
+        utilities.is_ecma_regex('[wrong regex')
     with pytest.raises(ValueError):
-        utilities.is_ecma_regex('wrong regex/')
+        utilities.is_ecma_regex('wrong regex[]')
     with pytest.raises(ValueError):
-        utilities.is_ecma_regex('wrong regex/gim')
+        utilities.is_ecma_regex('wrong regex(gim')
     with pytest.raises(ValueError):
-        utilities.is_ecma_regex('wrong regex/asdf')
+        utilities.is_ecma_regex('wrong regex)asdf')
 
     assert utilities.is_ecma_regex(r'/^some regex\/gim') is True
 
-    assert utilities.is_ecma_regex(r'/^some regex\\\\/trololo') is True
-    assert utilities.is_ecma_regex(r'/^some regex\\\\\/gim') is True
-    assert utilities.is_ecma_regex(r'/\\\\/') is True
+    assert utilities.is_ecma_regex('/^some regex\\\\/miug') is True
+    assert utilities.is_ecma_regex('/^some regex\\\\/gim') is True
+    assert utilities.is_ecma_regex('/\\\\/') is True
 
     assert utilities.is_ecma_regex('some /regex/asdf') is False
     assert utilities.is_ecma_regex('^some regex$//') is False

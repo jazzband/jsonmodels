@@ -249,7 +249,72 @@ Features
         "type": "object"
     }
 
-  For more information, please see topic about validation in documentation.
+  You can also validate scalars, when needed:
+
+  .. code-block:: python
+
+    >>> class Person(models.Base):
+    ...
+    ...     name = fields.StringField(
+    ...         required=True,
+    ...         validators=[
+    ...             validators.Regex('^[A-Za-z]+$'),
+    ...             validators.Length(3, 25),
+    ...         ],
+    ...     )
+    ...     age = fields.IntField(
+    ...         nullable=True,
+    ...         validators=[
+    ...             validators.Min(18),
+    ...             validators.Max(101),
+    ...         ]
+    ...     )
+    ...     nickname = fields.StringField(
+    ...         required=True,
+    ...         nullable=True
+    ...     )
+    ...
+
+    >>> def only_odd_numbers(item):
+    ... if item % 2 != 1:
+    ...    raise validators.ValidationError("Only odd numbers are accepted")
+    ...
+    >>> class Person(models.Base):
+    ... lucky_numbers = fields.ListField(int, item_validators=[only_odd_numbers])
+    ... item_validator_str = fields.ListField(
+    ...        str,
+    ...        item_validators=[validators.Length(10, 20), validators.Regex(r"\w+")],
+    ...        validators=[validators.Length(1, 2)],
+    ...    )
+    ...
+    >>> Person.to_json_schema()
+    {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "item_validator_str": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 20,
+                    "pattern": "/\\w+/"
+                },
+                "minItems": 1,
+                "maxItems": 2
+            },
+            "lucky_numbers": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+
+(Note that `only_odd_numbers` did not modify schema, since only class based validators are
+able to do that, though it will still work as expected in python. Use class based validators
+that can be expressed in json schema if you want to be 100% correct on schema side.)
 
 * Lazy loading, best for circular references:
 
@@ -330,6 +395,40 @@ Features
             }
         }
     }
+
+* Dealing with schemaless data
+
+(Plese note that using schemaless fields can cause your models to get out of control - especially if
+you are the one responsible for data schema. On the other hand there is usually the case when incomming
+data are with no schema defined and schemaless fields are the way to go.)
+
+  .. code-block:: python
+
+    >>> class Event(models.Base):
+    ...
+    ...     name = fields.StringField()
+    ...     size = fields.FloatField()
+    ...     extra = fields.DictField()
+
+    >>> Event.to_json_schema()
+    {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "extra": {
+                "type": "object"
+            },
+            "name": {
+                "type": "string"
+            },
+            "size": {
+                "type": "float"
+            }
+        }
+    }
+
+`DictField` allow to pass any dict of values (`"type": "object"`), but note, that it will not make any validation
+on values except for the dict type.
 
 * Compare JSON schemas:
 

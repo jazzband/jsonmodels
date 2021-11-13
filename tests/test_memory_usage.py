@@ -12,14 +12,14 @@ class User(Base):
 
 
 @mark.skipif(
-    platform.python_implementation() == 'PyPy',
-    reason="PyPy's weakref implementation is not stable."
+    platform.python_implementation() == "PyPy",
+    reason="PyPy's weakref implementation is not stable.",
 )
 def test_garbage_collecting():
     first = len(User.name.memory)
-    instance = User(name='Bob')
+    instance = User(name="Bob")
     second = len(User.name.memory)
-    User(name='Frank')
+    User(name="Frank")
     third = len(User.name.memory)
     del instance
     four = len(User.name.memory)

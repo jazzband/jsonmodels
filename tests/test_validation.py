@@ -2,11 +2,10 @@
 
 import pytest
 
-from jsonmodels import models, fields, validators, errors
+from jsonmodels import errors, fields, models, validators
 
 
 class FakeValidator:
-
     def __init__(self):
         self.called_with = None
         self.called_amount = 0
@@ -34,38 +33,35 @@ def test_validation():
 
     class Person(models.Base):
 
-        name = fields.StringField(
-            required=True, validators=[validator1, validator2])
+        name = fields.StringField(required=True, validators=[validator1, validator2])
         surname = fields.StringField(required=True)
         age = fields.IntField(validators=validator3)
         cash = fields.FloatField()
 
     person = Person()
-    person.name = 'John'
-    person.surname = 'Smith'
+    person.name = "John"
+    person.surname = "Smith"
     person.age = 33
     person.cash = 123567.89
 
-    validator1.assert_called_once_with('John')
-    validator2.assert_called_once_with('John')
+    validator1.assert_called_once_with("John")
+    validator2.assert_called_once_with("John")
 
     assert 1 == sum(called)
     assert 33 == arg.pop()
 
 
 def test_validators_are_always_iterable():
-
     class Person(models.Base):
 
         children = fields.ListField()
 
     alan = Person()
 
-    assert isinstance(alan.get_field('children').validators, list)
+    assert isinstance(alan.get_field("children").validators, list)
 
 
 def test_get_field_not_found():
-
     class Person(models.Base):
 
         children = fields.ListField()
@@ -73,7 +69,7 @@ def test_get_field_not_found():
     alan = Person()
 
     with pytest.raises(errors.FieldNotFound):
-        alan.get_field('bazinga')
+        alan.get_field("bazinga")
 
 
 def test_min_validation():
@@ -133,15 +129,15 @@ def test_max_exclusive_validation():
 
 def test_regex_validation():
 
-    validator = validators.Regex('some')
-    assert 'some' == validator.pattern
+    validator = validators.Regex("some")
+    assert "some" == validator.pattern
 
-    validator.validate('some string')
-    validator.validate('get some chips')
+    validator.validate("some string")
+    validator.validate("get some chips")
     with pytest.raises(errors.ValidationError):
-        validator.validate('asdf')
+        validator.validate("asdf")
     with pytest.raises(errors.ValidationError):
-        validator.validate('trololo')
+        validator.validate("trololo")
 
 
 def test_regex_validation_flags():
@@ -155,10 +151,12 @@ def test_regex_validation_flags():
 
     # ECMA pattern flags recognized
     validator = validators.Regex("/foo/im")
-    assert sorted(validator.flags) == sorted([
-        validators.Regex.FLAGS["multiline"],
-        validators.Regex.FLAGS["ignorecase"],
-    ])
+    assert sorted(validator.flags) == sorted(
+        [
+            validators.Regex.FLAGS["multiline"],
+            validators.Regex.FLAGS["ignorecase"],
+        ]
+    )
 
     # ECMA pattern overrides flags kwargs
     validator = validators.Regex("/foo/", ignorecase=True, multiline=True)
@@ -167,8 +165,8 @@ def test_regex_validation_flags():
 
 def test_regex_validation_for_wrong_type():
 
-    validator = validators.Regex('some')
-    assert 'some' == validator.pattern
+    validator = validators.Regex("some")
+    assert "some" == validator.pattern
 
     with pytest.raises(errors.ValidationError):
         validator.validate(1)
@@ -176,70 +174,70 @@ def test_regex_validation_for_wrong_type():
 
 def test_validation_2():
 
-    validator = validators.Regex('^some[0-9]$')
-    assert '^some[0-9]$' == validator.pattern
+    validator = validators.Regex("^some[0-9]$")
+    assert "^some[0-9]$" == validator.pattern
 
-    validator.validate('some0')
+    validator.validate("some0")
     with pytest.raises(errors.ValidationError):
-        validator.validate('some')
+        validator.validate("some")
     with pytest.raises(errors.ValidationError):
-        validator.validate(' some')
+        validator.validate(" some")
     with pytest.raises(errors.ValidationError):
-        validator.validate('asdf')
+        validator.validate("asdf")
     with pytest.raises(errors.ValidationError):
-        validator.validate('trololo')
+        validator.validate("trololo")
 
 
 def test_validation_ignorecase():
-    validator = validators.Regex('^some$')
-    validator.validate('some')
+    validator = validators.Regex("^some$")
+    validator.validate("some")
     with pytest.raises(errors.ValidationError):
-        validator.validate('sOmE')
+        validator.validate("sOmE")
 
-    validator = validators.Regex('^some$', ignorecase=True)
-    validator.validate('some')
-    validator.validate('SoMe')
+    validator = validators.Regex("^some$", ignorecase=True)
+    validator.validate("some")
+    validator.validate("SoMe")
 
 
 def test_validation_multiline():
-    validator = validators.Regex('^s.*e$')
-    validator.validate('some')
+    validator = validators.Regex("^s.*e$")
+    validator.validate("some")
     with pytest.raises(errors.ValidationError):
-        validator.validate('some\nso more')
+        validator.validate("some\nso more")
 
-    validator = validators.Regex('^s.*e$', multiline=True)
-    validator.validate('some')
-    validator.validate('some\nso more')
+    validator = validators.Regex("^s.*e$", multiline=True)
+    validator.validate("some")
+    validator.validate("some\nso more")
 
 
 def test_regex_validator():
-
     class Person(models.Base):
 
         name = fields.StringField(
-            validators=validators.Regex('^[a-z]+$', ignorecase=True))
+            validators=validators.Regex("^[a-z]+$", ignorecase=True)
+        )
 
     person = Person()
 
     with pytest.raises(errors.ValidationError):
-        person.name = '123'
+        person.name = "123"
 
-    person.name = 'Jimmy'
+    person.name = "Jimmy"
 
 
 def test_regex_validator_when_ecma_regex_given():
-
     class Person(models.Base):
 
         name = fields.StringField(
-            validators=validators.Regex('/^[a-z]+$/i', ignorecase=False))
+            validators=validators.Regex("/^[a-z]+$/i", ignorecase=False)
+        )
 
     person = Person()
 
     with pytest.raises(errors.ValidationError):
-        person.name = '123'
+        person.name = "123"
 
-    person.name = 'Jimmy'
+    person.name = "Jimmy"
 
 
 def test_init():
@@ -261,14 +259,14 @@ def test_init():
 
 def test_length_validation_string_min_max():
     validator = validators.Length(1, 10)
-    validator.validate('word')
-    validator.validate('w' * 10)
-    validator.validate('w')
+    validator.validate("word")
+    validator.validate("w" * 10)
+    validator.validate("w")
 
     with pytest.raises(errors.ValidationError):
-        validator.validate('')
+        validator.validate("")
     with pytest.raises(errors.ValidationError):
-        validator.validate('na' * 10)
+        validator.validate("na" * 10)
 
 
 def test_length_validation_string_min():
@@ -331,11 +329,11 @@ def test_validation_nullable():
 
 
 def test_enum_validation():
-    validator = validators.Enum('cat', 'dog', 'fish')
+    validator = validators.Enum("cat", "dog", "fish")
 
-    validator.validate('cat')
-    validator.validate('dog')
-    validator.validate('fish')
+    validator.validate("cat")
+    validator.validate("dog")
+    validator.validate("fish")
 
     with pytest.raises(errors.ValidationError):
-        validator.validate('horse')
+        validator.validate("horse")

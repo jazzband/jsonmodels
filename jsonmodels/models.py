@@ -22,6 +22,22 @@ class JsonmodelMeta(type):
                 raise ValueError('Name taken', structue_name, name)
             taken_names.add(structue_name)
 
+    @staticmethod
+    def find_type(value, types):
+        matching = {}
+        for key, _ in value.items():
+            if key.startswith('__'):
+                continue
+
+            for typ in types:
+                matching.setdefault(typ, 0)
+                if key in dir(typ):
+                    matching[typ] += 1
+
+        ordered = sorted(matching.items(), key=lambda kv: kv[1], reverse=True)
+        if not ordered:
+            return None
+        return ordered[0][0]
 
 class Base(metaclass=JsonmodelMeta):
 

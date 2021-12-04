@@ -8,7 +8,6 @@ from .fields import NotSet
 
 
 class Builder:
-
     def __init__(self, parent=None, nullable=False, default=NotSet):
         self.parent = parent
         self.types_builders = {}
@@ -53,7 +52,6 @@ class Builder:
 
 
 class ObjectBuilder(Builder):
-
     def __init__(self, model_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.properties = {}
@@ -73,33 +71,31 @@ class ObjectBuilder(Builder):
         if self.is_definition and not self.is_root:
             self.add_definition(builder)
             [self.maybe_build(value) for _, value in self.properties.items()]
-            return f'#/definitions/{self.type_name}'
+            return f"#/definitions/{self.type_name}"
         else:
             return builder.build_definition(nullable=self.nullable)
 
     @property
     def type_name(self):
-        module_name = '{module}.{name}'.format(
+        module_name = "{module}.{name}".format(
             module=self.type.__module__,
             name=self.type.__name__,
         )
-        return module_name.replace('.', '_').lower()
+        return module_name.replace(".", "_").lower()
 
     def build_definition(self, add_defintitions=True, nullable=False):
         properties = {
-            name: self.maybe_build(value)
-            for name, value
-            in self.properties.items()
+            name: self.maybe_build(value) for name, value in self.properties.items()
         }
         schema = {
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': properties,
+            "type": "object",
+            "additionalProperties": False,
+            "properties": properties,
         }
         if self.required:
-            schema['required'] = self.required
+            schema["required"] = self.required
         if self.definitions and add_defintitions:
-            schema['definitions'] = {
+            schema["definitions"] = {
                 builder.type_name: builder.build_definition(False, False)
                 for builder in self.definitions
             }
@@ -135,7 +131,6 @@ def _apply_validators_modifications(field_schema, field):
 
 
 class PrimitiveBuilder(Builder):
-
     def __init__(self, type, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.type = type
@@ -143,23 +138,21 @@ class PrimitiveBuilder(Builder):
     def build(self):
         schema = {}
         if issubclass(self.type, str):
-            obj_type = 'string'
+            obj_type = "string"
         elif issubclass(self.type, bool):
-            obj_type = 'boolean'
+            obj_type = "boolean"
         elif issubclass(self.type, int):
-            obj_type = 'number'
+            obj_type = "number"
         elif issubclass(self.type, float):
-            obj_type = 'number'
+            obj_type = "number"
         elif issubclass(self.type, dict):
-            obj_type = 'object'
+            obj_type = "object"
         else:
-            raise errors.FieldNotSupported(
-                "Can't specify value schema!", self.type
-            )
+            raise errors.FieldNotSupported("Can't specify value schema!", self.type)
 
         if self.nullable:
-            obj_type = [obj_type, 'null']
-        schema['type'] = obj_type
+            obj_type = [obj_type, "null"]
+        schema["type"] = obj_type
 
         if self.has_default:
             schema["default"] = self.default
@@ -168,7 +161,6 @@ class PrimitiveBuilder(Builder):
 
 
 class ListBuilder(Builder):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.schemas = []
@@ -177,9 +169,9 @@ class ListBuilder(Builder):
         self.schemas.append(schema)
 
     def build(self):
-        schema = {'type': 'array'}
+        schema = {"type": "array"}
         if self.nullable:
-            self.add_type_schema({'type': 'null'})
+            self.add_type_schema({"type": "null"})
 
         if self.has_default:
             schema["default"] = [self.to_struct(i) for i in self.default]
@@ -188,9 +180,9 @@ class ListBuilder(Builder):
         if len(schemas) == 1:
             items = schemas[0]
         else:
-            items = {'oneOf': schemas}
+            items = {"oneOf": schemas}
 
-        schema['items'] = items
+        schema["items"] = items
         return schema
 
     @property
@@ -203,7 +195,6 @@ class ListBuilder(Builder):
 
 
 class EmbeddedBuilder(Builder):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.schemas = []
@@ -213,13 +204,13 @@ class EmbeddedBuilder(Builder):
 
     def build(self):
         if self.nullable:
-            self.add_type_schema({'type': 'null'})
+            self.add_type_schema({"type": "null"})
 
         schemas = [self.maybe_build(schema) for schema in self.schemas]
         if len(schemas) == 1:
             schema = schemas[0]
         else:
-            schema = {'oneOf': schemas}
+            schema = {"oneOf": schemas}
 
         if self.has_default:
             # The default value of EmbeddedField is expected to be an instance

@@ -1,4 +1,4 @@
-from jsonmodels import models, fields, validators
+from jsonmodels import fields, models, validators
 
 
 def test_bool_field():
@@ -19,24 +19,24 @@ def test_bool_field():
     assert person.is_programmer is False
 
     assert field.parse_value(True) is True
-    assert field.parse_value('something') is True
+    assert field.parse_value("something") is True
     assert field.parse_value(object()) is True
 
     assert field.parse_value(None) is None
 
     assert field.parse_value(False) is False
     assert field.parse_value(0) is False
-    assert field.parse_value('') is False
+    assert field.parse_value("") is False
     assert field.parse_value([]) is False
 
 
 def test_dict_field():
 
     field = fields.DictField()
-    default_field = fields.DictField(default={
-        "extra_default": "Hello",
-        "deep_extra": {"spanish": "Hola"}},
-        validators=[validators.Length(2)])
+    default_field = fields.DictField(
+        default={"extra_default": "Hello", "deep_extra": {"spanish": "Hola"}},
+        validators=[validators.Length(2)],
+    )
 
     class Person(models.Base):
 
@@ -48,8 +48,10 @@ def test_dict_field():
     person = Person(extra_required={"required": True})
     assert person.extra is None
     assert person.extra_required == {"required": True}
-    assert person.extra_default == {"extra_default": "Hello",
-                                    "deep_extra": {"spanish": "Hola"}}
+    assert person.extra_default == {
+        "extra_default": "Hello",
+        "deep_extra": {"spanish": "Hola"},
+    }
 
     person.extra = {"extra": True}
     assert person.extra == {"extra": True}

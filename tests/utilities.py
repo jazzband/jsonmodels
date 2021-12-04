@@ -1,10 +1,7 @@
-import os
 import json
+import os
 
-FIXTURES_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    'fixtures'
-)
+FIXTURES_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures")
 
 
 def get_fixture(filepath):

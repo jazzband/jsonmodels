@@ -1,4 +1,4 @@
-from jsonmodels.fields import StringField, DictField, ListField, EmbeddedField
+from jsonmodels.fields import DictField, EmbeddedField, ListField, StringField
 from jsonmodels.models import Base
 
 
@@ -21,20 +21,20 @@ class NullableEmbedded(Base):
 def test_nullable_simple_field():
     result = Nullable.to_json_schema()
 
-    assert result['properties']['field']['type'] == ['string', 'null']
+    assert result["properties"]["field"]["type"] == ["string", "null"]
 
 
 def test_nullable_dict_field():
     result = NullableDict.to_json_schema()
 
-    assert result['properties']['field']['type'] == ['object', 'null']
+    assert result["properties"]["field"]["type"] == ["object", "null"]
 
 
 def test_nullable_list_field():
     result = NullableListField.to_json_schema()
-    items = result['properties']['field']['items']
-    assert items.get('oneOf')
-    assert items['oneOf'] == [{'type': 'string'}, {'type': 'null'}]
+    items = result["properties"]["field"]["items"]
+    assert items.get("oneOf")
+    assert items["oneOf"] == [{"type": "string"}, {"type": "null"}]
 
 
 def test_nullable_embedded_field():
@@ -42,19 +42,10 @@ def test_nullable_embedded_field():
 
     expected = [
         {
-            'type': 'object',
-            'additionalProperties': False,
-            'properties': {
-                'field': {
-                    'type': [
-                        'string',
-                        'null'
-                    ]
-                }
-            }
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {"field": {"type": ["string", "null"]}},
         },
-        {
-            'type': 'null'
-        }
+        {"type": "null"},
     ]
-    assert result['properties']['field']['oneOf'] == expected
+    assert result["properties"]["field"]["oneOf"] == expected

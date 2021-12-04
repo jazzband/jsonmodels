@@ -1,10 +1,9 @@
-from . import parsers, errors
-from .fields import BaseField
+from . import errors, parsers
 from .errors import ValidationError
+from .fields import BaseField
 
 
 class JsonmodelMeta(type):
-
     def __new__(cls, name, bases, attributes):
         cls.validate_fields(attributes)
         return super(cls, cls).__new__(cls, name, bases, attributes)
@@ -12,14 +11,15 @@ class JsonmodelMeta(type):
     @staticmethod
     def validate_fields(attributes):
         fields = {
-            key: value for key, value in attributes.items()
+            key: value
+            for key, value in attributes.items()
             if isinstance(value, BaseField)
         }
         taken_names = set()
         for name, field in fields.items():
             structue_name = field.structue_name(name)
             if structue_name in taken_names:
-                raise ValueError('Name taken', structue_name, name)
+                raise ValueError("Name taken", structue_name, name)
             taken_names.add(structue_name)
 
 
@@ -37,8 +37,7 @@ class Base(metaclass=JsonmodelMeta):
         fields = list(self.iterate_with_name())
         for _, structure_name, field in fields:
             if structure_name in values:
-                self.set_field(field, structure_name,
-                               values.pop(structure_name))
+                self.set_field(field, structure_name, values.pop(structure_name))
         for name, _, field in fields:
             if name in values:
                 self.set_field(field, name, values.pop(name))
@@ -49,15 +48,18 @@ class Base(metaclass=JsonmodelMeta):
             if field_name == attr_name:
                 return field
 
-        raise errors.FieldNotFound('Field not found', field_name)
+        raise errors.FieldNotFound("Field not found", field_name)
 
     def set_field(self, field, field_name, value):
-        """ Sets the value of a field. """
+        """Sets the value of a field."""
         try:
             field.__set__(self, value)
         except ValidationError as error:
-            raise ValidationError("Error for field '{name}': {error}."
-                                  .format(name=field_name, error=error))
+            raise ValidationError(
+                "Error for field '{name}': {error}.".format(
+                    name=field_name, error=error
+                )
+            )
 
     def __iter__(self):
         """Iterate through fields and values."""
@@ -110,24 +112,19 @@ class Base(metaclass=JsonmodelMeta):
             if attr is not None:
                 attrs[name] = repr(attr)
 
-        return '{class_name}({fields})'.format(
+        return "{class_name}({fields})".format(
             class_name=self.__class__.__name__,
-            fields=', '.join(
-                '{0[0]}={0[1]}'.format(x) for x in sorted(attrs.items())
-            ),
+            fields=", ".join("{0[0]}={0[1]}".format(x) for x in sorted(attrs.items())),
         )
 
     def __str__(self):
-        return f'{self.__class__.__name__} object'
+        return f"{self.__class__.__name__} object"
 
     def __setattr__(self, name, value):
         try:
             return super().__setattr__(name, value)
         except ValidationError as error:
-            raise ValidationError(
-                f"Error for field '{name}'.",
-                error
-            )
+            raise ValidationError(f"Error for field '{name}'.", error)
 
     def __eq__(self, other):
         if type(other) is not type(self):

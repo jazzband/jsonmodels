@@ -1,48 +1,48 @@
 import pytest
 
-from jsonmodels import models, fields, errors
+from jsonmodels import errors, fields, models
 
 
 class Primary(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('Secondary')
+    secondary = fields.EmbeddedField("Secondary")
 
 
 class Third(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('tests.test_lazy_loading.Secondary')
+    secondary = fields.EmbeddedField("tests.test_lazy_loading.Secondary")
 
 
 class Fourth(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('.Secondary')
+    secondary = fields.EmbeddedField(".Secondary")
 
 
 class Fifth(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('..test_lazy_loading.Secondary')
+    secondary = fields.EmbeddedField("..test_lazy_loading.Secondary")
 
 
 class Sixth(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('...tests.test_lazy_loading.Secondary')
+    secondary = fields.EmbeddedField("...tests.test_lazy_loading.Secondary")
 
 
 class Seventh(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('....tests.test_lazy_loading.Secondary')
+    secondary = fields.EmbeddedField("....tests.test_lazy_loading.Secondary")
 
 
 class Eighth(models.Base):
 
     name = fields.StringField()
-    secondary = fields.EmbeddedField('.SomeWrongEntity')
+    secondary = fields.EmbeddedField(".SomeWrongEntity")
 
 
 class Secondary(models.Base):
@@ -50,22 +50,25 @@ class Secondary(models.Base):
     data = fields.IntField()
 
 
-@pytest.mark.parametrize(['model'], [
-    (Primary,),
-    (Third,),
-    (Fourth,),
-    (Fifth,),
-    (Sixth,),
-])
+@pytest.mark.parametrize(
+    ["model"],
+    [
+        (Primary,),
+        (Third,),
+        (Fourth,),
+        (Fifth,),
+        (Sixth,),
+    ],
+)
 def test_embedded_model(model):
     entity = model()
     assert entity.secondary is None
-    entity.name = 'chuck'
+    entity.name = "chuck"
     entity.secondary = Secondary()
     entity.secondary.data = 42
 
     with pytest.raises(errors.ValidationError):
-        entity.secondary = 'something different'
+        entity.secondary = "something different"
 
     entity.secondary = None
 
@@ -89,7 +92,7 @@ class File(models.Base):
 class Directory(models.Base):
 
     name = fields.StringField()
-    children = fields.ListField(['Directory', File])
+    children = fields.ListField(["Directory", File])
 
 
 def test_list_field():
@@ -99,4 +102,4 @@ def test_list_field():
     sub_dir = Directory()
     directory.children.append(sub_dir)
     with pytest.raises(errors.ValidationError):
-        directory.children.append('some string')
+        directory.children.append("some string")

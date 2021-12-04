@@ -4,9 +4,8 @@ from weakref import WeakKeyDictionary
 
 from dateutil.parser import parse
 
-from .errors import ValidationError
 from .collections import ModelCollection
-
+from .errors import ValidationError
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
@@ -20,13 +19,14 @@ class BaseField:
     types = None
 
     def __init__(
-            self,
-            required=False,
-            nullable=False,
-            help_text=None,
-            validators=None,
-            default=NotSet,
-            name=None):
+        self,
+        required=False,
+        nullable=False,
+        help_text=None,
+        validators=None,
+        default=NotSet,
+        name=None,
+    ):
         self.memory = WeakKeyDictionary()
         self.required = required
         self.help_text = help_text
@@ -82,13 +82,13 @@ class BaseField:
 
     def _check_against_required(self, value):
         if value is None and self.required:
-            raise ValidationError('Field is required!')
+            raise ValidationError("Field is required!")
 
     def _validate_against_types(self, value):
         if value is not None and not isinstance(value, self.types):
             raise ValidationError(
                 'Value is wrong, expected type "{types}"'.format(
-                    types=', '.join([t.__name__ for t in self.types])
+                    types=", ".join([t.__name__ for t in self.types])
                 ),
                 value,
             )
@@ -97,7 +97,8 @@ class BaseField:
         if self.types is None:
             raise ValidationError(
                 'Field "{type}" is not usable, try '
-                'different field type.'.format(type=type(self).__name__))
+                "different field type.".format(type=type(self).__name__)
+            )
 
     def to_struct(self, value):
         """Cast value to Python structure."""
@@ -133,8 +134,8 @@ class BaseField:
     def _validate_name(self):
         if self.name is None:
             return
-        if not re.match(r'^[A-Za-z_](([\w\-]*)?\w+)?$', self.name):
-            raise ValueError('Wrong name', self.name)
+        if not re.match(r"^[A-Za-z_](([\w\-]*)?\w+)?$", self.name):
+            raise ValueError("Wrong name", self.name)
 
     def structue_name(self, default):
         return self.name if self.name is not None else default
@@ -184,7 +185,7 @@ class DictField(BaseField):
 
     """Dict field."""
 
-    types = (dict, )
+    types = (dict,)
 
 
 class ListField(BaseField):
@@ -217,7 +218,7 @@ class ListField(BaseField):
             try:
                 self.items_types = tuple(items_types)
             except TypeError:
-                self.items_types = items_types,
+                self.items_types = (items_types,)
         else:
             self.items_types = tuple()
 
@@ -247,11 +248,12 @@ class ListField(BaseField):
 
         if not isinstance(value, self.items_types):
             raise ValidationError(
-                'All items must be instances '
+                "All items must be instances "
                 'of "{types}", and not "{type}".'.format(
-                    types=', '.join([t.__name__ for t in self.items_types]),
+                    types=", ".join([t.__name__ for t in self.items_types]),
                     type=type(value).__name__,
-                ))
+                )
+            )
 
     def parse_value(self, values):
         """Cast value to proper collection."""
@@ -272,9 +274,7 @@ class ListField(BaseField):
             if len(self.items_types) != 1:
                 tpl = 'Cannot decide which type to choose from "{types}".'
                 raise ValidationError(
-                    tpl.format(
-                        types=', '.join([t.__name__ for t in self.items_types])
-                    )
+                    tpl.format(types=", ".join([t.__name__ for t in self.items_types]))
                 )
             return self.items_types[0](**value)
 
@@ -349,7 +349,7 @@ class EmbeddedField(BaseField):
         if len(self.types) != 1:
             raise ValidationError(
                 'Cannot decide which type to choose from "{types}".'.format(
-                    types=', '.join([t.__name__ for t in self.types])
+                    types=", ".join([t.__name__ for t in self.types])
                 )
             )
         return self.types[0]
@@ -359,7 +359,6 @@ class EmbeddedField(BaseField):
 
 
 class _LazyType:
-
     def __init__(self, path):
         self.path = path
 
@@ -374,25 +373,25 @@ def _evaluate_path(relative_path, base_cls):
     modules = _get_modules(relative_path, base_module)
 
     type_name = modules.pop()
-    module = '.'.join(modules)
+    module = ".".join(modules)
     if not module:
         module = base_module
     return module, type_name
 
 
 def _get_modules(relative_path, base_module):
-    canonical_path = relative_path.lstrip('.')
-    canonical_modules = canonical_path.split('.')
+    canonical_path = relative_path.lstrip(".")
+    canonical_modules = canonical_path.split(".")
 
-    if not relative_path.startswith('.'):
+    if not relative_path.startswith("."):
         return canonical_modules
 
     parents_amount = len(relative_path) - len(canonical_path)
-    parent_modules = base_module.split('.')
+    parent_modules = base_module.split(".")
     parents_amount = max(0, parents_amount - 1)
     if parents_amount > len(parent_modules):
         raise ValueError(f"Can't evaluate path '{relative_path}'")
-    return parent_modules[:parents_amount * -1] + canonical_modules
+    return parent_modules[: parents_amount * -1] + canonical_modules
 
 
 def _import(module_name, type_name):
@@ -400,8 +399,7 @@ def _import(module_name, type_name):
     try:
         return getattr(module, type_name)
     except AttributeError:
-        raise ValueError(
-            f"Can't find type '{module_name}.{type_name}'.")
+        raise ValueError(f"Can't find type '{module_name}.{type_name}'.")
 
 
 class TimeField(StringField):
@@ -440,7 +438,7 @@ class DateField(StringField):
     """Date field."""
 
     types = (datetime.date,)
-    default_format = '%Y-%m-%d'
+    default_format = "%Y-%m-%d"
 
     def __init__(self, str_format=None, *args, **kwargs):
         """Init.

@@ -1,10 +1,9 @@
 import pytest
 
-from jsonmodels import models, fields, errors
+from jsonmodels import errors, fields, models
 
 
 def test_model1():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -14,14 +13,13 @@ def test_model1():
 
     alan = Person()
 
-    alan.name = 'Alan'
-    alan.surname = 'Wake'
+    alan.name = "Alan"
+    alan.surname = "Wake"
     alan.age = 34
     alan.extra = {"extra_value": 1}
 
 
 def test_required():
-
     class Person(models.Base):
 
         name = fields.StringField(required=True)
@@ -32,12 +30,11 @@ def test_required():
     with pytest.raises(errors.ValidationError):
         alan.validate()
 
-    alan.name = 'Chuck'
+    alan.name = "Chuck"
     alan.validate()
 
 
 def test_type_validation():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -49,7 +46,6 @@ def test_type_validation():
 
 
 def test_base_field_should_not_be_usable():
-
     class Person(models.Base):
 
         name = fields.BaseField()
@@ -57,14 +53,13 @@ def test_base_field_should_not_be_usable():
     alan = Person()
 
     with pytest.raises(errors.ValidationError):
-        alan.name = 'some name'
+        alan.name = "some name"
 
     with pytest.raises(errors.ValidationError):
         alan.name = 2345
 
 
 def test_value_replacements():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -80,21 +75,19 @@ def test_value_replacements():
 
 
 def test_list_field():
-
     class Car(models.Base):
 
         wheels = fields.ListField()
 
     viper = Car()
 
-    viper.wheels.append('some')
-    viper.wheels.append('not necessarily')
-    viper.wheels.append('proper')
-    viper.wheels.append('wheels')
+    viper.wheels.append("some")
+    viper.wheels.append("not necessarily")
+    viper.wheels.append("proper")
+    viper.wheels.append("wheels")
 
 
 def test_list_field_types():
-
     class Wheel(models.Base):
         pass
 
@@ -115,7 +108,6 @@ def test_list_field_types():
 
 
 def test_list_field_types_when_assigning():
-
     class Wheel(models.Base):
         pass
 
@@ -136,7 +128,6 @@ def test_list_field_types_when_assigning():
 
 
 def test_list_field_for_subtypes():
-
     class Car(models.Base):
         pass
 
@@ -168,7 +159,6 @@ def test_list_field_for_subtypes():
 
 
 def test_list_validation():
-
     class Garage(models.Base):
 
         cars = fields.ListField()
@@ -176,11 +166,10 @@ def test_list_validation():
     garage = Garage()
 
     with pytest.raises(errors.ValidationError):
-        garage.cars = 'some string'
+        garage.cars = "some string"
 
 
 def test_embedded_model():
-
     class Secondary(models.Base):
 
         data = fields.IntField()
@@ -192,18 +181,17 @@ def test_embedded_model():
 
     entity = Primary()
     assert entity.secondary is None
-    entity.name = 'chuck'
+    entity.name = "chuck"
     entity.secondary = Secondary()
     entity.secondary.data = 42
 
     with pytest.raises(errors.ValidationError):
-        entity.secondary = 'something different'
+        entity.secondary = "something different"
 
     entity.secondary = None
 
 
 def test_embedded_required_validation():
-
     class Secondary(models.Base):
 
         data = fields.IntField(required=True)
@@ -238,7 +226,6 @@ def test_embedded_required_validation():
 
 
 def test_embedded_inheritance():
-
     class Car(models.Base):
         pass
 
@@ -274,7 +261,6 @@ def test_embedded_inheritance():
 
 
 def test_iterable():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -284,16 +270,16 @@ def test_iterable():
 
     alan = Person()
 
-    alan.name = 'Alan'
-    alan.surname = 'Wake'
+    alan.name = "Alan"
+    alan.surname = "Wake"
     alan.age = 24
     alan.cash = 2445.45
 
     pattern = {
-        'name': 'Alan',
-        'surname': 'Wake',
-        'age': 24,
-        'cash': 2445.45,
+        "name": "Alan",
+        "surname": "Wake",
+        "age": 24,
+        "cash": 2445.45,
     }
 
     result = {}
@@ -317,13 +303,12 @@ def test_get_field():
 
     alan = Person()
 
-    assert alan.get_field('name') is name_field
-    assert alan.get_field('surname') is surname_field
-    assert alan.get_field('age') is age_field
+    assert alan.get_field("name") is name_field
+    assert alan.get_field("surname") is surname_field
+    assert alan.get_field("age") is age_field
 
 
 def test_repr():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -332,8 +317,8 @@ def test_repr():
 
     chuck = Person()
 
-    assert chuck.__repr__() == 'Person()'
-    assert chuck.__str__() == 'Person object'
+    assert chuck.__repr__() == "Person()"
+    assert chuck.__str__() == "Person object"
 
     class Person2(models.Base):
 
@@ -346,44 +331,41 @@ def test_repr():
 
     chuck = Person2()
 
-    assert chuck.__repr__() == 'Person2()'
+    assert chuck.__repr__() == "Person2()"
 
-    chuck.name = 'Chuck'
+    chuck.name = "Chuck"
     assert chuck.__repr__() == "Person2(name='Chuck')"
-    assert chuck.__str__() == 'Chuck'
+    assert chuck.__str__() == "Chuck"
 
-    chuck.name = 'Testa'
+    chuck.name = "Testa"
     chuck.age = 42
     assert chuck.__repr__() == "Person2(age=42, name='Testa')"
-    assert chuck.__str__() == 'Testa'
+    assert chuck.__str__() == "Testa"
 
 
 def test_list_field_with_non_model_types():
-
     class Person(models.Base):
 
         names = fields.ListField(str)
         surname = fields.StringField()
 
-    person = Person(surname='Norris')
-    person.names.append('Chuck')
-    person.names.append('Testa')
+    person = Person(surname="Norris")
+    person.names.append("Chuck")
+    person.names.append("Testa")
 
 
 def test_help_text():
-
     class Person(models.Base):
 
-        name = fields.StringField(help_text='Name of person.')
-        age = fields.IntField(help_text='Age of person.')
+        name = fields.StringField(help_text="Name of person.")
+        age = fields.IntField(help_text="Age of person.")
 
     person = Person()
-    assert person.get_field('name').help_text == 'Name of person.'
-    assert person.get_field('age').help_text == 'Age of person.'
+    assert person.get_field("name").help_text == "Name of person."
+    assert person.get_field("age").help_text == "Age of person."
 
 
 def test_types():
-
     class Person:
         pass
 
@@ -402,7 +384,6 @@ def test_types():
 
 
 def test_items_types():
-
     class Person:
         pass
 
@@ -424,7 +405,6 @@ def test_items_types():
 
 
 def test_required_embedded_field():
-
     class Secondary(models.Base):
 
         data = fields.IntField()
@@ -453,7 +433,6 @@ def test_required_embedded_field():
 
 
 def test_assignation_of_list_of_models():
-
     class Wheel(models.Base):
         pass
 
@@ -487,17 +466,17 @@ def test_equality_of_simple_models():
         name = fields.StringField()
         age = fields.IntField()
 
-    p1 = Person(name='Jack')
-    p2 = Person(name='Jack')
+    p1 = Person(name="Jack")
+    p2 = Person(name="Jack")
 
     assert p1 == p2
     assert p2 == p1
 
-    p3 = Person(name='Jack', age=100)
+    p3 = Person(name="Jack", age=100)
     assert p1 != p3
     assert p3 != p1
 
-    p4 = Person(name='Jill')
+    p4 = Person(name="Jill")
     assert p1 != p4
     assert p4 != p1
 
@@ -509,20 +488,19 @@ def test_equality_embedded_objects():
     class Company(models.Base):
         chairman = fields.EmbeddedField(Person)
 
-    c1 = Company(chairman=Person(name='Pete'))
-    c2 = Company(chairman=Person(name='Pete'))
+    c1 = Company(chairman=Person(name="Pete"))
+    c2 = Company(chairman=Person(name="Pete"))
 
     assert c1 == c2
     assert c2 == c1
 
-    c3 = Company(chairman=Person(name='Joshua'))
+    c3 = Company(chairman=Person(name="Joshua"))
 
     assert c1 != c3
     assert c3 != c1
 
 
 def test_equality_list_fields():
-
     class Wheel(models.Base):
         pressure = fields.FloatField()
 
@@ -568,4 +546,4 @@ def test_equality_missing_required_field():
 
     assert Model(age=1) == Model(age=1)
     assert Model(age=1) != Model(age=2)
-    assert Model(name='William', age=1) != Model(age=1)
+    assert Model(name="William", age=1) != Model(age=1)

@@ -1,20 +1,17 @@
-import sre_constants
-
 import re
+import sre_constants
 from collections import namedtuple
 
 SCALAR_TYPES = tuple(list((str,)) + [int, float, bool])
 
 ECMA_TO_PYTHON_FLAGS = {
-    'i': re.I,
-    'm': re.M,
+    "i": re.I,
+    "m": re.M,
 }
 
-PYTHON_TO_ECMA_FLAGS = {
-    value: key for key, value in ECMA_TO_PYTHON_FLAGS.items()
-}
+PYTHON_TO_ECMA_FLAGS = {value: key for key, value in ECMA_TO_PYTHON_FLAGS.items()}
 
-PythonRegex = namedtuple('PythonRegex', ['regex', 'flags'])
+PythonRegex = namedtuple("PythonRegex", ["regex", "flags"])
 
 
 def _normalize_string_type(value):
@@ -52,8 +49,11 @@ def _compare_lists(one, two):
 
 def _assert_same_types(one, two):
     if not isinstance(one, type(two)) or not isinstance(two, type(one)):
-        raise RuntimeError('Types mismatch! "{type1}" and "{type2}".'.format(
-            type1=type(one).__name__, type2=type(two).__name__))
+        raise RuntimeError(
+            'Types mismatch! "{type1}" and "{type2}".'.format(
+                type1=type(one).__name__, type2=type(two).__name__
+            )
+        )
 
 
 def compare_schemas(one, two):
@@ -85,8 +85,7 @@ def compare_schemas(one, two):
     elif one is None:
         return one is two
     else:
-        raise RuntimeError('Not allowed type "{type}"'.format(
-            type=type(one).__name__))
+        raise RuntimeError('Not allowed type "{type}"'.format(type=type(one).__name__))
 
 
 def is_ecma_regex(regex):
@@ -101,8 +100,10 @@ def is_ecma_regex(regex):
     try:
         re.compile(regex)
     except sre_constants.error as err:
-        raise ValueError("Given regex {} isn't ECMA regex nor "
-                         "Python regex: {}.".format(regex, err))
+        raise ValueError(
+            "Given regex {} isn't ECMA regex nor "
+            "Python regex: {}.".format(regex, err)
+        )
     return False
 
 
@@ -119,7 +120,7 @@ def convert_ecma_regex_to_python(value):
     if not is_ecma_regex(value):
         return PythonRegex(value, [])
 
-    parts = value.split('/')
+    parts = value.split("/")
     flags = parts.pop()
 
     try:
@@ -127,7 +128,7 @@ def convert_ecma_regex_to_python(value):
     except KeyError:
         raise ValueError(f'Wrong flags "{flags}".')
 
-    return PythonRegex('/'.join(parts[1:]), result_flags)
+    return PythonRegex("/".join(parts[1:]), result_flags)
 
 
 def convert_python_regex_to_ecma(value, flags=[]):
@@ -145,6 +146,6 @@ def convert_python_regex_to_ecma(value, flags=[]):
         return value
 
     result_flags = [PYTHON_TO_ECMA_FLAGS[f] for f in flags]
-    result_flags = ''.join(result_flags)
+    result_flags = "".join(result_flags)
 
-    return f'/{value}/{result_flags}'
+    return f"/{value}/{result_flags}"

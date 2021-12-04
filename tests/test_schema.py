@@ -1,13 +1,12 @@
 import pytest
 
-from jsonmodels import models, fields, validators, errors, builders
+from jsonmodels import builders, errors, fields, models, validators
 from jsonmodels.utilities import compare_schemas
 
 from .utilities import get_fixture
 
 
 def test_model1():
-
     class Person(models.Base):
 
         name = fields.StringField(required=True)
@@ -18,12 +17,11 @@ def test_model1():
     alan = Person()
     schema = alan.to_json_schema()
 
-    pattern = get_fixture('schema1.json')
+    pattern = get_fixture("schema1.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_model2():
-
     class Car(models.Base):
 
         brand = fields.StringField(required=True)
@@ -52,12 +50,11 @@ def test_model2():
     chuck = Person()
     schema = chuck.to_json_schema()
 
-    pattern = get_fixture('schema2.json')
+    pattern = get_fixture("schema2.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_model3():
-
     class Viper(models.Base):
 
         brand = fields.StringField()
@@ -94,12 +91,11 @@ def test_model3():
     chuck = Person()
     schema = chuck.to_json_schema()
 
-    pattern = get_fixture('schema3.json')
+    pattern = get_fixture("schema3.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_model_with_constructors():
-
     class Car(models.Base):
         brand = fields.StringField(required=True)
         registration = fields.StringField(required=True)
@@ -135,12 +131,11 @@ def test_model_with_constructors():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema2.json')
+    pattern = get_fixture("schema2.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_datetime_fields():
-
     class Event(models.Base):
 
         time = fields.TimeField()
@@ -149,24 +144,22 @@ def test_datetime_fields():
 
     schema = Event.to_json_schema()
 
-    pattern = get_fixture('schema4.json')
+    pattern = get_fixture("schema4.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_bool_field():
-
     class Person(models.Base):
 
         has_childen = fields.BoolField()
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema5.json')
+    pattern = get_fixture("schema5.json")
     assert compare_schemas(pattern, schema) is True
 
 
 def test_unsupported_field():
-
     class NewField(fields.BaseField):
 
         pass
@@ -180,14 +173,12 @@ def test_unsupported_field():
 
 
 def test_validators_can_modify_schema():
-
     class ClassBasedValidator:
-
         def validate(self, value):
             raise RuntimeError()
 
         def modify_schema(self, field_schema):
-            field_schema['some'] = 'unproper value'
+            field_schema["some"] = "unproper value"
 
     def function_validator(value):
         raise RuntimeError()
@@ -200,12 +191,11 @@ def test_validators_can_modify_schema():
     for person in [Person, Person()]:
         schema = person.to_json_schema()
 
-        pattern = get_fixture('schema6.json')
+        pattern = get_fixture("schema6.json")
         assert compare_schemas(pattern, schema) is True
 
 
 def test_min_validator():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -214,12 +204,11 @@ def test_min_validator():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_min.json')
+    pattern = get_fixture("schema_min.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_min_validator_with_exclusive():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -228,12 +217,11 @@ def test_min_validator_with_exclusive():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_min_exclusive.json')
+    pattern = get_fixture("schema_min_exclusive.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_max_validator():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -242,12 +230,11 @@ def test_max_validator():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_max.json')
+    pattern = get_fixture("schema_max.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_max_validator_with_exclusive():
-
     class Person(models.Base):
 
         name = fields.StringField()
@@ -256,52 +243,46 @@ def test_max_validator_with_exclusive():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_max_exclusive.json')
+    pattern = get_fixture("schema_max_exclusive.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_regex_validator():
-
     class Person(models.Base):
 
-        name = fields.StringField(
-            validators=validators.Regex('^some pattern$'))
+        name = fields.StringField(validators=validators.Regex("^some pattern$"))
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_pattern.json')
+    pattern = get_fixture("schema_pattern.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_regex_validator_when_ecma_regex_given():
-
     class Person(models.Base):
 
-        name = fields.StringField(
-            validators=validators.Regex('/^some pattern$/'))
+        name = fields.StringField(validators=validators.Regex("/^some pattern$/"))
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_pattern.json')
+    pattern = get_fixture("schema_pattern.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_regex_validator_with_flag():
-
     class Person(models.Base):
 
         name = fields.StringField(
-            validators=validators.Regex(
-                '^some pattern$', ignorecase=True))
+            validators=validators.Regex("^some pattern$", ignorecase=True)
+        )
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_pattern_flag.json')
+    pattern = get_fixture("schema_pattern_flag.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_length_validator_min():
-
     class Person(models.Base):
 
         name = fields.StringField(validators=validators.Length(5))
@@ -310,12 +291,11 @@ def test_length_validator_min():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_length_min.json')
+    pattern = get_fixture("schema_length_min.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_length_validator():
-
     class Person(models.Base):
 
         name = fields.StringField(validators=validators.Length(5, 20))
@@ -324,12 +304,11 @@ def test_length_validator():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_length.json')
+    pattern = get_fixture("schema_length.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_length_validator_list():
-
     class People(models.Base):
         min_max_len = fields.ListField(str, validators=validators.Length(2, 4))
         min_len = fields.ListField(str, validators=validators.Length(2))
@@ -338,56 +317,49 @@ def test_length_validator_list():
             int, item_validators=[validators.Min(10), validators.Max(20)]
         )
         item_validator_str = fields.ListField(
-            str, item_validators=[validators.Length(10, 20),
-                                  validators.Regex(r"\w+")],
+            str,
+            item_validators=[validators.Length(10, 20), validators.Regex(r"\w+")],
             validators=[validators.Length(1, 2)],
         )
         surname = fields.StringField()
 
     schema = People.to_json_schema()
 
-    pattern = get_fixture('schema_length_list.json')
+    pattern = get_fixture("schema_length_list.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_item_validator_for_simple_functions():
-
     def only_odd_numbers(item):
         if item % 2 != 1:
             raise validators.ValidationError("Only odd numbers are accepted")
 
     class Person(models.Base):
-        lucky_numbers = fields.ListField(
-            int, item_validators=[only_odd_numbers]
-        )
+        lucky_numbers = fields.ListField(int, item_validators=[only_odd_numbers])
 
     Person(lucky_numbers=[1, 3])
     with pytest.raises(validators.ValidationError):
         Person(lucky_numbers=[1, 2, 3])
 
     schema = Person.to_json_schema()
-    pattern = get_fixture('schema_list_item_simple.json')
+    pattern = get_fixture("schema_list_item_simple.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_max_only_validator():
-
     class Person(models.Base):
 
-        name = fields.StringField(
-            validators=validators.Length(maximum_value=20)
-        )
+        name = fields.StringField(validators=validators.Length(maximum_value=20))
         surname = fields.StringField()
         age = fields.IntField()
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_length_max.json')
+    pattern = get_fixture("schema_length_max.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_schema_for_list_and_primitives():
-
     class Event(models.Base):
 
         time = fields.TimeField()
@@ -400,12 +372,11 @@ def test_schema_for_list_and_primitives():
 
     schema = Person.to_json_schema()
 
-    pattern = get_fixture('schema_with_list.json')
+    pattern = get_fixture("schema_with_list.json")
     assert compare_schemas(pattern, schema)
 
 
 def test_schema_for_unsupported_primitive():
-
     class Person(models.Base):
 
         names = fields.ListField([str, object])
@@ -416,18 +387,15 @@ def test_schema_for_unsupported_primitive():
 
 def test_enum_validator():
     class Person(models.Base):
-        handness = fields.StringField(
-            validators=validators.Enum('left', 'right')
-        )
+        handness = fields.StringField(validators=validators.Enum("left", "right"))
 
     schema = Person.to_json_schema()
-    pattern = get_fixture('schema_enum.json')
+    pattern = get_fixture("schema_enum.json")
 
     assert compare_schemas(pattern, schema)
 
 
 def test_default_value():
-
     class Pet(models.Base):
         kind = fields.StringField(default="Dog")
 
@@ -435,12 +403,11 @@ def test_default_value():
         name = fields.StringField(default="John Doe")
         age = fields.IntField(default=18)
         pet = fields.EmbeddedField(Pet, default=Pet(kind="Cat"))
-        nicknames = fields.ListField(
-            items_types=(str,), default=["yo", "dawg"])
+        nicknames = fields.ListField(items_types=(str,), default=["yo", "dawg"])
         profession = fields.StringField(default=None)
 
     schema = Person.to_json_schema()
-    pattern = get_fixture('schema_with_defaults.json')
+    pattern = get_fixture("schema_with_defaults.json")
 
     assert compare_schemas(pattern, schema)
 
@@ -451,7 +418,7 @@ def test_primitives():
         (bool, "boolean"),
         (int, "number"),
         (float, "number"),
-        (dict, "object")
+        (dict, "object"),
     )
     for pytpe, jstype in cases:
         b = builders.PrimitiveBuilder(pytpe)

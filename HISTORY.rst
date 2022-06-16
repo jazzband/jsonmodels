@@ -3,6 +3,12 @@
 History
 -------
 
+2.5.1 (2022-06-16)
+++++++++++++++++++
+
+* Specified PyPy version to PyPy 3.8.
+* Added support for Python 3.10.
+
 2.5.0 (2021-07-26)
 ++++++++++++++++++
 

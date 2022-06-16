@@ -33,7 +33,7 @@ Features
 
 * Fully tested with Python 3.6+.
 
-* Support for PyPy (see implementation notes in docs for more details).
+* Support for PyPy 3.8 (see implementation notes in docs for more details).
 
 * Create Django-like models:
 

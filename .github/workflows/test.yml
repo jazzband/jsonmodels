@@ -3,12 +3,12 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy-3.8"]
 
     steps:
       - uses: actions/checkout@v2
@@ -49,3 +49,11 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           name: Python ${{ matrix.python-version }}
+
+  success:
+    needs: test
+    runs-on: ubuntu-latest
+    name: test successful
+    steps:
+      - name: Success
+        run: echo Test successful

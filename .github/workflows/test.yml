@@ -3,7 +3,7 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
@@ -49,3 +49,11 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           name: Python ${{ matrix.python-version }}
+
+  success:
+    needs: test
+    runs-on: ubuntu-latest
+    name: test successful
+    steps:
+      - name: Success
+        run: echo Test successful

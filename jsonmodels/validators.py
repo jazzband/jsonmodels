@@ -30,9 +30,7 @@ class Min:
         else:
             if value < self.minimum_value:
                 raise ValidationError(
-                    "'{value}' is lower than minimum ('{min}').".format(
-                        value=value, min=self.minimum_value
-                    )
+                    f"'{value}' is lower than minimum ('{self.minimum_value}')."
                 )
 
     def modify_schema(self, field_schema):
@@ -66,9 +64,7 @@ class Max:
         else:
             if value > self.maximum_value:
                 raise ValidationError(
-                    "'{value}' is bigger than maximum ('{max}').".format(
-                        value=value, max=self.maximum_value
-                    )
+                    f"'{value}' is bigger than maximum ('{self.maximum_value}')."
                 )
 
     def modify_schema(self, field_schema):
@@ -124,9 +120,7 @@ class Regex:
 
         if not result:
             raise ValidationError(
-                'Value "{value}" did not match pattern "{pattern}".'.format(
-                    value=value, pattern=self.pattern
-                )
+                f'Value "{value}" did not match pattern "{self.pattern}".'
             )
 
     def _calculate_flags(self):

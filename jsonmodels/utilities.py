@@ -85,7 +85,7 @@ def compare_schemas(one, two):
     elif one is None:
         return one is two
     else:
-        raise RuntimeError('Not allowed type "{type}"'.format(type=type(one).__name__))
+        raise RuntimeError(f'Not allowed type "{type(one).__name__}"')
 
 
 def is_ecma_regex(regex):

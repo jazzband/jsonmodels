@@ -9,6 +9,7 @@ flake8
 invoke
 mccabe
 mock
+mypy
 pep8
 py
 pyflakes

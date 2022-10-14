@@ -17,5 +17,6 @@ pytest-cov
 sphinxcontrib-spelling
 tox
 types-python-dateutil
+types-setuptools
 virtualenv
 wheel

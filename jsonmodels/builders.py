@@ -4,7 +4,7 @@
 from collections import defaultdict
 
 from . import errors
-from .fields import NotSet
+from .fields import Value, NotSet
 
 
 class Builder:
@@ -41,7 +41,7 @@ class Builder:
         return self.types_count[type]
 
     @staticmethod
-    def maybe_build(value):
+    def maybe_build(value: Value) -> dict[str, Value] | Value:
         return value.build() if isinstance(value, Builder) else value
 
     def add_definition(self, builder):

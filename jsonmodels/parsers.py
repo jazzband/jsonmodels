@@ -1,16 +1,13 @@
 """Parsers to change model structure into different ones."""
+from typing import Any
+
 import inspect
 
 from . import builders, errors, fields
 
 
-def to_struct(model):
-    """Cast instance of model to python structure.
-
-    :param model: Model to be casted.
-    :rtype: ``dict``
-
-    """
+def to_struct(model: fields.Model) -> dict[str, Any]:
+    """Cast instance of model to python structure."""
     model.validate()
 
     resp = {}
@@ -24,18 +21,13 @@ def to_struct(model):
     return resp
 
 
-def to_json_schema(cls):
-    """Generate JSON schema for given class.
-
-    :param cls: Class to be casted.
-    :rtype: ``dict``
-
-    """
+def to_json_schema(cls: fields.Model) -> dict[str, Any]:
+    """Generate JSON schema for given class."""
     builder = build_json_schema(cls)
     return builder.build()
 
 
-def build_json_schema(value, parent_builder=None):
+def build_json_schema(value, parent_builder=None) -> builders.PrimitiveBuilder | builders.ObjectBuilder:
     from .models import Base
 
     cls = value if inspect.isclass(value) else value.__class__
@@ -45,7 +37,7 @@ def build_json_schema(value, parent_builder=None):
         return build_json_schema_primitive(cls, parent_builder)
 
 
-def build_json_schema_object(cls, parent_builder=None):
+def build_json_schema_object(cls, parent_builder=None) -> builders.ObjectBuilder:
     builder = builders.ObjectBuilder(cls, parent_builder)
     if builder.count_type(builder.type) > 1:
         return builder
@@ -59,7 +51,7 @@ def build_json_schema_object(cls, parent_builder=None):
     return builder
 
 
-def _parse_list(field, parent_builder):
+def _parse_list(field, parent_builder) -> dict[str, Any]:
     builder = builders.ListBuilder(
         parent_builder, field.nullable, default=field._default
     )
@@ -68,7 +60,7 @@ def _parse_list(field, parent_builder):
     return builder.build()
 
 
-def _parse_embedded(field, parent_builder):
+def _parse_embedded(field, parent_builder) -> dict[str, Any] | fields.Value:
     builder = builders.EmbeddedBuilder(
         parent_builder, field.nullable, default=field._default
     )
@@ -77,13 +69,13 @@ def _parse_embedded(field, parent_builder):
     return builder.build()
 
 
-def build_json_schema_primitive(cls, parent_builder):
+def build_json_schema_primitive(cls, parent_builder) -> builders.PrimitiveBuilder:
     builder = builders.PrimitiveBuilder(cls, parent_builder)
     return builder
 
 
-def _create_primitive_field_schema(field):
-    if isinstance(field, fields.StringField):
+def _create_primitive_field_schema(field) -> dict[str, Any]:
+    if isinstance(field, fields.StringField):  # TODO rewrite this as switch case?
         obj_type = "string"
     elif isinstance(field, fields.IntField):
         obj_type = "number"
@@ -98,10 +90,11 @@ def _create_primitive_field_schema(field):
             f"Field {type(field).__class__.__name__} is not supported!"
         )
 
+    schema: dict[str, Any] = {}
     if field.nullable:
-        obj_type = [obj_type, "null"]
-
-    schema = {"type": obj_type}
+        schema = {"type": [obj_type, "null"]}
+    else:
+        schema = {"type": obj_type}
 
     if field.has_default:
         schema["default"] = field._default

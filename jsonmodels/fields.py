@@ -1,6 +1,7 @@
 import datetime
 import re
 from weakref import WeakKeyDictionary
+from typing import Any, Optional
 
 from dateutil.parser import parse
 
@@ -16,7 +17,7 @@ class BaseField:
 
     """Base class for all fields."""
 
-    types = None
+    types: tuple[Optional[Any]] = tuple()
 
     def __init__(
         self,
@@ -39,7 +40,7 @@ class BaseField:
         self._default = default
 
     @property
-    def has_default(self):
+    def has_default(self) -> bool:
         return self._default is not NotSet
 
     def _assign_validators(self, validators):
@@ -47,7 +48,7 @@ class BaseField:
             validators = [validators]
         self.validators = validators or []
 
-    def __set__(self, instance, value):
+    def __set__(self, instance, value) -> None:
         self._finish_initialization(type(instance))
         value = self.parse_value(value)
         self.validate(value)
@@ -70,11 +71,11 @@ class BaseField:
         if obj._cache_key not in self.memory:
             self.__set__(obj, self.get_default_value())
 
-    def validate_for_object(self, obj):
+    def validate_for_object(self, obj) -> None:
         value = self.__get__(obj)
         self.validate(value)
 
-    def validate(self, value):
+    def validate(self, value) -> None:
         self._check_types()
         self._validate_against_types(value)
         self._check_against_required(value)
@@ -137,7 +138,7 @@ class BaseField:
         if not re.match(r"^[A-Za-z_](([\w\-]*)?\w+)?$", self.name):
             raise ValueError("Wrong name", self.name)
 
-    def structue_name(self, default):
+    def structue_name(self, default) -> str:
         return self.name if self.name is not None else default
 
 
@@ -154,7 +155,7 @@ class IntField(BaseField):
 
     types = (int,)
 
-    def parse_value(self, value):
+    def parse_value(self, value) -> int:
         """Cast value to `int`, e.g. from string or long"""
         parsed = super().parse_value(value)
         if parsed is None:
@@ -230,13 +231,13 @@ class ListField(BaseField):
                 types.append(type_)
         self.items_types = tuple(types)
 
-    def validate(self, value):
+    def validate(self, value: Any) -> None:
         super().validate(value)
 
         for item in value:
             self.validate_single_value(item)
 
-    def validate_single_value(self, value):
+    def validate_single_value(self, value: Any) -> None:
         for validator in self.item_validators:
             try:
                 validator.validate(value)

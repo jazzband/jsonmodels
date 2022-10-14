@@ -50,9 +50,7 @@ def _compare_lists(one, two):
 def _assert_same_types(one, two):
     if not isinstance(one, type(two)) or not isinstance(two, type(one)):
         raise RuntimeError(
-            'Types mismatch! "{type1}" and "{type2}".'.format(
-                type1=type(one).__name__, type2=type(two).__name__
-            )
+            f'Types mismatch! "{type(one).__name__}" and "{type(two).__name__}".'
         )
 
 
@@ -85,7 +83,7 @@ def compare_schemas(one, two):
     elif one is None:
         return one is two
     else:
-        raise RuntimeError('Not allowed type "{type}"'.format(type=type(one).__name__))
+        raise RuntimeError(f'Not allowed type "{type(one).__name__}"')
 
 
 def is_ecma_regex(regex):
@@ -101,8 +99,7 @@ def is_ecma_regex(regex):
         re.compile(regex)
     except sre_constants.error as err:
         raise ValueError(
-            "Given regex {} isn't ECMA regex nor "
-            "Python regex: {}.".format(regex, err)
+            f"Given regex {regex} isn't ECMA regex nor Python regex: {err}."
         )
     return False
 

@@ -6,15 +6,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
+      max-parallel: 6
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy-3.8"]
+        python-version: ["pypy-3.8", "3.7", "3.8", "3.9", "3.10", "3.11-dev"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -24,7 +24,7 @@ jobs:
           echo "::set-output name=dir::$(pip cache dir)"
 
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ matrix.os }}-${{ matrix.python-version }}-v1-${{ hashFiles('**/requirements.txt') }}
@@ -46,7 +46,7 @@ jobs:
           python setup.py test
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
           name: Python ${{ matrix.python-version }}
 

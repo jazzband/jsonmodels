@@ -1,7 +1,7 @@
 import datetime
 import re
-from weakref import WeakKeyDictionary
 from typing import Any, Callable, Optional, TypeVar, cast
+from weakref import WeakKeyDictionary
 
 from dateutil.parser import parse
 

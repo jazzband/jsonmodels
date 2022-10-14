@@ -4,7 +4,7 @@
 from collections import defaultdict
 
 from . import errors
-from .fields import Value, NotSet
+from .fields import NotSet, Value
 
 
 class Builder:

@@ -1,7 +1,6 @@
 """Parsers to change model structure into different ones."""
-from typing import Any
-
 import inspect
+from typing import Any
 
 from . import builders, errors, fields
 
@@ -27,7 +26,9 @@ def to_json_schema(cls: fields.Model) -> dict[str, Any]:
     return builder.build()
 
 
-def build_json_schema(value, parent_builder=None) -> builders.PrimitiveBuilder | builders.ObjectBuilder:
+def build_json_schema(
+    value, parent_builder=None
+) -> builders.PrimitiveBuilder | builders.ObjectBuilder:
     from .models import Base
 
     cls = value if inspect.isclass(value) else value.__class__

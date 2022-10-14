@@ -77,10 +77,7 @@ class ObjectBuilder(Builder):
 
     @property
     def type_name(self):
-        module_name = "{module}.{name}".format(
-            module=self.type.__module__,
-            name=self.type.__name__,
-        )
+        module_name = f"{self.type.__module__}.{self.type.__name__}"
         return module_name.replace(".", "_").lower()
 
     def build_definition(self, add_defintitions=True, nullable=False):

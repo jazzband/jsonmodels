@@ -6,9 +6,8 @@ Sphinx
 coverage
 docutils
 flake8
-invoke
+importlib-metadata==4.13.0
 mccabe
-mock
 mypy
 pep8
 py

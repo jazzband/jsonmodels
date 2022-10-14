@@ -31,7 +31,7 @@ are converted to, or read from JSON.
 Features
 --------
 
-* Fully tested with Python 3.6+.
+* Fully tested with Python 3.7+.
 
 * Support for PyPy 3.8 (see implementation notes in docs for more details).
 

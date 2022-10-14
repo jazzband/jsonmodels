@@ -55,11 +55,7 @@ class Base(metaclass=JsonmodelMeta):
         try:
             field.__set__(self, value)
         except ValidationError as error:
-            raise ValidationError(
-                "Error for field '{name}': {error}.".format(
-                    name=field_name, error=error
-                )
-            )
+            raise ValidationError(f"Error for field '{field_name}': {error}.")
 
     def __iter__(self):
         """Iterate through fields and values."""

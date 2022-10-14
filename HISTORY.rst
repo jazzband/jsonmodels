@@ -3,6 +3,12 @@
 History
 -------
 
+2.6.0 (2022-10-14)
+++++++++++++++++++
+
+* Removed Python 3.6 support.
+* Added support for Python 3.11.
+
 2.5.1 (2022-06-16)
 ++++++++++++++++++
 

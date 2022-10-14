@@ -6,7 +6,6 @@ Sphinx
 coverage
 docutils
 flake8
-invoke
 importlib-metadata==4.13.0
 mccabe
 pep8

@@ -95,9 +95,7 @@ def _create_primitive_field_schema(field):
         obj_type = "object"
     else:
         raise errors.FieldNotSupported(
-            "Field {field} is not supported!".format(
-                field=type(field).__class__.__name__
-            )
+            f"Field {type(field).__class__.__name__} is not supported!"
         )
 
     if field.nullable:

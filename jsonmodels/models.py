@@ -71,7 +71,7 @@ class Base(metaclass=JsonmodelMeta):
                     f"Error for field '{name}'.",
                     error,
                 )
-    
+
     def is_valid(self):
         self._errors = {}
         for name, field in self:
@@ -79,9 +79,9 @@ class Base(metaclass=JsonmodelMeta):
                 field.validate_for_object(self)
             except ValidationError as error:
                 self._errors[name] = str(error)
-        
+
         return not bool(self._errors)
-    
+
     @property
     def errors(self):
         return self._errors

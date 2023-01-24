@@ -7,7 +7,7 @@ from dateutil.parser import parse
 
 from .collections import ModelCollection
 from .errors import ValidationError
-from .types import Model, Value, Validator
+from .types import Model, Validator, Value
 
 T = TypeVar("T")
 

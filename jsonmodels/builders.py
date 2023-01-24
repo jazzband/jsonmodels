@@ -2,18 +2,11 @@
 
 
 from collections import defaultdict
-from typing import Any, Dict, Optional, Set, List, cast
+from typing import Any, Dict, List, Optional, Set, cast
 
 from . import errors
 from .fields import NotSet, Value
-from .types import (
-    ClassValidator,
-    JsonSchema,
-    Model,
-    Builder,
-    SchemaPart,
-    Field,
-)
+from .types import Builder, ClassValidator, Field, JsonSchema, Model, SchemaPart
 
 
 class BaseBuilder:

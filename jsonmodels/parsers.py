@@ -3,7 +3,7 @@ import inspect
 from typing import Any
 
 from . import builders, errors, fields
-from .types import JsonSchema, Model, Builder
+from .types import Builder, JsonSchema, Model
 
 
 def to_struct(model: Model) -> dict[str, Any]:

@@ -1,4 +1,5 @@
 """Test for validators."""
+from typing import Any
 
 import pytest
 
@@ -6,20 +7,20 @@ from jsonmodels import errors, fields, models, validators
 
 
 class FakeValidator:
-    def __init__(self):
+    def __init__(self) -> None:
         self.called_with = None
         self.called_amount = 0
 
-    def validate(self, value):
+    def validate(self, value: Any) -> None:
         self.called_amount = self.called_amount + 1
         self.called_with = value
 
-    def assert_called_once_with(self, value):
+    def assert_called_once_with(self, value: Any) -> None:
         if value != self.called_with or self.called_amount != 1:
             raise AssertionError('Assert called once with "{}" failed!')
 
 
-def test_validation():
+def test_validation() -> None:
 
     validator1 = FakeValidator()
     validator2 = FakeValidator()
@@ -27,7 +28,7 @@ def test_validation():
     called = []
     arg = []
 
-    def validator3(value):
+    def validator3(value: Any) -> None:
         called.append(1)
         arg.append(value)
 
@@ -51,7 +52,7 @@ def test_validation():
     assert 33 == arg.pop()
 
 
-def test_validators_are_always_iterable():
+def test_validators_are_always_iterable() -> None:
     class Person(models.Base):
 
         children = fields.ListField()
@@ -61,7 +62,7 @@ def test_validators_are_always_iterable():
     assert isinstance(alan.get_field("children").validators, list)
 
 
-def test_get_field_not_found():
+def test_get_field_not_found() -> None:
     class Person(models.Base):
 
         children = fields.ListField()
@@ -72,7 +73,7 @@ def test_get_field_not_found():
         alan.get_field("bazinga")
 
 
-def test_min_validation():
+def test_min_validation() -> None:
 
     validator = validators.Min(3)
     assert 3 == validator.minimum_value
@@ -86,7 +87,7 @@ def test_min_validation():
         validator.validate(-2)
 
 
-def test_exclusive_validation():
+def test_exclusive_validation() -> None:
 
     validator = validators.Min(3, True)
     assert 3 == validator.minimum_value
@@ -100,7 +101,7 @@ def test_exclusive_validation():
         validator.validate(-2)
 
 
-def test_max_validation():
+def test_max_validation() -> None:
 
     validator = validators.Max(42)
     assert 42 == validator.maximum_value
@@ -113,7 +114,7 @@ def test_max_validation():
         validator.validate(43)
 
 
-def test_max_exclusive_validation():
+def test_max_exclusive_validation() -> None:
 
     validator = validators.Max(42, True)
     assert 42 == validator.maximum_value
@@ -127,7 +128,7 @@ def test_max_exclusive_validation():
         validator.validate(43)
 
 
-def test_regex_validation():
+def test_regex_validation() -> None:
 
     validator = validators.Regex("some")
     assert "some" == validator.pattern
@@ -140,7 +141,7 @@ def test_regex_validation():
         validator.validate("trololo")
 
 
-def test_regex_validation_flags():
+def test_regex_validation_flags() -> None:
     # Invalid flags ignored
     validator = validators.Regex("foo", bla=True, ble=False, ignorecase=True)
     assert validator.flags == [validators.Regex.FLAGS["ignorecase"]]
@@ -163,7 +164,7 @@ def test_regex_validation_flags():
     assert validator.flags == []
 
 
-def test_regex_validation_for_wrong_type():
+def test_regex_validation_for_wrong_type() -> None:
 
     validator = validators.Regex("some")
     assert "some" == validator.pattern
@@ -172,7 +173,7 @@ def test_regex_validation_for_wrong_type():
         validator.validate(1)
 
 
-def test_validation_2():
+def test_validation_2() -> None:
 
     validator = validators.Regex("^some[0-9]$")
     assert "^some[0-9]$" == validator.pattern
@@ -188,7 +189,7 @@ def test_validation_2():
         validator.validate("trololo")
 
 
-def test_validation_ignorecase():
+def test_validation_ignorecase() -> None:
     validator = validators.Regex("^some$")
     validator.validate("some")
     with pytest.raises(errors.ValidationError):
@@ -199,7 +200,7 @@ def test_validation_ignorecase():
     validator.validate("SoMe")
 
 
-def test_validation_multiline():
+def test_validation_multiline() -> None:
     validator = validators.Regex("^s.*e$")
     validator.validate("some")
     with pytest.raises(errors.ValidationError):
@@ -210,7 +211,7 @@ def test_validation_multiline():
     validator.validate("some\nso more")
 
 
-def test_regex_validator():
+def test_regex_validator() -> None:
     class Person(models.Base):
 
         name = fields.StringField(
@@ -225,7 +226,7 @@ def test_regex_validator():
     person.name = "Jimmy"
 
 
-def test_regex_validator_when_ecma_regex_given():
+def test_regex_validator_when_ecma_regex_given() -> None:
     class Person(models.Base):
 
         name = fields.StringField(
@@ -240,7 +241,7 @@ def test_regex_validator_when_ecma_regex_given():
     person.name = "Jimmy"
 
 
-def test_init():
+def test_init() -> None:
     validator = validators.Length(0, 10)
     assert 0 == validator.minimum_value
     assert 10 == validator.maximum_value
@@ -257,7 +258,7 @@ def test_init():
         validators.Length()
 
 
-def test_length_validation_string_min_max():
+def test_length_validation_string_min_max() -> None:
     validator = validators.Length(1, 10)
     validator.validate("word")
     validator.validate("w" * 10)
@@ -269,7 +270,7 @@ def test_length_validation_string_min_max():
         validator.validate("na" * 10)
 
 
-def test_length_validation_string_min():
+def test_length_validation_string_min() -> None:
     validator = validators.Length(minimum_value=1)
     validator.validate("a")
     validator.validate("aasdasd" * 1000)
@@ -277,7 +278,7 @@ def test_length_validation_string_min():
         validator.validate("")
 
 
-def test_length_validation_string_max():
+def test_length_validation_string_max() -> None:
     validator = validators.Length(maximum_value=10)
     validator.validate("")
     validator.validate("a")
@@ -286,7 +287,7 @@ def test_length_validation_string_max():
         validator.validate("a" * 11)
 
 
-def test_length_validation_list_min_max():
+def test_length_validation_list_min_max() -> None:
     validator = validators.Length(1, 10)
     validator.validate([1, 2, 3, 4])
     validator.validate([1] * 10)
@@ -298,7 +299,7 @@ def test_length_validation_list_min_max():
         validator.validate([1, 2] * 10)
 
 
-def test_length_validation_list_min():
+def test_length_validation_list_min() -> None:
     validator = validators.Length(minimum_value=1)
     validator.validate([1])
     validator.validate(range(1000))
@@ -306,7 +307,7 @@ def test_length_validation_list_min():
         validator.validate([])
 
 
-def test_length_validation_list_max():
+def test_length_validation_list_max() -> None:
     validator = validators.Length(maximum_value=10)
     validator.validate([])
     validator.validate([1])
@@ -315,7 +316,7 @@ def test_length_validation_list_max():
         validator.validate([1] * 11)
 
 
-def test_validation_nullable():
+def test_validation_nullable() -> None:
     class Emb(models.Base):
         name = fields.StringField(nullable=True)
 
@@ -328,7 +329,7 @@ def test_validation_nullable():
     user.validate()
 
 
-def test_enum_validation():
+def test_enum_validation() -> None:
     validator = validators.Enum("cat", "dog", "fish")
 
     validator.validate("cat")

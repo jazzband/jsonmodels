@@ -1,15 +1,21 @@
+from typing import Any, Dict, Generator, Tuple, Type
+
 from . import errors, parsers
 from .errors import ValidationError
 from .fields import BaseField
 
+Values = Dict[str, Any]
+Fields = Tuple[str, BaseField]
+FieldsWithNames = Tuple[str, str, BaseField]
+
 
 class JsonmodelMeta(type):
-    def __new__(cls, name, bases, attributes):
+    def __new__(cls: Type[type], name: str, bases: tuple, attributes: dict) -> type:
         cls.validate_fields(attributes)
         return super(cls, cls).__new__(cls, name, bases, attributes)
 
     @staticmethod
-    def validate_fields(attributes):
+    def validate_fields(attributes: dict[str, Any]) -> None:
         fields = {
             key: value
             for key, value in attributes.items()
@@ -27,11 +33,11 @@ class Base(metaclass=JsonmodelMeta):
 
     """Base class for all models."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Values) -> None:
         self._cache_key = _CacheKey()
         self.populate(**kwargs)
 
-    def populate(self, **values):
+    def populate(self, **values: Values) -> None:
         """Populate values to fields. Skip non-existing."""
         values = values.copy()
         fields = list(self.iterate_with_name())
@@ -42,7 +48,7 @@ class Base(metaclass=JsonmodelMeta):
             if name in values:
                 self.set_field(field, name, values.pop(name))
 
-    def get_field(self, field_name):
+    def get_field(self, field_name: str) -> BaseField:
         """Get field associated with given attribute."""
         for attr_name, field in self:
             if field_name == attr_name:
@@ -50,18 +56,18 @@ class Base(metaclass=JsonmodelMeta):
 
         raise errors.FieldNotFound("Field not found", field_name)
 
-    def set_field(self, field, field_name, value):
+    def set_field(self, field: BaseField, field_name: str, value: Any) -> None:
         """Sets the value of a field."""
         try:
             field.__set__(self, value)
         except ValidationError as error:
             raise ValidationError(f"Error for field '{field_name}': {error}.")
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[Fields, None, None]:
         """Iterate through fields and values."""
         yield from self.iterate_over_fields()
 
-    def validate(self):
+    def validate(self) -> None:
         """Explicitly validate all the fields."""
         for name, field in self:
             try:
@@ -73,7 +79,7 @@ class Base(metaclass=JsonmodelMeta):
                 )
 
     @classmethod
-    def iterate_over_fields(cls):
+    def iterate_over_fields(cls) -> Generator[Fields, None, None]:
         """Iterate through fields as `(attribute_name, field_instance)`."""
         for attr in dir(cls):
             clsattr = getattr(cls, attr)
@@ -81,7 +87,7 @@ class Base(metaclass=JsonmodelMeta):
                 yield attr, clsattr
 
     @classmethod
-    def iterate_with_name(cls):
+    def iterate_with_name(cls) -> Generator[FieldsWithNames, None, None]:
         """Iterate over fields, but also give `structure_name`.
 
         Format is `(attribute_name, structue_name, field_instance)`.
@@ -92,16 +98,16 @@ class Base(metaclass=JsonmodelMeta):
             structure_name = field.structue_name(attr_name)
             yield attr_name, structure_name, field
 
-    def to_struct(self):
+    def to_struct(self) -> dict[str, Any]:
         """Cast model to Python structure."""
         return parsers.to_struct(self)
 
     @classmethod
-    def to_json_schema(cls):
+    def to_json_schema(cls) -> str:
         """Generate JSON schema for model."""
         return parsers.to_json_schema(cls)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = {}
         for name, _ in self:
             attr = getattr(self, name)
@@ -113,16 +119,16 @@ class Base(metaclass=JsonmodelMeta):
             fields=", ".join("{0[0]}={0[1]}".format(x) for x in sorted(attrs.items())),
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.__class__.__name__} object"
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         try:
             return super().__setattr__(name, value)
         except ValidationError as error:
             raise ValidationError(f"Error for field '{name}'.", error)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(other) is not type(self):
             return False
 
@@ -142,7 +148,7 @@ class Base(metaclass=JsonmodelMeta):
 
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not (self == other)
 
 

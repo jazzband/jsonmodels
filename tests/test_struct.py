@@ -1,16 +1,9 @@
-from datetime import datetime
-
 import pytest
 
 from jsonmodels import errors, fields, models
 
 
-class _DateField(fields.BaseField):
-
-    _types = (datetime,)
-
-
-def test_to_struct_basic():
+def test_to_struct_basic() -> None:
     class Person(models.Base):
 
         name = fields.StringField(required=True)
@@ -42,7 +35,7 @@ def test_to_struct_basic():
     assert pattern == alan.to_struct()
 
 
-def test_to_struct_nested_1():
+def test_to_struct_nested_1() -> None:
     class Car(models.Base):
 
         brand = fields.StringField()
@@ -72,7 +65,7 @@ def test_to_struct_nested_1():
     assert pattern == place.to_struct()
 
 
-def test_to_struct_nested_2():
+def test_to_struct_nested_2() -> None:
     class Viper(models.Base):
 
         serial = fields.StringField()
@@ -111,7 +104,7 @@ def test_to_struct_nested_2():
     assert pattern == parking.to_struct()
 
 
-def test_to_struct_with_non_models_types():
+def test_to_struct_with_non_models_types() -> None:
     class Person(models.Base):
 
         names = fields.ListField(str)
@@ -135,14 +128,14 @@ def test_to_struct_with_non_models_types():
     pattern == person.to_struct()
 
 
-def test_to_struct_with_multi_non_models_types():
+def test_to_struct_with_multi_non_models_types() -> None:
     class Person(models.Base):
 
         name = fields.StringField()
         mix = fields.ListField((str, float))
 
     person = Person()
-    pattern = {"mix": []}
+    pattern: dict[str, list] = {"mix": []}
     assert pattern == person.to_struct()
 
     person.mix.append("something")
@@ -158,7 +151,7 @@ def test_to_struct_with_multi_non_models_types():
     assert pattern == person.to_struct()
 
 
-def test_list_to_struct():
+def test_list_to_struct() -> None:
     class Cat(models.Base):
         name = fields.StringField(required=True)
         breed = fields.StringField()
@@ -184,7 +177,7 @@ def test_list_to_struct():
     assert pattern == person.to_struct()
 
 
-def test_to_struct_time():
+def test_to_struct_time() -> None:
     class Clock(models.Base):
         time = fields.TimeField()
 
@@ -195,7 +188,7 @@ def test_to_struct_time():
     assert pattern == clock.to_struct()
 
 
-def test_to_struct_date():
+def test_to_struct_date() -> None:
     class Event(models.Base):
         start = fields.DateField()
 
@@ -206,7 +199,7 @@ def test_to_struct_date():
     assert pattern == event.to_struct()
 
 
-def test_to_struct_datetime():
+def test_to_struct_datetime() -> None:
     class Event(models.Base):
         start = fields.DateTimeField()
 

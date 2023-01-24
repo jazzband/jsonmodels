@@ -8,6 +8,7 @@ docutils
 flake8
 importlib-metadata==4.13.0
 mccabe
+mypy
 pep8
 py
 pyflakes
@@ -15,5 +16,7 @@ pytest
 pytest-cov
 sphinxcontrib-spelling
 tox
+types-python-dateutil
+types-setuptools
 virtualenv
 wheel

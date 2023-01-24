@@ -3,9 +3,10 @@ import inspect
 from typing import Any
 
 from . import builders, errors, fields
+from .types import JsonSchema, Model, Builder
 
 
-def to_struct(model: fields.Model) -> dict[str, Any]:
+def to_struct(model: Model) -> dict[str, Any]:
     """Cast instance of model to python structure."""
     model.validate()
 
@@ -26,9 +27,7 @@ def to_json_schema(cls: fields.Model) -> dict[str, Any]:
     return builder.build()
 
 
-def build_json_schema(
-    value, parent_builder=None
-) -> builders.PrimitiveBuilder | builders.ObjectBuilder:
+def build_json_schema(value, parent_builder=None) -> Builder:
     from .models import Base
 
     cls = value if inspect.isclass(value) else value.__class__
@@ -40,7 +39,7 @@ def build_json_schema(
 
 def build_json_schema_object(cls, parent_builder=None) -> builders.ObjectBuilder:
     builder = builders.ObjectBuilder(cls, parent_builder)
-    if builder.count_type(builder.type) > 1:
+    if builder.count_type(builder.model_type) > 1:
         return builder
     for _, name, field in cls.iterate_with_name():
         if isinstance(field, fields.EmbeddedField):
@@ -52,7 +51,7 @@ def build_json_schema_object(cls, parent_builder=None) -> builders.ObjectBuilder
     return builder
 
 
-def _parse_list(field, parent_builder) -> dict[str, Any]:
+def _parse_list(field, parent_builder) -> JsonSchema:
     builder = builders.ListBuilder(
         parent_builder, field.nullable, default=field._default
     )
@@ -61,7 +60,7 @@ def _parse_list(field, parent_builder) -> dict[str, Any]:
     return builder.build()
 
 
-def _parse_embedded(field, parent_builder) -> dict[str, Any] | fields.Value:
+def _parse_embedded(field, parent_builder) -> JsonSchema:
     builder = builders.EmbeddedBuilder(
         parent_builder, field.nullable, default=field._default
     )
@@ -70,13 +69,13 @@ def _parse_embedded(field, parent_builder) -> dict[str, Any] | fields.Value:
     return builder.build()
 
 
-def build_json_schema_primitive(cls, parent_builder) -> builders.PrimitiveBuilder:
+def build_json_schema_primitive(cls, parent_builder) -> JsonSchema:
     builder = builders.PrimitiveBuilder(cls, parent_builder)
-    return builder
+    return builder.build()
 
 
 def _create_primitive_field_schema(field) -> dict[str, Any]:
-    if isinstance(field, fields.StringField):  # TODO rewrite this as switch case?
+    if isinstance(field, fields.StringField):
         obj_type = "string"
     elif isinstance(field, fields.IntField):
         obj_type = "number"

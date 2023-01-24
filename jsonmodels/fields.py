@@ -1,18 +1,15 @@
 import datetime
 import re
-from typing import Any, Callable, Optional, TypeVar, cast
+from typing import Any, Callable, List, Optional, TypeVar, cast
 from weakref import WeakKeyDictionary
 
 from dateutil.parser import parse
 
 from .collections import ModelCollection
 from .errors import ValidationError
+from .types import Model, Value, Validator
 
-Validator = Callable | object
-Validators = list[Validator]  # TODO create typing.py file for those
-Model = TypeVar("Model")
 T = TypeVar("T")
-Value = Any
 
 # unique marker for "no default value specified". None is not good enough since
 # it is a completely valid default value.
@@ -24,6 +21,7 @@ class BaseField:
     """Base class for all fields."""
 
     types: tuple = tuple()
+    validators: List[Callable]
 
     def __init__(
         self,
@@ -49,7 +47,7 @@ class BaseField:
     def has_default(self) -> bool:
         return self._default is not NotSet
 
-    def _assign_validators(self, validators: Validators) -> None:
+    def _assign_validators(self, validators: list[Validator]) -> None:
         if validators and not isinstance(validators, list):
             validators = [validators]
         self.validators = validators or []

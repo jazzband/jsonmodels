@@ -20,7 +20,6 @@ class FakeValidator:
 
 
 def test_validation():
-
     validator1 = FakeValidator()
     validator2 = FakeValidator()
 
@@ -32,7 +31,6 @@ def test_validation():
         arg.append(value)
 
     class Person(models.Base):
-
         name = fields.StringField(required=True, validators=[validator1, validator2])
         surname = fields.StringField(required=True)
         age = fields.IntField(validators=validator3)
@@ -53,7 +51,6 @@ def test_validation():
 
 def test_validators_are_always_iterable():
     class Person(models.Base):
-
         children = fields.ListField()
 
     alan = Person()
@@ -63,7 +60,6 @@ def test_validators_are_always_iterable():
 
 def test_get_field_not_found():
     class Person(models.Base):
-
         children = fields.ListField()
 
     alan = Person()
@@ -73,7 +69,6 @@ def test_get_field_not_found():
 
 
 def test_min_validation():
-
     validator = validators.Min(3)
     assert 3 == validator.minimum_value
 
@@ -87,7 +82,6 @@ def test_min_validation():
 
 
 def test_exclusive_validation():
-
     validator = validators.Min(3, True)
     assert 3 == validator.minimum_value
 
@@ -101,7 +95,6 @@ def test_exclusive_validation():
 
 
 def test_max_validation():
-
     validator = validators.Max(42)
     assert 42 == validator.maximum_value
 
@@ -114,7 +107,6 @@ def test_max_validation():
 
 
 def test_max_exclusive_validation():
-
     validator = validators.Max(42, True)
     assert 42 == validator.maximum_value
 
@@ -128,7 +120,6 @@ def test_max_exclusive_validation():
 
 
 def test_regex_validation():
-
     validator = validators.Regex("some")
     assert "some" == validator.pattern
 
@@ -164,7 +155,6 @@ def test_regex_validation_flags():
 
 
 def test_regex_validation_for_wrong_type():
-
     validator = validators.Regex("some")
     assert "some" == validator.pattern
 
@@ -173,7 +163,6 @@ def test_regex_validation_for_wrong_type():
 
 
 def test_validation_2():
-
     validator = validators.Regex("^some[0-9]$")
     assert "^some[0-9]$" == validator.pattern
 
@@ -212,7 +201,6 @@ def test_validation_multiline():
 
 def test_regex_validator():
     class Person(models.Base):
-
         name = fields.StringField(
             validators=validators.Regex("^[a-z]+$", ignorecase=True)
         )
@@ -227,7 +215,6 @@ def test_regex_validator():
 
 def test_regex_validator_when_ecma_regex_given():
     class Person(models.Base):
-
         name = fields.StringField(
             validators=validators.Regex("/^[a-z]+$/i", ignorecase=False)
         )

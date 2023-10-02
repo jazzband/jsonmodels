@@ -5,7 +5,6 @@ from jsonmodels import errors, fields, models
 
 def test_model1():
     class Person(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
@@ -21,7 +20,6 @@ def test_model1():
 
 def test_required():
     class Person(models.Base):
-
         name = fields.StringField(required=True)
         surname = fields.StringField()
         age = fields.IntField()
@@ -36,7 +34,6 @@ def test_required():
 
 def test_type_validation():
     class Person(models.Base):
-
         name = fields.StringField()
         age = fields.IntField()
 
@@ -47,7 +44,6 @@ def test_type_validation():
 
 def test_base_field_should_not_be_usable():
     class Person(models.Base):
-
         name = fields.BaseField()
 
     alan = Person()
@@ -61,7 +57,6 @@ def test_base_field_should_not_be_usable():
 
 def test_value_replacements():
     class Person(models.Base):
-
         name = fields.StringField()
         age = fields.IntField()
         cash = fields.FloatField()
@@ -76,7 +71,6 @@ def test_value_replacements():
 
 def test_list_field():
     class Car(models.Base):
-
         wheels = fields.ListField()
 
     viper = Car()
@@ -95,7 +89,6 @@ def test_list_field_types():
         pass
 
     class Car(models.Base):
-
         wheels = fields.ListField(items_types=[Wheel])
 
     viper = Car()
@@ -115,7 +108,6 @@ def test_list_field_types_when_assigning():
         pass
 
     class Car(models.Base):
-
         wheels = fields.ListField(items_types=[Wheel])
 
     viper = Car()
@@ -138,7 +130,6 @@ def test_list_field_for_subtypes():
         pass
 
     class Garage1(models.Base):
-
         cars = fields.ListField(items_types=[Car])
 
     garage = Garage1()
@@ -147,7 +138,6 @@ def test_list_field_for_subtypes():
     garage.cars.append(Lamborghini())
 
     class Garage2(models.Base):
-
         cars = fields.ListField(items_types=[Viper, Lamborghini])
 
     garage = Garage2()
@@ -160,7 +150,6 @@ def test_list_field_for_subtypes():
 
 def test_list_validation():
     class Garage(models.Base):
-
         cars = fields.ListField()
 
     garage = Garage()
@@ -171,11 +160,9 @@ def test_list_validation():
 
 def test_embedded_model():
     class Secondary(models.Base):
-
         data = fields.IntField()
 
     class Primary(models.Base):
-
         name = fields.StringField()
         secondary = fields.EmbeddedField(Secondary)
 
@@ -193,11 +180,9 @@ def test_embedded_model():
 
 def test_embedded_required_validation():
     class Secondary(models.Base):
-
         data = fields.IntField(required=True)
 
     class Primary(models.Base):
-
         name = fields.StringField()
         secondary = fields.EmbeddedField(Secondary)
 
@@ -212,7 +197,6 @@ def test_embedded_required_validation():
     entity.secondary = None
 
     class Primary(models.Base):
-
         name = fields.StringField()
         secondary = fields.EmbeddedField(Secondary, required=True)
 
@@ -236,7 +220,6 @@ def test_embedded_inheritance():
         pass
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField([Viper, Lamborghini])
 
@@ -249,7 +232,6 @@ def test_embedded_inheritance():
         place.car = Car()
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField(Car)
 
@@ -262,7 +244,6 @@ def test_embedded_inheritance():
 
 def test_iterable():
     class Person(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
@@ -290,13 +271,11 @@ def test_iterable():
 
 
 def test_get_field():
-
     name_field = fields.StringField()
     surname_field = fields.StringField()
     age_field = fields.IntField()
 
     class Person(models.Base):
-
         name = name_field
         surname = surname_field
         age = age_field
@@ -310,7 +289,6 @@ def test_get_field():
 
 def test_repr():
     class Person(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
@@ -321,7 +299,6 @@ def test_repr():
     assert chuck.__str__() == "Person object"
 
     class Person2(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
@@ -345,7 +322,6 @@ def test_repr():
 
 def test_list_field_with_non_model_types():
     class Person(models.Base):
-
         names = fields.ListField(str)
         surname = fields.StringField()
 
@@ -356,7 +332,6 @@ def test_list_field_with_non_model_types():
 
 def test_help_text():
     class Person(models.Base):
-
         name = fields.StringField(help_text="Name of person.")
         age = fields.IntField(help_text="Age of person.")
 
@@ -406,11 +381,9 @@ def test_items_types():
 
 def test_required_embedded_field():
     class Secondary(models.Base):
-
         data = fields.IntField()
 
     class Primary(models.Base):
-
         name = fields.StringField()
         secondary = fields.EmbeddedField(Secondary, required=True)
 
@@ -421,7 +394,6 @@ def test_required_embedded_field():
     entity.validate()
 
     class Primary(models.Base):
-
         name = fields.StringField()
         secondary = fields.EmbeddedField(Secondary, required=False)
 
@@ -437,7 +409,6 @@ def test_assignation_of_list_of_models():
         pass
 
     class Car(models.Base):
-
         wheels = fields.ListField(items_types=[Wheel])
 
     viper = Car()
@@ -505,7 +476,6 @@ def test_equality_list_fields():
         pressure = fields.FloatField()
 
     class Car(models.Base):
-
         wheels = fields.ListField(items_types=[Wheel])
 
     car = Car(

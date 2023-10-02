@@ -30,7 +30,6 @@ class _TestUtc(datetime.tzinfo):
 
 def test_time_field():
     class Event(models.Base):
-
         time = fields.TimeField()
 
     event = Event()
@@ -42,7 +41,6 @@ def test_time_field():
 
 def test_time_field_not_required():
     class Event(models.Base):
-
         time = fields.TimeField(required=False)
 
     event = Event()
@@ -52,7 +50,6 @@ def test_time_field_not_required():
 
 
 def test_time_field_to_struct():
-
     field = fields.TimeField()
 
     assert field.str_format is None
@@ -65,7 +62,6 @@ def test_time_field_to_struct():
 
 
 def test_base_field_to_struct():
-
     field = fields.BaseField()
     assert field.to_struct(True) is True
     assert field.to_struct(False) is False
@@ -74,7 +70,6 @@ def test_base_field_to_struct():
 
 
 def test_time_field_to_struct_with_format():
-
     field = fields.TimeField(str_format="%H:%M")
 
     assert "%H:%M" == field.str_format
@@ -87,7 +82,6 @@ def test_time_field_to_struct_with_format():
 
 
 def test_time_field_to_struct_with_tz():
-
     field = fields.TimeField()
 
     tt = datetime.time(tzinfo=_TestCet())
@@ -104,7 +98,6 @@ def test_time_field_to_struct_with_tz():
 
 
 def test_time_field_format_has_precedence():
-
     field = fields.TimeField(str_format="%H:%M")
 
     tt = datetime.time(12, 34, 56, tzinfo=_TestCet())
@@ -112,7 +105,6 @@ def test_time_field_format_has_precedence():
 
 
 def test_time_field_parse_value():
-
     field = fields.TimeField()
 
     assert datetime.time() == field.parse_value("00:00:00")
@@ -126,7 +118,6 @@ def test_time_field_parse_value():
 
 def test_date_field():
     class Event(models.Base):
-
         date = fields.DateField()
 
     event = Event()
@@ -138,7 +129,6 @@ def test_date_field():
 
 def test_date_field_not_required():
     class Event(models.Base):
-
         date = fields.DateField(required=False)
 
     event = Event()
@@ -148,7 +138,6 @@ def test_date_field_not_required():
 
 
 def test_date_field_to_struct():
-
     field = fields.DateField()
 
     assert field.str_format is None
@@ -161,7 +150,6 @@ def test_date_field_to_struct():
 
 
 def test_date_field_to_struct_with_format():
-
     field = fields.DateField(str_format="%Y/%m/%d")
 
     assert "%Y/%m/%d" == field.str_format
@@ -171,7 +159,6 @@ def test_date_field_to_struct_with_format():
 
 
 def test_date_field_parse_value():
-
     field = fields.DateField()
 
     assert datetime.date(2012, 12, 21) == field.parse_value("2012-12-21")
@@ -183,7 +170,6 @@ def test_date_field_parse_value():
 
 def test_datetime_field():
     class Event(models.Base):
-
         date = fields.DateTimeField()
 
     event = Event()
@@ -195,7 +181,6 @@ def test_datetime_field():
 
 def test_datetime_field_not_required():
     class Event(models.Base):
-
         date = fields.DateTimeField()
 
     event = Event()
@@ -204,7 +189,6 @@ def test_datetime_field_not_required():
 
 
 def test_datetime_field_to_struct():
-
     field = fields.DateTimeField()
 
     assert field.str_format is None
@@ -214,7 +198,6 @@ def test_datetime_field_to_struct():
 
 
 def test_datetime_field_to_struct_with_format():
-
     field = fields.TimeField(str_format="%H:%M %Y/%m")
 
     assert "%H:%M %Y/%m" == field.str_format
@@ -224,7 +207,6 @@ def test_datetime_field_to_struct_with_format():
 
 
 def test_datetime_field_to_struct_with_tz():
-
     field = fields.DateTimeField()
 
     tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
@@ -235,7 +217,6 @@ def test_datetime_field_to_struct_with_tz():
 
 
 def test_datetime_field_format_has_precedence():
-
     field = fields.DateTimeField(str_format="%H:%M %Y/%m")
 
     tt = datetime.datetime(2014, 5, 7, 12, 45, 56, tzinfo=_TestCet())
@@ -243,7 +224,6 @@ def test_datetime_field_format_has_precedence():
 
 
 def test_datetime_field_parse_value():
-
     field = fields.DateTimeField()
 
     assert datetime.datetime(2014, 4, 21, 12, 45, 56) == field.parse_value(

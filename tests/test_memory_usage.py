@@ -7,7 +7,6 @@ from jsonmodels.models import Base
 
 
 class User(Base):
-
     name = StringField()
 
 

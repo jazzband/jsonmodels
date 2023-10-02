@@ -7,7 +7,6 @@ from jsonmodels import errors, fields, models
 
 def test_initialization():
     class Person(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField()
         age = fields.IntField()
@@ -38,12 +37,10 @@ def test_initialization():
 
 def test_deep_initialization():
     class Car(models.Base):
-
         brand = fields.StringField()
         extra = fields.DictField()
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField(Car)
 
@@ -89,15 +86,12 @@ def test_deep_initialization():
 
 def test_deep_initialization_error_with_multitypes():
     class Viper(models.Base):
-
         brand = fields.StringField()
 
     class Lamborghini(models.Base):
-
         brand = fields.StringField()
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField([Viper, Lamborghini])
 
@@ -113,11 +107,9 @@ def test_deep_initialization_error_with_multitypes():
 
 def test_deep_initialization_with_list():
     class Car(models.Base):
-
         brand = fields.StringField()
 
     class Parking(models.Base):
-
         location = fields.StringField()
         cars = fields.ListField(items_types=Car)
 
@@ -156,15 +148,12 @@ def test_deep_initialization_with_list():
 
 def test_deep_initialization_error_with_list_and_multitypes():
     class Viper(models.Base):
-
         brand = fields.StringField()
 
     class Lamborghini(models.Base):
-
         brand = fields.StringField()
 
     class Parking(models.Base):
-
         location = fields.StringField()
         cars = fields.ListField([Viper, Lamborghini])
 
@@ -193,15 +182,12 @@ def test_deep_initialization_error_with_list_and_multitypes():
 
 def test_deep_initialization_error_when_result_non_iterable():
     class Viper(models.Base):
-
         brand = fields.StringField()
 
     class Lamborghini(models.Base):
-
         brand = fields.StringField()
 
     class Parking(models.Base):
-
         location = fields.StringField()
         cars = fields.ListField([Viper, Lamborghini])
 
@@ -220,7 +206,6 @@ def test_deep_initialization_error_when_result_non_iterable():
 
 def test_initialization_with_non_models_types():
     class Person(models.Base):
-
         names = fields.ListField(str)
         surname = fields.StringField()
 
@@ -239,7 +224,6 @@ def test_initialization_with_non_models_types():
 
 def test_initialization_with_multi_non_models_types():
     class Person(models.Base):
-
         name = fields.StringField()
         mix = fields.ListField((str, float))
 
@@ -259,7 +243,6 @@ def test_initialization_with_multi_non_models_types():
 
 def test_initialization_with_wrong_types():
     class Person(models.Base):
-
         name = fields.StringField()
         mix = fields.ListField((str, float))
 
@@ -270,11 +253,9 @@ def test_initialization_with_wrong_types():
 
 def test_deep_initialization_for_embed_field():
     class Car(models.Base):
-
         brand = fields.StringField()
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField(Car)
 

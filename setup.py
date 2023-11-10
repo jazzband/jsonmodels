@@ -15,7 +15,6 @@ if sys.argv[-1] == "publish":
 
 
 class PyTest(TestCommand):
-
     user_options = [("pytest-args=", "a", "Arguments to pass to py.test")]
 
     def initialize_options(self):

@@ -6,13 +6,11 @@ from jsonmodels import errors, fields, models
 
 
 class _DateField(fields.BaseField):
-
     _types = (datetime,)
 
 
 def test_to_struct_basic():
     class Person(models.Base):
-
         name = fields.StringField(required=True)
         surname = fields.StringField(required=True)
         age = fields.IntField()
@@ -44,12 +42,10 @@ def test_to_struct_basic():
 
 def test_to_struct_nested_1():
     class Car(models.Base):
-
         brand = fields.StringField()
         extra = fields.DictField()
 
     class ParkingPlace(models.Base):
-
         location = fields.StringField()
         car = fields.EmbeddedField(Car)
 
@@ -74,15 +70,12 @@ def test_to_struct_nested_1():
 
 def test_to_struct_nested_2():
     class Viper(models.Base):
-
         serial = fields.StringField()
 
     class Lamborghini(models.Base):
-
         serial = fields.StringField()
 
     class Parking(models.Base):
-
         location = fields.StringField()
         cars = fields.ListField([Viper, Lamborghini])
 
@@ -113,7 +106,6 @@ def test_to_struct_nested_2():
 
 def test_to_struct_with_non_models_types():
     class Person(models.Base):
-
         names = fields.ListField(str)
         surname = fields.StringField()
 
@@ -137,7 +129,6 @@ def test_to_struct_with_non_models_types():
 
 def test_to_struct_with_multi_non_models_types():
     class Person(models.Base):
-
         name = fields.StringField()
         mix = fields.ListField((str, float))
 

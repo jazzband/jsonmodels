@@ -5,7 +5,6 @@ from jsonmodels import fields, models
 
 def test_fields_can_have_different_names():
     class Human(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField(name="second-name")
 
@@ -24,7 +23,6 @@ def test_only_subset_of_names_is_accepted():
 
 def test_load_data_from_structure_names():
     class Human(models.Base):
-
         name = fields.StringField()
         surname = fields.StringField(name="second-name")
 
@@ -40,7 +38,6 @@ def test_load_data_from_structure_names():
 
 
 def test_names_duplicates_are_invalid():
-
     with pytest.raises(ValueError):
 
         class Human(models.Base):
@@ -76,12 +73,10 @@ def test_data_assignation():
 
 def test_nested_data():
     class Pet(models.Base):
-
         name = fields.StringField(required=True, name="pets_name")
         age = fields.IntField()
 
     class Human(models.Base):
-
         name = fields.StringField()
         pet = fields.EmbeddedField(Pet, name="owned-pet")
 
@@ -92,7 +87,6 @@ def test_nested_data():
 
 def test_cross_names():
     class Foo(models.Base):
-
         one = fields.IntField(name="two")
         two = fields.IntField(name="one")
 

@@ -34,7 +34,7 @@ jobs:
       - name: Install enchant
         run: |
           sudo apt-get -qq update
-          sudo apt-get -y install enchant
+          sudo apt-get -y install enchant-2
 
       - name: Install dependencies
         run: |

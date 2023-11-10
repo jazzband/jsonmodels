@@ -4,49 +4,41 @@ from jsonmodels import errors, fields, models
 
 
 class Primary(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField("Secondary")
 
 
 class Third(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField("tests.test_lazy_loading.Secondary")
 
 
 class Fourth(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField(".Secondary")
 
 
 class Fifth(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField("..test_lazy_loading.Secondary")
 
 
 class Sixth(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField("...tests.test_lazy_loading.Secondary")
 
 
 class Seventh(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField("....tests.test_lazy_loading.Secondary")
 
 
 class Eighth(models.Base):
-
     name = fields.StringField()
     secondary = fields.EmbeddedField(".SomeWrongEntity")
 
 
 class Secondary(models.Base):
-
     data = fields.IntField()
 
 
@@ -84,13 +76,11 @@ def test_wrong_entity():
 
 
 class File(models.Base):
-
     name = fields.StringField()
     size = fields.FloatField()
 
 
 class Directory(models.Base):
-
     name = fields.StringField()
     children = fields.ListField(["Directory", File])
 

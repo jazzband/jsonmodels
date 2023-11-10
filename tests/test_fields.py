@@ -2,11 +2,9 @@ from jsonmodels import fields, models, validators
 
 
 def test_bool_field():
-
     field = fields.BoolField()
 
     class Person(models.Base):
-
         is_programmer = field
 
     person = Person()
@@ -31,7 +29,6 @@ def test_bool_field():
 
 
 def test_dict_field():
-
     field = fields.DictField()
     default_field = fields.DictField(
         default={"extra_default": "Hello", "deep_extra": {"spanish": "Hola"}},
@@ -39,7 +36,6 @@ def test_dict_field():
     )
 
     class Person(models.Base):
-
         extra = field
         extra_required = fields.DictField(required=True)
         extra_default = default_field

@@ -3,6 +3,12 @@
 History
 -------
 
+2.7.0 (2023-12-17)
+++++++++++++++++++
+
+* Added Python 3.12, PyPy 3.9 and 3.10 support.
+* Removed Python 3.7 and PyPy 3.8 support.
+
 2.6.0 (2022-10-14)
 ++++++++++++++++++
 

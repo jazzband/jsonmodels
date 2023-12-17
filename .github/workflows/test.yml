@@ -43,7 +43,7 @@ jobs:
 
       - name: Tests
         run: |
-          python setup.py test
+          pytest
 
       - name: Upload coverage
         uses: codecov/codecov-action@v2

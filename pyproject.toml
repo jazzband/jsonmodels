@@ -1,0 +1,62 @@
+[project]
+name = "jsonmodels"
+version = "2.7.0"
+description="Models to make easier to deal with structures that are converted to, or read from JSON."
+readme = "README.rst"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+dependencies = ["python-dateutil"]
+classifiers=[
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3 :: Only",
+]
+authors = [
+  {name = "Szczepan Cieślik", email = "szczepan.cieslik@gmail.com"}
+]
+
+[project.optional-dependencies]
+dev = [
+  "Jinja2",
+  "MarkupSafe",
+  "Pygments",
+  "Sphinx",
+  "coverage",
+  "docutils",
+  "flake8",
+  "flake8-pyproject",
+  "invoke",
+  "importlib-metadata==4.13.0",
+  "mccabe",
+  "pep8",
+  "py",
+  "pyflakes",
+  "pytest",
+  "pytest-cov",
+  "sphinxcontrib-spelling",
+  "tox",
+  "virtualenv",
+  "wheel",
+]
+
+[project.urls]
+"Home" = "https://github.com/jazzband/jsonmodels"
+
+[tool.flake8]
+exclude = ["./docs/conf.py"]
+max-complexity = 8
+max_line_length = 88
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -72,6 +72,20 @@ class Base(metaclass=JsonmodelMeta):
                     error,
                 )
 
+    def is_valid(self):
+        self._errors = {}
+        for name, field in self:
+            try:
+                field.validate_for_object(self)
+            except ValidationError as error:
+                self._errors[name] = str(error)
+
+        return not bool(self._errors)
+
+    @property
+    def errors(self):
+        return self._errors
+
     @classmethod
     def iterate_over_fields(cls):
         """Iterate through fields as `(attribute_name, field_instance)`."""

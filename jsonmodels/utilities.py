@@ -1,5 +1,4 @@
 import re
-import sre_constants
 from collections import namedtuple
 
 SCALAR_TYPES = tuple(list((str,)) + [int, float, bool])
@@ -97,10 +96,10 @@ def is_ecma_regex(regex):
 
     try:
         re.compile(regex)
-    except sre_constants.error as err:
+    except re.error as err:
         raise ValueError(
             f"Given regex {regex} isn't ECMA regex nor Python regex: {err}."
-        )
+        ) from err
     return False
 
 

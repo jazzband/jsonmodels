@@ -1,6 +1,5 @@
 """Builders to generate in memory representation of model and fields tree."""
 
-
 from collections import defaultdict
 
 from . import errors

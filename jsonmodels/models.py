@@ -24,7 +24,6 @@ class JsonmodelMeta(type):
 
 
 class Base(metaclass=JsonmodelMeta):
-
     """Base class for all models."""
 
     def __init__(self, **kwargs):

@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jsonmodels"
-version = "2.7.0"
-description="Models to make easier to deal with structures that are converted to, or read from JSON."
+version = "2.8.0"
+description = "Models to make easier to deal with structures that are converted to, or read from JSON."
 readme = "README.rst"
-requires-python = ">=3.8"
-license = {file = "LICENSE"}
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
 dependencies = ["python-dateutil"]
-classifiers=[
+classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: BSD License",
   "Natural Language :: English",
@@ -22,9 +22,7 @@ classifiers=[
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3 :: Only",
 ]
-authors = [
-  {name = "Szczepan Cieślik", email = "szczepan.cieslik@gmail.com"}
-]
+authors = [{ name = "Szczepan Cieślik", email = "szczepan.cieslik@gmail.com" }]
 
 [project.optional-dependencies]
 dev = [

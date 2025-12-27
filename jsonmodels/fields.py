@@ -13,7 +13,6 @@ NotSet = object()
 
 
 class BaseField:
-
     """Base class for all fields."""
 
     types = None
@@ -142,14 +141,12 @@ class BaseField:
 
 
 class StringField(BaseField):
-
     """String field."""
 
     types = (str,)
 
 
 class IntField(BaseField):
-
     """Integer field."""
 
     types = (int,)
@@ -163,14 +160,12 @@ class IntField(BaseField):
 
 
 class FloatField(BaseField):
-
     """Float field."""
 
     types = (float, int)
 
 
 class BoolField(BaseField):
-
     """Bool field."""
 
     types = (bool,)
@@ -182,14 +177,12 @@ class BoolField(BaseField):
 
 
 class DictField(BaseField):
-
     """Dict field."""
 
     types = (dict,)
 
 
 class ListField(BaseField):
-
     """List field."""
 
     types = (list,)
@@ -300,7 +293,6 @@ class ListField(BaseField):
 
 
 class EmbeddedField(BaseField):
-
     """Field for embedded models."""
 
     def __init__(self, model_types, *args, **kwargs):
@@ -403,7 +395,6 @@ def _import(module_name, type_name):
 
 
 class TimeField(StringField):
-
     """Time field."""
 
     types = (datetime.time,)
@@ -434,7 +425,6 @@ class TimeField(StringField):
 
 
 class DateField(StringField):
-
     """Date field."""
 
     types = (datetime.date,)
@@ -466,7 +456,6 @@ class DateField(StringField):
 
 
 class DateTimeField(StringField):
-
     """Datetime field."""
 
     types = (datetime.datetime,)

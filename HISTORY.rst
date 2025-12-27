@@ -3,6 +3,13 @@
 History
 -------
 
+2.8.0 (2025-12-27)
+++++++++++++++++++
+
+* Removed support for PyPy.
+* Removed support for Python 3.8 and 3.9.
+* Added support for Python 3.13 and 3.14.
+
 2.7.0 (2023-12-17)
 ++++++++++++++++++
 

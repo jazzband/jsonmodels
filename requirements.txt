@@ -15,6 +15,5 @@ pyflakes
 pytest
 pytest-cov
 sphinxcontrib-spelling
-tox
 virtualenv
 wheel

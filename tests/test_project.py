@@ -26,7 +26,7 @@ def test_pep8_and_complexity():
     not tests.LINT or not tests.CHECK_SPELLING, reason="No spelling check."
 )
 def test_docs():
-    run("sphinx-build -b spelling -d docs/_build/doctress " "docs docs/build/spelling")
+    run("sphinx-build -b spelling -d docs/_build/doctress docs docs/build/spelling")
 
 
 def _collect_static(dirs):

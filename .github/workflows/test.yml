@@ -38,8 +38,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -U pip
+          python -m pip install -U build twine
+          pip install .[dev]
 
       - name: Tests
         run: |
@@ -49,6 +50,11 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           name: Python ${{ matrix.python-version }}
+
+      - name: Test build package
+        run: |
+          python -m build
+          twine check dist/*
 
   success:
     needs: test

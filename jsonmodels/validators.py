@@ -1,4 +1,5 @@
 """Predefined validators."""
+
 import re
 from functools import reduce
 
@@ -7,7 +8,6 @@ from .errors import ValidationError
 
 
 class Min:
-
     """Validator for minimum value."""
 
     def __init__(self, minimum_value, exclusive=False):
@@ -41,7 +41,6 @@ class Min:
 
 
 class Max:
-
     """Validator for maximum value."""
 
     def __init__(self, maximum_value, exclusive=False):
@@ -75,7 +74,6 @@ class Max:
 
 
 class Regex:
-
     """Validator for regular expressions."""
 
     FLAGS = {
@@ -134,7 +132,6 @@ class Regex:
 
 
 class Length:
-
     """Validator for length."""
 
     def __init__(self, minimum_value=None, maximum_value=None):
@@ -186,7 +183,6 @@ class Length:
 
 
 class Enum:
-
     """Validator for enums."""
 
     def __init__(self, *choices):

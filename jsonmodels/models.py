@@ -17,10 +17,10 @@ class JsonmodelMeta(type):
         }
         taken_names = set()
         for name, field in fields.items():
-            structue_name = field.structue_name(name)
-            if structue_name in taken_names:
-                raise ValueError("Name taken", structue_name, name)
-            taken_names.add(structue_name)
+            structure_name = field.structure_name(name)
+            if structure_name in taken_names:
+                raise ValueError("Name taken", structure_name, name)
+            taken_names.add(structure_name)
 
 
 class Base(metaclass=JsonmodelMeta):
@@ -83,12 +83,12 @@ class Base(metaclass=JsonmodelMeta):
     def iterate_with_name(cls):
         """Iterate over fields, but also give `structure_name`.
 
-        Format is `(attribute_name, structue_name, field_instance)`.
+        Format is `(attribute_name, structure_name, field_instance)`.
         Structure name is name under which value is seen in structure and
         schema (in primitives) and only there.
         """
         for attr_name, field in cls.iterate_over_fields():
-            structure_name = field.structue_name(attr_name)
+            structure_name = field.structure_name(attr_name)
             yield attr_name, structure_name, field
 
     def to_struct(self):

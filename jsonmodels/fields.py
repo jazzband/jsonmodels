@@ -1,5 +1,6 @@
 import datetime
 import re
+import warnings
 from weakref import WeakKeyDictionary
 
 from dateutil.parser import parse
@@ -95,8 +96,9 @@ class BaseField:
     def _check_types(self):
         if self.types is None:
             raise ValidationError(
-                'Field "{type}" is not usable, try '
-                "different field type.".format(type=type(self).__name__)
+                'Field "{type}" is not usable, try different field type.'.format(
+                    type=type(self).__name__
+                )
             )
 
     def to_struct(self, value):
@@ -136,8 +138,18 @@ class BaseField:
         if not re.match(r"^[A-Za-z_](([\w\-]*)?\w+)?$", self.name):
             raise ValueError("Wrong name", self.name)
 
-    def structue_name(self, default):
+    def structure_name(self, default):
         return self.name if self.name is not None else default
+
+    def structue_name(self, default):
+        """Deprecated alias for structure_name. Will be removed in version 3.0."""
+        warnings.warn(
+            "'structue_name' is a typo and will be removed in version 3.0; "
+            "use 'structure_name' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.structure_name(default)
 
 
 class StringField(BaseField):
@@ -241,8 +253,7 @@ class ListField(BaseField):
 
         if not isinstance(value, self.items_types):
             raise ValidationError(
-                "All items must be instances "
-                'of "{types}", and not "{type}".'.format(
+                'All items must be instances of "{types}", and not "{type}".'.format(
                     types=", ".join([t.__name__ for t in self.items_types]),
                     type=type(value).__name__,
                 )
@@ -275,11 +286,11 @@ class ListField(BaseField):
         super()._finish_initialization(owner)
 
         types = []
-        for type in self.items_types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for type_ in self.items_types:
+            if isinstance(type_, _LazyType):
+                types.append(type_.evaluate(owner))
             else:
-                types.append(type)
+                types.append(type_)
         self.items_types = tuple(types)
 
     def _elem_to_struct(self, value):
@@ -315,11 +326,11 @@ class EmbeddedField(BaseField):
         super()._finish_initialization(owner)
 
         types = []
-        for type in self.types:
-            if isinstance(type, _LazyType):
-                types.append(type.evaluate(owner))
+        for type_ in self.types:
+            if isinstance(type_, _LazyType):
+                types.append(type_.evaluate(owner))
             else:
-                types.append(type)
+                types.append(type_)
         self.types = tuple(types)
 
     def validate(self, value):

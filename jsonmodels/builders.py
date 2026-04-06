@@ -1,5 +1,6 @@
 """Builders to generate in memory representation of model and fields tree."""
 
+import warnings
 from collections import defaultdict
 
 from . import errors
@@ -79,7 +80,15 @@ class ObjectBuilder(Builder):
         module_name = f"{self.type.__module__}.{self.type.__name__}"
         return module_name.replace(".", "_").lower()
 
-    def build_definition(self, add_defintitions=True, nullable=False):
+    def build_definition(self, add_definitions=True, nullable=False, **kwargs):
+        if "add_defintitions" in kwargs:
+            warnings.warn(
+                "The 'add_defintitions' parameter is a typo and will be removed in "
+                "version 3.0; use 'add_definitions' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            add_definitions = kwargs.pop("add_defintitions")
         properties = {
             name: self.maybe_build(value) for name, value in self.properties.items()
         }
@@ -90,7 +99,7 @@ class ObjectBuilder(Builder):
         }
         if self.required:
             schema["required"] = self.required
-        if self.definitions and add_defintitions:
+        if self.definitions and add_definitions:
             schema["definitions"] = {
                 builder.type_name: builder.build_definition(False, False)
                 for builder in self.definitions

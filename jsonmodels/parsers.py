@@ -64,8 +64,8 @@ def _parse_list(field, parent_builder):
     builder = builders.ListBuilder(
         parent_builder, field.nullable, default=field._default
     )
-    for type in field.items_types:
-        builder.add_type_schema(build_json_schema(type, builder))
+    for type_ in field.items_types:
+        builder.add_type_schema(build_json_schema(type_, builder))
     return builder.build()
 
 
@@ -73,8 +73,8 @@ def _parse_embedded(field, parent_builder):
     builder = builders.EmbeddedBuilder(
         parent_builder, field.nullable, default=field._default
     )
-    for type in field.types:
-        builder.add_type_schema(build_json_schema(type, builder))
+    for type_ in field.types:
+        builder.add_type_schema(build_json_schema(type_, builder))
     return builder.build()
 
 
@@ -96,7 +96,7 @@ def _create_primitive_field_schema(field):
         obj_type = "object"
     else:
         raise errors.FieldNotSupported(
-            f"Field {type(field).__class__.__name__} is not supported!"
+            f"Field {type(field).__name__} is not supported!"
         )
 
     if field.nullable:

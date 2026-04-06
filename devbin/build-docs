@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sphinx-build -b spelling -d docs/_build/doctress docs docs/build/spelling

@@ -398,7 +398,7 @@ that can be expressed in json schema if you want to be 100% correct on schema si
 
 * Dealing with schemaless data
 
-(Plese note that using schemaless fields can cause your models to get out of control - especially if
+(Please note that using schemaless fields can cause your models to get out of control - especially if
 you are the one responsible for data schema. On the other hand there is usually the case when incomming
 data are with no schema defined and schemaless fields are the way to go.)
 

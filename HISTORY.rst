@@ -31,7 +31,7 @@ History
 2.5.0 (2021-07-26)
 ++++++++++++++++++
 
-* Improvied error messages for field validation errors.
+* Improvised error messages for field validation errors.
 * Allowed to validate non model list items.
 * Added DictField.
 

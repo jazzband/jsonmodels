@@ -1,0 +1,25 @@
+name: Docs
+
+on: [pull_request]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install enchant and dictionary
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -y install enchant-2 hunspell-en-us
+
+      - name: Install dependencies
+        run: pip install .[dev]
+
+      - name: Build docs
+        run: devbin/build-docs

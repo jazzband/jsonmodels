@@ -5,8 +5,10 @@ explicite
 django
 docstring
 docstrings
+Garimort
 indices
 jsonmodels
+jsonschema
 kwargs
 metaclass
 namedtuple
@@ -16,3 +18,4 @@ szczepan
 regex
 validator
 validators
+virtualenv

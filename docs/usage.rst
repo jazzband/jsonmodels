@@ -249,7 +249,7 @@ is possible to you to operate just on models.
     >>> person = Person()
     >>> schema = person.to_json_schema()
 
-And thats it! You can serve then this schema through your API or use it for
+And that's it! You can serve then this schema through your API or use it for
 validation incoming data.
 
 Different names in structure and objects

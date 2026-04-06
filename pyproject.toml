@@ -32,13 +32,8 @@ dev = [
   "Sphinx",
   "coverage",
   "docutils",
-  "flake8",
-  "flake8-pyproject",
   "invoke",
   "isort",
-  "mccabe",
-  "pep8",
-  "pyflakes",
   "pytest",
   "pytest-cov",
   "sphinxcontrib-spelling",
@@ -46,11 +41,6 @@ dev = [
 
 [project.urls]
 "Home" = "https://github.com/jazzband/jsonmodels"
-
-[tool.flake8]
-exclude = ["./docs/conf.py"]
-max-complexity = 8
-max_line_length = 88
 
 [tool.isort]
 profile = "black"
